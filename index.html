@@ -405,24 +405,6 @@
     }
     .persona-row:last-child { border-bottom: none; }
 
-    /* ── API LOADED PILL ────────────────────────────────────────── */
-    .api-loaded-pill {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 0.55rem 0.875rem;
-      background: rgba(5,150,105,0.08);
-      border: 1.5px solid rgba(5,150,105,0.25);
-      border-radius: 0.625rem;
-    }
-    .api-dot {
-      width: 7px; height: 7px;
-      background: #34d399;
-      border-radius: 50%;
-      box-shadow: 0 0 8px #34d399;
-      flex-shrink: 0;
-    }
-
     /* ── PANEL HEADER ───────────────────────────────────────────── */
     .panel-title {
       font-family: 'Fraunces', serif;
@@ -435,7 +417,7 @@
 </head>
 
 <body>
-<div style="max-width:1380px; margin:0 auto; padding:1.5rem 1.25rem 5rem; position:relative; z-index:1;">
+<div style="max-width:1380px; margin:0 auto; padding:1.5rem 1.25rem 2rem; position:relative; z-index:1;">
 
   <!-- ═══ HEADER ══════════════════════════════════════════════════ -->
   <header style="text-align:center; padding:2rem 0 2.75rem; position:relative;">
@@ -468,7 +450,7 @@
   </header>
 
   <!-- ═══ MAIN GRID ════════════════════════════════════════════════ -->
-  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(360px,1fr)); gap:1.5rem; margin-bottom:1.5rem;">
+  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(360px,1fr)); gap:1.5rem; margin-bottom:1.5rem; align-items:start;">
 
     <!-- ─── EL LABORATORIO ALQUIMISTA ─────────────────────────────── -->
     <div class="panel-card" style="padding:1.75rem; display:flex; flex-direction:column; gap:1.25rem;">
@@ -483,8 +465,6 @@
         </div>
         <span class="section-eyebrow" style="padding-left:23px;">Diseñá tu pupusa · Conquistá el mercado</span>
       </div>
-
-      <!-- API key is managed server-side via ANTHROPIC_API_KEY env var -->
 
       <!-- MASAS -->
       <div class="section-card">
