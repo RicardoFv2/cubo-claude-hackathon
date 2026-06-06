@@ -484,15 +484,7 @@
         <span class="section-eyebrow" style="padding-left:23px;">Diseñá tu pupusa · Conquistá el mercado</span>
       </div>
 
-      <!-- API Key -->
-      <div id="api-key-container">
-        <label class="field-label" for="api-key">API Key — Anthropic</label>
-        <input id="api-key" type="password" class="field" placeholder="sk-ant-api03-…" autocomplete="off" style="margin-bottom:0.5rem;" />
-        <label style="display:flex; align-items:center; gap:7px; font-size:0.7rem; color:var(--text-muted); cursor:pointer; user-select:none;">
-          <input type="checkbox" id="remember-key" class="cb" />
-          <span>Recordar en esta pestaña (Session Storage)</span>
-        </label>
-      </div>
+      <!-- API key is managed server-side via ANTHROPIC_API_KEY env var -->
 
       <!-- MASAS -->
       <div class="section-card">
@@ -864,9 +856,7 @@
 </div>
 
 <script type="module">
-  import Anthropic from 'https://esm.sh/@anthropic-ai/sdk@0.52.0';
-
-  const CONFIG = { apiKey: '' };
+  // API key lives in ANTHROPIC_API_KEY on the server — /api/evaluate proxies all calls.
 
   // ── PERSONAS ─────────────────────────────────────────────────────
   const PERSONAS = [
@@ -1216,65 +1206,6 @@ Evaluá la propuesta. Respondé SOLO con el JSON. Nada más.`;
   }
 
   // ── SECURE CONFIG SYNC & AUTO-LOADER ─────────────────────────────
-  const apiKeyInput  = document.getElementById('api-key');
-  const rememberKeyEl = document.getElementById('remember-key');
-
-  apiKeyInput.addEventListener('input', (e) => {
-    CONFIG.apiKey = e.target.value.trim();
-    if (rememberKeyEl.checked) {
-      CONFIG.apiKey ? sessionStorage.setItem('ANTHROPIC_API_KEY', CONFIG.apiKey)
-                    : sessionStorage.removeItem('ANTHROPIC_API_KEY');
-    }
-  });
-
-  rememberKeyEl.addEventListener('change', (e) => {
-    if (e.target.checked) {
-      if (CONFIG.apiKey) sessionStorage.setItem('ANTHROPIC_API_KEY', CONFIG.apiKey);
-    } else {
-      sessionStorage.removeItem('ANTHROPIC_API_KEY');
-    }
-  });
-
-  async function initializeConfig() {
-    const showLoadedUI = () => {
-      const container = document.getElementById('api-key-container');
-      if (container) {
-        container.innerHTML = `
-          <div>
-            <label class="field-label" style="margin-bottom:0.5rem;">API Key — Anthropic</label>
-            <div class="api-loaded-pill">
-              <span class="api-dot"></span>
-              <span style="font-family:'IBM Plex Mono',monospace; font-size:0.65rem; color:#34d399; letter-spacing:0.08em; font-weight:600;">CARGADA LOCALMENTE</span>
-            </div>
-          </div>`;
-      }
-    };
-
-    const cachedKey = sessionStorage.getItem('ANTHROPIC_API_KEY');
-    if (cachedKey && /^sk-ant-api\d{2}-[A-Za-z0-9\-_]{80,}$/.test(cachedKey.trim())) {
-      CONFIG.apiKey = cachedKey.trim();
-      apiKeyInput.value = CONFIG.apiKey;
-      rememberKeyEl.checked = true;
-      showLoadedUI();
-      appendLog('Clave API cargada desde almacenamiento de sesión.', 'success');
-      return;
-    }
-
-    try {
-      const resp = await fetch('./config.local.json');
-      if (resp.ok) {
-        const data = await resp.json();
-        const key = data.apiKey || data.ANTHROPIC_API_KEY;
-        if (key && /^sk-ant-api\d{2}-[A-Za-z0-9\-_]{80,}$/.test(key.trim())) {
-          CONFIG.apiKey = key.trim();
-          apiKeyInput.value = CONFIG.apiKey;
-          showLoadedUI();
-          appendLog('Clave API cargada desde config.local.json.', 'success');
-        }
-      }
-    } catch (_) { /* silent */ }
-  }
-
   // ── CONCURRENCY HELPER ────────────────────────────────────────────
   async function runWithConcurrencyLimit(tasks, limit) {
     const results = [];
@@ -1292,10 +1223,6 @@ Evaluá la propuesta. Respondé SOLO con el JSON. Nada más.`;
 
   // ── MAIN PIPELINE ─────────────────────────────────────────────────
   async function run() {
-    const apiInputEl = document.getElementById('api-key');
-    if (apiInputEl) CONFIG.apiKey = apiInputEl.value.trim();
-    if (!CONFIG.apiKey) { alert('Ingresá tu Anthropic API key para continuar.'); return; }
-
     const masaEl = document.querySelector('input[name="masa"]:checked');
     const masa = masaEl ? masaEl.value : 'Tradicional (Maíz)';
     const proteins  = [...document.querySelectorAll('input.protein-cb:checked')].map(el => el.value);
@@ -1330,8 +1257,6 @@ Evaluá la propuesta. Respondé SOLO con el JSON. Nada más.`;
     logEl.innerHTML = ''; logEl.style.display = 'none';
     document.getElementById('results').style.display = 'none';
 
-    const client = new Anthropic({ apiKey: CONFIG.apiKey, dangerouslyAllowBrowser: true });
-
     const displayRecipe = [
       fillings,
       upgrades.length ? upgrades.join(', ') : '',
@@ -1344,13 +1269,17 @@ Evaluá la propuesta. Respondé SOLO con el JSON. Nada más.`;
     const tasks = PERSONAS.map(p => async () => {
       appendLog(`[${p.region}] Consultando a ${p.name.split('"')[0].trim() || p.name.split(' ')[0]}…`, 'wait');
       try {
-        const resp = await client.messages.create({
-          model: 'claude-sonnet-4-6',
-          max_tokens: 300,
-          system: buildSystem(p),
-          messages: [{ role:'user', content:userMsg }],
+        const res = await fetch('/api/evaluate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            system: buildSystem(p),
+            messages: [{ role: 'user', content: userMsg }],
+          }),
         });
-        const raw = resp.content?.[0]?.text ?? '';
+        if (!res.ok) throw new Error(`Error del servidor: ${res.status}`);
+        const data = await res.json();
+        const raw = data.text ?? '';
         const parsed = safeparse(raw, p);
         appendLog(`[${p.region}] ${parsed.score}/100 — ${parsed.accepted ? 'APROBADO' : 'RECHAZADO'}`, parsed.accepted ? 'success' : 'error');
         return parsed;
@@ -1405,7 +1334,6 @@ Evaluá la propuesta. Respondé SOLO con el JSON. Nada más.`;
   // ── BOOT ──────────────────────────────────────────────────────────
   document.getElementById('run-btn').addEventListener('click', run);
   renderPersonas();
-  initializeConfig();
 </script>
 </body>
 </html>
