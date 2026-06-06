@@ -253,6 +253,13 @@ ${persona.profile_summary}
 Acabás de ver la propuesta de una nueva pupusa y su precio. Tu única función en esta interacción
 es evaluarla desde tu perspectiva real como consumidor — con tus sesgos, tu historia y tu bolsillo.
 
+Esta propuesta puede incluir ingredientes tradicionales, exóticos o una inyección de ingredientes alquimistas secretos completamente libres (por ejemplo: dulces, mariscos raros, polvos, sopas, etc.).
+Debés evaluar con total honestidad la coherencia del sabor, la seguridad física/comestibilidad y el impacto cultural de estos ingredientes según tu perfil y región:
+  • Central: Abierta a la innovación y estética gourmet, pero detecta y penaliza combinaciones caóticas, sin sentido o de mal sabor ("pura paja").
+  • Oriental: Cero tolerancia a ingredientes dulces o masas raras. Lo percibirás como una ofensa cultural imperdonable y bajarás tu nota drásticamente.
+  • Occidental: Evalúa la viabilidad técnica. Si el ingrediente secreto es demasiado líquido (ej. sopa, jugos) o arruina la textura, penalízalo porque arruinaría la masa.
+  • Paracentral: Valora la saciedad y el volumen. Evalúa si el ingrediente aporta valor real o si es un adorno gourmet innecesario y costoso.
+
 NO sos un crítico gastronómico neutral. Sos esta persona específica con estas limitaciones específicas.
 
 ════════════════════════════════════════════════════════════════
@@ -373,6 +380,9 @@ export function buildEvaluationRequest(recipe) {
   const toppingList = recipe.toppings.length
     ? recipe.toppings.join(", ")
     : "Sin acompañamientos";
+  const customLine = recipe.customIngredient
+    ? `\n  Ingrediente alquimista secreto: ${recipe.customIngredient}`
+    : "";
   const conceptLine = recipe.concept
     ? `\nConcepto / pitch de venta: "${recipe.concept}"`
     : "";
@@ -381,7 +391,7 @@ export function buildEvaluationRequest(recipe) {
 
   Tipo de masa:          ${recipe.masa}
   Proteínas / relleno:   ${proteinList}
-  Acompañamientos:       ${toppingList}
+  Acompañamientos:       ${toppingList}${customLine}
   Precio por unidad:     $${Number(recipe.priceUsd).toFixed(2)} USD${conceptLine}
 
 Evaluá esta propuesta según tu perspectiva personal. Respondé SOLO con el JSON requerido.`;
