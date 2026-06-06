@@ -1,0 +1,16 @@
+# Vercel Deployment Ignore Configuration
+# Exclude database source files and initialization scripts
+data/
+
+# Exclude local configs and environment secrets
+config.local.json
+.env
+.env.*
+secrets.json
+
+# Exclude IDE configurations and Git metadata
+.git/
+.gitignore
+.claude/
+mcp.json
+*.md
