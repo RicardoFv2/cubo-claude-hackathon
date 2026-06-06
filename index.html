@@ -527,6 +527,40 @@
       animation: pulse-center 3s ease-in-out infinite;
     }
 
+    /* ── CUSTOM CHIP INPUT ROW ──────────────────────────────── */
+    .custom-chip-row {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border-subtle);
+    }
+    .custom-chip-input {
+      flex: 1;
+      min-height: 34px !important;
+      padding: 0.4rem 0.75rem !important;
+      font-size: 0.75rem !important;
+    }
+    .add-chip-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px; height: 34px;
+      flex-shrink: 0;
+      border-radius: 0.5rem;
+      border: 1.5px solid var(--border);
+      background: var(--surface);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .add-chip-btn:hover {
+      border-color: var(--amber);
+      color: var(--amber);
+      background: rgba(217,119,6,0.07);
+    }
+
     @media (prefers-reduced-motion: reduce) {
       body::after, header::after, .hr-comal, .log-cursor {
         animation: none !important;
@@ -652,6 +686,12 @@
             <label for="masa-azul" class="chip-label"><span class="masa-dot" style="background:#1d4ed8;"></span>Maíz Azul</label>
           </div>
         </div>
+        <div class="custom-chip-row">
+          <input type="text" class="field custom-chip-input" placeholder="Otra masa…" aria-label="Agregar masa personalizada" />
+          <button class="add-chip-btn" data-type="masa" aria-label="Agregar masa">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+          </button>
+        </div>
       </div>
 
       <!-- RELLENOS -->
@@ -739,6 +779,12 @@
             <label for="prot-molida" class="chip-label">Carne Molida</label>
           </div>
         </div>
+        <div class="custom-chip-row">
+          <input type="text" class="field custom-chip-input" placeholder="Otro relleno…" aria-label="Agregar relleno personalizado" />
+          <button class="add-chip-btn" data-type="protein" aria-label="Agregar relleno">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+          </button>
+        </div>
       </div>
 
       <!-- QUESOS -->
@@ -789,6 +835,12 @@
             <input type="checkbox" class="chip-input cheese-cb" value="Requesón" id="cheese-requeson" />
             <label for="cheese-requeson" class="chip-label">Requesón</label>
           </div>
+        </div>
+        <div class="custom-chip-row">
+          <input type="text" class="field custom-chip-input" placeholder="Otro queso o grasa…" aria-label="Agregar queso personalizado" />
+          <button class="add-chip-btn" data-type="cheese" aria-label="Agregar queso">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+          </button>
         </div>
       </div>
 
@@ -864,6 +916,12 @@
             <input type="checkbox" class="chip-input upgrade-cb" value="Cilantro y Cebolla Morada" id="upg-cilantro" />
             <label for="upg-cilantro" class="chip-label">Cilantro y Cebolla</label>
           </div>
+        </div>
+        <div class="custom-chip-row">
+          <input type="text" class="field custom-chip-input" placeholder="Otra mejora…" aria-label="Agregar mejora personalizada" />
+          <button class="add-chip-btn" data-type="upgrade" aria-label="Agregar mejora">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+          </button>
         </div>
       </div>
 
@@ -1439,9 +1497,67 @@ Evaluá la propuesta. Respondé SOLO con el JSON. Nada más.`;
 
   syncThemeIcon();
 
+  // ── CUSTOM CHIP INPUTS ───────────────────────────────────────────
+  function initCustomChipInputs() {
+    document.querySelectorAll('.add-chip-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const input = btn.previousElementSibling;
+        if (!input) return;
+        const val = input.value.trim();
+        if (!val) return;
+
+        const type = btn.dataset.type;
+        const grid = btn.closest('.section-card').querySelector('.chip-grid');
+        if (!grid) return;
+
+        const uid = `cust-${type}-${Date.now()}`;
+        const isRadio = type === 'masa';
+        const cls = {
+          masa:    'chip-input',
+          protein: 'chip-input protein-cb',
+          cheese:  'chip-input cheese-cb',
+          upgrade: 'chip-input upgrade-cb',
+        }[type] || 'chip-input';
+
+        const chipInput = document.createElement('input');
+        chipInput.type = isRadio ? 'radio' : 'checkbox';
+        if (isRadio) chipInput.name = 'masa';
+        chipInput.value = val;
+        chipInput.id = uid;
+        chipInput.className = cls;
+        chipInput.checked = true;
+
+        const label = document.createElement('label');
+        label.htmlFor = uid;
+        label.className = 'chip-label';
+        label.textContent = val;
+
+        const opt = document.createElement('div');
+        opt.className = 'chip-option';
+        opt.appendChild(chipInput);
+        opt.appendChild(label);
+        grid.appendChild(opt);
+
+        input.value = '';
+        input.focus();
+      });
+    });
+
+    document.querySelectorAll('.custom-chip-input').forEach(input => {
+      input.addEventListener('keydown', e => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          const btn = input.nextElementSibling;
+          if (btn) btn.click();
+        }
+      });
+    });
+  }
+
   // ── BOOT ──────────────────────────────────────────────────────────
   document.getElementById('run-btn').addEventListener('click', run);
   renderPersonas();
+  initCustomChipInputs();
 </script>
 </body>
 </html>
