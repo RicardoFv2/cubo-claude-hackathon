@@ -4,7 +4,9 @@
 -- ==============================================================================
 
 -- 1. Create table structure
-CREATE TABLE IF NOT EXISTS dataset_nemotron_completo (
+DROP TABLE IF EXISTS dataset_nemotron_completo;
+
+CREATE TABLE dataset_nemotron_completo (
     id                  TEXT PRIMARY KEY,
     name                TEXT NOT NULL,
     age                 INTEGER NOT NULL,
@@ -27,68 +29,55 @@ CREATE INDEX IF NOT EXISTS idx_region_income
 CREATE INDEX IF NOT EXISTS idx_age
     ON dataset_nemotron_completo (age);
 
--- 3. Seed data matching demographic macro-regions
+-- 3. Seed data matching demographic macro-regions (40 distinct personas)
 INSERT OR IGNORE INTO dataset_nemotron_completo (
     id, name, age, gender, department, municipality, region, 
     occupation, education, monthly_income_usd, ocean_openness, ocean_neuroticism, profile_summary
 ) VALUES 
-(
-    'NES-ORI-001',
-    'José "Don Chepe" Amaya Portillo',
-    54,
-    'Masculino',
-    'San Miguel',
-    'San Miguel',
-    'Oriental',
-    'Vendedor de mercado / Agricultor de temporada',
-    'Bachillerato incompleto',
-    365.00,
-    42,
-    61,
-    'Don Chepe es un vendedor de mediana edad oriundo del mercado central de San Miguel. Administra un puesto de granos básicos heredado de su padre y complementa ingresos con trabajo agrícola estacional en cultivos de maíz y frijol. Altamente sensible al precio — cualquier alza de más del 5% en un producto básico lo hace cambiar de proveedor de inmediato. Usa expresiones propias del oriente: "bróder", "qué chilero", "no me jale". Desconfía de marcas nuevas y prioriza la relación personal con los vendedores de confianza. Compra pupusas en el mercado 4-5 veces por semana como almuerzo de trabajo; su precio tope es $0.50 por unidad.'
-),
-(
-    'NES-CEN-002',
-    'Nayely Guadalupe Hernández Rivas',
-    29,
-    'Femenino',
-    'San Salvador',
-    'San Salvador',
-    'Central',
-    'Asistente administrativa en empresa de logística',
-    'Técnico universitario en Administración de Empresas',
-    850.00,
-    73,
-    38,
-    'Nayely es una profesional joven que vive en la colonia Escalón y trabaja en zona Rosa. Representa al consumidor urbano aspiracional del Gran San Salvador: está dispuesta a pagar precios premium si el producto tiene buena presentación, historia detrás o valor diferencial claro. Frecuenta pupuserías de la Zona Rosa y el food court de Multiplaza. Acepta pupusas gourmet a $2.00-$2.50 si incluyen ingredientes especiales como loroco importado o queso de cabra. Usa lenguaje neutro capitalino con ocasionales anglicismos. Valora la limpieza, el empaque y la experiencia del lugar tanto como el sabor.'
-),
-(
-    'NES-OCC-003',
-    'Carlos Ernesto Molina Gutiérrez',
-    41,
-    'Masculino',
-    'Santa Ana',
-    'Santa Ana',
-    'Occidental',
-    'Supervisor de producción en fábrica textil',
-    'Bachillerato técnico vocacional',
-    520.00,
-    55,
-    47,
-    'Carlos trabaja en el corredor industrial de Santa Ana y representa al consumidor obrero-formal de la zona occidental. Con una familia de cuatro personas, gestiona el presupuesto familiar con disciplina y compara precios antes de cada compra significativa. Acepta variaciones de precio de hasta 15% antes de reconsiderar una compra habitual. Compra pupusas como cena familiar los fines de semana; prefiere paquetes de 6 o más unidades a precio de mayoreo. Usa expresiones del occidente como "cipote", "está bien chivo" o "no se puede". Tiene lealtad moderada a marcas locales reconocidas y desconfía de productos sin procedencia clara.'
-),
-(
-    'NES-PAR-004',
-    'María Concepción "Conchita" Velásquez Torres',
-    36,
-    'Femenino',
-    'La Paz',
-    'Zacatecoluca',
-    'Paracentral',
-    'Maestra de educación primaria / Pupusera los fines de semana',
-    'Licenciatura en Ciencias de la Educación',
-    680.00,
-    68,
-    44,
-    'Conchita combina su rol de docente con la venta de pupusas artesanales los sábados en el parque central de Zacatecoluca, lo que le da una perspectiva única: es simultáneamente productora y consumidora frecuente del mercado pupusero. Conoce los costos de producción por dentro y tiene un umbral de precio justo muy calibrado — detecta inmediatamente si una pupusa está sobrevaluada respecto a sus ingredientes. Región Paracentral mezcla influencias del habla capitalina con giros rurales: dice "chivo", "bien hecho" y usa diminutivos afectivos. Acepta precios de $0.75 a $1.25 por pupusa si la calidad de la masa y el relleno lo justifican.'
-);
+-- Central Region
+('NES-CEN-001', 'Nayely Guadalupe Hernández Rivas', 29, 'Femenino', 'San Salvador', 'San Salvador', 'Central', 'Asistente administrativa en empresa de logística', 'Técnico universitario en Administración de Empresas', 850.00, 73, 38, 'Nayely vive en la colonia Escalón y trabaja en la Zona Rosa. Representa al consumidor urbano aspiracional: dispuesta a pagar precios premium por productos con buena presentación e ingredientes gourmet. Acepta precios de $2.00-$2.50. Valora la experiencia y la higiene.'),
+('NES-CEN-002', 'Rodrigo José Castillo Vega', 24, 'Masculino', 'San Salvador', 'Antiguo Cuscatlán', 'Central', 'Desarrollador junior / Freelancer', 'Técnico en Ingeniería de Sistemas', 950.00, 80, 45, 'Rodrigo es un joven tecnológico que trabaja desde cafés y tiene alta apertura a tendencias internacionales. Le gustan las fusiones exóticas (pupusas de birria o tocino) y paga premium si se puede pedir por app. Critica si percibe falta de innovación.'),
+('NES-CEN-003', 'Héctor Manuel Flores Ortiz', 47, 'Masculino', 'San Salvador', 'Soyapango', 'Central', 'Motorista de reparto', 'Bachillerato general', 480.00, 40, 55, 'Héctor trabaja todo el día manejando en el tráfico de San Salvador. Almuerza en comedores populares y busca comidas pesadas de bajo precio. Sensible al costo, su límite es de $1.00 por pupusa. Prefiere sabores tradicionales abundantes.'),
+('NES-CEN-004', 'Sofía Abigail Martínez Paz', 31, 'Femenino', 'San Salvador', 'Santa Tecla', 'Central', 'Diseñadora gráfica independiente', 'Licenciatura en Diseño Gráfico', 750.00, 65, 50, 'Sofía valora la estética y busca opciones vegetarianas (espinaca, ajo rostizado, hongos). Visita mercaditos orgánicos y prefiere pupuserías con ambiente artístico. Dispuesta a pagar hasta $2.00 por conceptos bien elaborados.'),
+('NES-CEN-005', 'Gerson Alexis Cruz Torres', 35, 'Masculino', 'San Salvador', 'Ilopango', 'Central', 'Técnico electromecánico', 'Bachillerato técnico', 550.00, 48, 42, 'Gerson valora la consistencia y el precio justo. Compra pupusas los viernes al salir del taller en Soyapango. Prefiere pupusas revueltas tradicionales y no le agradan las innovaciones pretenciosas con porciones pequeñas.'),
+('NES-CEN-006', 'Sandra Elizabeth Ruiz Gómez', 42, 'Femenino', 'San Salvador', 'Mejicanos', 'Central', 'Cajera de supermercado', 'Bachillerato general', 420.00, 35, 60, 'Sandra administra estrictamente el presupuesto familiar. Considera que las pupusas gourmet de $2.00 son "pura paja". Paga un límite de $0.75 y prefiere comprar en pupuserías locales tradicionales de su colonia.'),
+('NES-CEN-007', 'Josué David Alvarenga Peña', 20, 'Masculino', 'San Salvador', 'San Salvador', 'Central', 'Estudiante universitario / Call Center', 'Estudiante de tercer año de Comunicaciones', 365.00, 70, 30, 'Josué trabaja a tiempo parcial y tiene un presupuesto limitado, pero le gusta probar cosas nuevas con sus amigos de la universidad. Busca ofertas, promociones en redes sociales y valora que el lugar sea "instagrammeable".'),
+('NES-CEN-008', 'Patricia Leonor Quintanilla', 56, 'Femenino', 'La Libertad', 'Colón', 'Central', 'Costurera independiente', 'Educación básica completa', 380.00, 30, 58, 'Patricia trabaja desde su casa cosiendo ropa. Su presupuesto es limitado y prefiere preparar comida en casa. Considera comer fuera como un lujo ocasional; solo compra pupusas tradicionales si están bajo el precio de $0.75.'),
+('NES-CEN-009', 'Mauricio Edgardo Zelaya', 50, 'Masculino', 'San Salvador', 'Antiguo Cuscatlán', 'Central', 'Gerente de sucursal bancaria', 'Licenciatura en Economía', 1200.00, 58, 40, 'Mauricio busca calidad, higiene y buen servicio sin importar el precio. Prefiere pupuserías formales y ejecutivas. Compra pupusas gourmet para reuniones familiares y tolera precios de hasta $3.00 si la calidad lo respalda.'),
+('NES-CEN-010', 'Valeria Estefanía Pinto', 27, 'Femenino', 'San Salvador', 'San Salvador', 'Central', 'Enfermera graduada', 'Licenciatura en Enfermería', 680.00, 75, 49, 'Valeria tiene turnos rotativos en un hospital público. Busca comida rápida y nutritiva por las noches. Valora ingredientes frescos y ligeros (como masa de arroz o espinaca con loroco) y tolera precios de $1.25 a $1.75.'),
+
+-- Oriental Region
+('NES-ORI-001', 'José "Don Chepe" Amaya Portillo', 54, 'Masculino', 'San Miguel', 'San Miguel', 'Oriental', 'Vendedor de mercado / Agricultor de temporada', 'Bachillerato incompleto', 365.00, 42, 61, 'Don Chepe es vendedor en el mercado central de San Miguel. Altamente sensible al precio: su límite es de $0.50 por pupusa. Rechaza masas raras o ingredientes extravagantes como ofensa a la tradición migueleña.'),
+('NES-ORI-002', 'María Santos Benítez Melgar', 48, 'Femenino', 'Usulután', 'Jiquilisco', 'Oriental', 'Vendedora informal de minutas y golosinas', 'Educación básica incompleta', 280.00, 35, 65, 'María vive en una zona rural de Usulután. Su economía es de subsistencia. Compra pupusas solo para celebrar cumpleaños o fechas especiales. Paga máximo $0.50 y rechaza cualquier ingrediente exótico.'),
+('NES-ORI-003', 'Wilmer Alexander Rivas Ortiz', 23, 'Masculino', 'La Unión', 'Conchagua', 'Oriental', 'Pescador artesanal / Guía turístico ocasional', 'Bachillerato general', 350.00, 50, 40, 'Wilmer vive en el puerto de La Unión. Come mariscos a diario por su trabajo, pero prefiere pupusas tradicionales de queso o chicharrón. Sensible al precio, busca comer barato en puestos de la playa.'),
+('NES-ORI-004', 'Blanca Lilian Portillo', 38, 'Femenino', 'Morazán', 'San Francisco Gotera', 'Oriental', 'Promotora de salud comunitaria', 'Técnico en Enfermería', 450.00, 45, 52, 'Blanca viaja por cantones rurales de Morazán. Prefiere la comida casera e higiénica. Paga hasta $0.75 por pupusa y valora los ingredientes locales frescos como el loroco y el quesillo tradicional.'),
+('NES-ORI-005', 'Kevin Josué Lazo Guevara', 26, 'Masculino', 'San Miguel', 'El Tránsito', 'Oriental', 'Ayudante de mecánica automotriz', 'Educación básica completa', 380.00, 55, 48, 'Kevin trabaja en un taller en San Miguel. Come pupusas casi todas las noches por comodidad. Prefiere pupusas grande de chicharrón con mucho curtido y salsa picante. Su presupuesto límite es de $0.75 por unidad.'),
+('NES-ORI-006', 'Gladys Ondina Majano', 62, 'Femenino', 'San Miguel', 'San Miguel', 'Oriental', 'Ama de casa / Dependiente de remesas', 'Educación básica incompleta', 320.00, 25, 70, 'Gladys recibe una remesa mensual de su hijo en EE.UU. Es muy tradicional y religiosa. Detesta que le pongan cosas raras a la comida típica y añora el sabor de las pupusas cocinadas en leña de antes.'),
+('NES-ORI-007', 'Marvin Geovanny Salmerón', 32, 'Masculino', 'La Unión', 'La Unión', 'Oriental', 'Electricista independiente', 'Técnico vocacional', 580.00, 60, 44, 'Marvin realiza instalaciones eléctricas residenciales. Tiene ingresos estables y busca comida de buen sabor al final de su jornada. Acepta pagar hasta $1.00 por pupusas de camarón o pollo si están bien rellenas.'),
+('NES-ORI-008', 'Irma Yolanda Carballo', 45, 'Femenino', 'Usulután', 'Santiago de María', 'Oriental', 'Empleada doméstica', 'Educación básica completa', 410.00, 38, 57, 'Irma trabaja en casas particulares. Es muy económica y cuida el dinero para sus tres hijos. Compra pupusas como cena rápida los fines de semana en la pupusería de la esquina. Su precio máximo es de $0.75.'),
+('NES-ORI-009', 'Nelson Enrique Canales', 58, 'Masculino', 'Morazán', 'Cacaopera', 'Oriental', 'Agricultor de maíz y frijol', 'Sin educación formal', 300.00, 30, 62, 'Nelson cultiva su propia tierra. Considera que pagar más de $0.50 por una pupusa es ridículo porque él conoce el costo de los granos. Absolutamente tradicionalista; rechaza cualquier masa de color o sabor dulce.'),
+('NES-ORI-010', 'Xiomara Claribel Romero', 30, 'Femenino', 'San Miguel', 'San Miguel', 'Oriental', 'Secretaria en juzgado civil', 'Técnico en Secretariado', 650.00, 65, 47, 'Xiomara busca opciones limpias y formales en la ciudad de San Miguel. Prefiere pupusas de arroz con loroco. Acepta precios de hasta $1.25 por pupusa si el local cuenta con aire acondicionado y buen servicio.'),
+
+-- Occidental Region
+('NES-OCC-001', 'Carlos Ernesto Molina Gutiérrez', 41, 'Masculino', 'Santa Ana', 'Santa Ana', 'Occidental', 'Supervisor de producción en fábrica textil', 'Bachillerato técnico vocacional', 520.00, 55, 47, 'Carlos trabaja en la zona industrial de Santa Ana. Evalúa con rigor la consistencia y grosor de la masa antes que el relleno. Acepta variaciones de precio de hasta 15% antes de quejarse. Paga hasta $1.00.'),
+('NES-OCC-002', 'Silvia Elena Arana Toledo', 33, 'Femenino', 'Sonsonate', 'Izalco', 'Occidental', 'Artesana de alfarería / Vendedora de mercado', 'Bachillerato general', 450.00, 60, 50, 'Silvia vende artesanías de barro en Izalco. Prefiere pupusas de yuca o maíz tradicional bien tostadas. Valora la textura crujiente de la masa y castiga si las pupusas quedan grasosas o con la masa cruda.'),
+('NES-OCC-003', 'Jorge Alberto Escobar', 25, 'Masculino', 'Ahuachapán', 'Ahuachapán', 'Occidental', 'Guía de turismo en fincas de café', 'Bachillerato general', 365.00, 58, 42, 'Jorge guía a turistas extranjeros en la Ruta de las Flores. Prefiere pupusas tradicionales pero tolera ingredientes locales como ajo o jalapeño. Su presupuesto es ajustado y prefiere comer barato ($0.60 por unidad).'),
+('NES-OCC-004', 'Ana María Flores Lemus', 52, 'Femenino', 'Santa Ana', 'Chalchuapa', 'Occidental', 'Panificadora artesanal', 'Educación básica completa', 380.00, 32, 63, 'Ana posee un horno artesanal de pan de dulce en Chalchuapa. Conoce las texturas de la masa perfectamente. Exige masa suave y bien cocinada; penaliza con dureza si la masa se deshace. Su precio tope es de $0.75.'),
+('NES-OCC-005', 'Marlon Castaneda', 28, 'Masculino', 'Sonsonate', 'Sonsonate', 'Occidental', 'Despachador de aduanas marítimas', 'Estudios aduaneros', 490.00, 52, 46, 'Marlon trabaja bajo presión en el puerto de Acajutla. Busca cenar abundante después del trabajo. Prefiere pupusas revueltas tradicionales en masa de maíz. Acepta precios de hasta $1.00 si el tamaño es generoso.'),
+('NES-OCC-006', 'Teresa de Jesús Calderón', 60, 'Femenino', 'Ahuachapán', 'Ataco', 'Occidental', 'Tejedora de telares de pedal', 'Educación básica incompleta', 340.00, 28, 68, 'Teresa teje mantas coloridas en Ataco. Es muy tradicional y cuida cada centavo. Prefiere comer en su casa y considera que las pupuserías turísticas cobran demasiado caro por comida que no tiene la cocción tradicional.'),
+('NES-OCC-007', 'Walter Alexander Menjívar', 36, 'Masculino', 'Santa Ana', 'Metapán', 'Occidental', 'Operador de horno en planta de cemento', 'Bachillerato técnico', 680.00, 47, 40, 'Walter tiene un trabajo físicamente exigente. Come pupusas tres veces por semana en Metapán. Prefiere pupusas de maíz con bastante chicharrón para llenarse. Tolera precios de hasta $1.25 si están bien rellenas.'),
+('NES-OCC-008', 'Evelyn Vanessa Rivera', 30, 'Femenino', 'Santa Ana', 'Santa Ana', 'Occidental', 'Agente de ventas inmobiliarias', 'Licenciatura en Mercadeo', 600.00, 67, 45, 'Evelyn trabaja mostrando propiedades en Santa Ana. Valora la presentación del platillo y prefiere ingredientes limpios y ligeros. Acepta masas alternativas como arroz o espinaca y tolera precios de hasta $1.50.'),
+('NES-OCC-009', 'René Alonso Figueroa', 46, 'Masculino', 'Sonsonate', 'Acajutla', 'Occidental', 'Estibador portuario', 'Educación básica completa', 550.00, 42, 52, 'René descarga barcos cargueros en Acajutla. Necesita mucha energía y busca comida de gran volumen a bajo precio. Detesta las pupusas pequeñas con rellenos exóticos; prefiere las revueltas tradicionales a $0.75.'),
+('NES-OCC-010', 'Carmen Estela Solís', 44, 'Femenino', 'Ahuachapán', 'El Refugio', 'Occidental', 'Cocinera de comedor escolar público', 'Educación básica completa', 400.00, 38, 59, 'Carmen cocina almuerzos escolares a diario. Tiene estándares altos de sazón e higiene y juzga críticamente el sabor y sellado de la masa. Paga máximo $0.75 por pupusas de maíz tradicionales bien hechas.'),
+
+-- Paracentral Region
+('NES-PAR-001', 'María Concepción Velásquez Torres', 36, 'Femenino', 'La Paz', 'Zacatecoluca', 'Paracentral', 'Maestra de educación primaria / Pupusera los fines de semana', 'Licenciatura en Ciencias de la Educación', 680.00, 68, 44, 'Conchita produce y consume pupusas. Conoce al detalle los costos de materia prima. Acepta de $0.75 a $1.25 si la calidad lo amerita, pero detecta la sobrevaloración al instante. Exige porciones generosas.'),
+('NES-PAR-002', 'Julio César Barahona', 44, 'Masculino', 'Cuscatlán', 'Cojutepeque', 'Paracentral', 'Elaborador artesanal de embutidos', 'Bachillerato general', 480.00, 42, 56, 'Julio prepara chorizos tradicionales en Cojutepeque. Valora los embutidos de calidad y la carne fresca. Le gustan las pupusas con carne de calidad (como chorizo o birria) y rechaza si la carne sabe artificial o vieja. Límite de $1.00.'),
+('NES-PAR-003', 'Wendy Yamileth Rosales', 22, 'Femenino', 'San Vicente', 'San Vicente', 'Paracentral', 'Estudiante de enfermería / Ventas de ropa online', 'Estudiante de enfermería', 350.00, 72, 38, 'Wendy es una joven estudiante que cuida su presupuesto. Comparte pupusas los fines de semana en el parque de San Vicente. Valora las ofertas familiares y las porciones generosas por su dinero. Límite de $0.75.'),
+('NES-PAR-004', 'Francisco Armando Orellana', 50, 'Masculino', 'Cabañas', 'Sensuntepeque', 'Paracentral', 'Pequeño ganadero de leche', 'Educación básica completa', 410.00, 35, 60, 'Francisco produce queso y leche en Cabañas. Es extremadamente exigente con la calidad del queso de la pupusa: si no estira o sabe sintético, lo rechaza. Paga un límite de $0.75 y prefiere comer en zonas rurales.'),
+('NES-PAR-005', 'Roxana Beatriz Amaya', 28, 'Femenino', 'La Paz', 'Olocuilta', 'Paracentral', 'Palmeadora de pupusas de arroz', 'Bachillerato general', 520.00, 60, 46, 'Roxana palmea pupusas de arroz en Olocuilta, la cuna del arroz. Exige masa de arroz suave y fina. Tolera precios de hasta $1.00 si el tamaño y la cocción de la pupusa en la plancha son óptimos.'),
+('NES-PAR-006', 'Manuel de Jesús Raymundo', 55, 'Masculino', 'San Vicente', 'Apastepeque', 'Paracentral', 'Jornalero de caña de azúcar', 'Sin educación formal', 320.00, 30, 64, 'Manuel corta caña bajo el sol. Busca comidas baratas que le quiten el hambre todo el día. Considera comer fuera un gasto que debe evitar; solo compra pupusas tradicionales gigantes cuando están bajo $0.50.'),
+('NES-PAR-007', 'Karla Tatiana Cisneros', 31, 'Femenino', 'Cuscatlán', 'San Pedro Perulapán', 'Paracentral', 'Artesana de sombreros de palma', 'Educación básica completa', 430.00, 50, 53, 'Karla teje sombreros en San Pedro Perulapán. Cuida su presupuesto mensual con mucho cuidado. Compra pupusas revueltas los domingos con su familia. Prefiere locales pequeños e informales con precios de $0.60 a $0.75.'),
+('NES-PAR-008', 'Edwin Giovanny Portillo', 27, 'Masculino', 'La Paz', 'San Luis Talpa', 'Paracentral', 'Empleado aeroportuario de rampa', 'Bachillerato técnico', 470.00, 58, 42, 'Edwin trabaja en el aeropuerto internacional. Busca comida abundante para llevar. Prefiere pupusas de maíz con quesillo y chicharrón que resistan el transporte. Acepta pagar hasta $1.00 si el tamaño es grande.'),
+('NES-PAR-009', 'Mercedes del Carmen Huezo', 65, 'Femenino', 'San Vicente', 'Tecoluca', 'Paracentral', 'Agricultora de subsistencia / Pensionada del INPEP', 'Educación básica incompleta', 300.00, 24, 68, 'Mercedes es una abuela pensionada muy conservadora. Solo come pupusas tradicionales de frijol con queso o loroco. Castiga cualquier ingrediente dulce o carne que no sea de cerdo. Su precio máximo es de $0.50.'),
+('NES-PAR-010', 'Luis Alonso Henríquez', 39, 'Masculino', 'Cabañas', 'Ilobasco', 'Paracentral', 'Alfarero y modelador de barro', 'Bachillerato general', 620.00, 53, 41, 'Luis modela figuras de barro en Ilobasco. Valora el trabajo artesanal y manual. Prefiere comer en comedores de mercado locales y apoya a los pequeños negocios de pupusas de maíz tradicionales. Paga hasta $1.00 por unidad.');
