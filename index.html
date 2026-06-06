@@ -165,9 +165,18 @@
       pointer-events: none;
     }
 
+    /* ── MASA COLOR DOT ─────────────────────────────────────── */
+    .masa-dot {
+      width: 9px; height: 9px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      border: 1.5px solid rgba(0,0,0,0.18);
+    }
+
     .chip-label {
       display: inline-flex;
       align-items: center;
+      gap: 6px;
       padding: 7px 13px;
       border-radius: 999px;
       border: 1.5px solid var(--border);
@@ -463,27 +472,59 @@
         <div class="chip-grid">
           <div class="chip-option">
             <input type="radio" name="masa" value="Tradicional (Maíz)" id="masa-maiz" class="chip-input" checked />
-            <label for="masa-maiz" class="chip-label">Maíz Dorado</label>
+            <label for="masa-maiz" class="chip-label"><span class="masa-dot" style="background:#f59e0b;border-color:rgba(0,0,0,0.1);"></span>Maíz Dorado</label>
           </div>
           <div class="chip-option">
             <input type="radio" name="masa" value="Arroz" id="masa-arroz" class="chip-input" />
-            <label for="masa-arroz" class="chip-label">Arroz Blanco</label>
+            <label for="masa-arroz" class="chip-label"><span class="masa-dot" style="background:#f5f0e0;border-color:#d6cdb8;"></span>Arroz Blanco</label>
           </div>
           <div class="chip-option">
             <input type="radio" name="masa" value="Espinaca (Verde)" id="masa-espinaca" class="chip-input" />
-            <label for="masa-espinaca" class="chip-label">Espinaca Verde</label>
+            <label for="masa-espinaca" class="chip-label"><span class="masa-dot" style="background:#22c55e;"></span>Espinaca Verde</label>
           </div>
           <div class="chip-option">
             <input type="radio" name="masa" value="Remolacha (Rosada)" id="masa-remolacha" class="chip-input" />
-            <label for="masa-remolacha" class="chip-label">Remolacha Rosada</label>
+            <label for="masa-remolacha" class="chip-label"><span class="masa-dot" style="background:#ec4899;"></span>Remolacha Rosa</label>
           </div>
           <div class="chip-option">
             <input type="radio" name="masa" value="Yuca" id="masa-yuca" class="chip-input" />
-            <label for="masa-yuca" class="chip-label">Yuca</label>
+            <label for="masa-yuca" class="chip-label"><span class="masa-dot" style="background:#fde68a;border-color:#d6b95a;"></span>Yuca</label>
           </div>
           <div class="chip-option">
             <input type="radio" name="masa" value="Plátano Fusion" id="masa-platano" class="chip-input" />
-            <label for="masa-platano" class="chip-label">Plátano Fusión</label>
+            <label for="masa-platano" class="chip-label"><span class="masa-dot" style="background:#a16207;"></span>Plátano Fusión</label>
+          </div>
+          <div class="chip-option">
+            <input type="radio" name="masa" value="Maíz Morado" id="masa-morado" class="chip-input" />
+            <label for="masa-morado" class="chip-label"><span class="masa-dot" style="background:#7c3aed;"></span>Maíz Morado</label>
+          </div>
+          <div class="chip-option">
+            <input type="radio" name="masa" value="Zanahoria (Naranja)" id="masa-zanahoria" class="chip-input" />
+            <label for="masa-zanahoria" class="chip-label"><span class="masa-dot" style="background:#ea580c;"></span>Zanahoria Naranja</label>
+          </div>
+          <div class="chip-option">
+            <input type="radio" name="masa" value="Cúrcuma (Dorada Intensa)" id="masa-curcuma" class="chip-input" />
+            <label for="masa-curcuma" class="chip-label"><span class="masa-dot" style="background:#ca8a04;"></span>Cúrcuma Dorada</label>
+          </div>
+          <div class="chip-option">
+            <input type="radio" name="masa" value="Chile Guajillo (Rojo Oscuro)" id="masa-guajillo" class="chip-input" />
+            <label for="masa-guajillo" class="chip-label"><span class="masa-dot" style="background:#991b1b;"></span>Chile Guajillo</label>
+          </div>
+          <div class="chip-option">
+            <input type="radio" name="masa" value="Frijol Negro" id="masa-frijol" class="chip-input" />
+            <label for="masa-frijol" class="chip-label"><span class="masa-dot" style="background:#292524;border-color:rgba(255,255,255,0.25);"></span>Frijol Negro</label>
+          </div>
+          <div class="chip-option">
+            <input type="radio" name="masa" value="Mariposa Clitoria (Azul Natural)" id="masa-clitoria" class="chip-input" />
+            <label for="masa-clitoria" class="chip-label"><span class="masa-dot" style="background:#4338ca;"></span>Mariposa Azul</label>
+          </div>
+          <div class="chip-option">
+            <input type="radio" name="masa" value="Carbón Activado (Negro Intenso)" id="masa-carbon" class="chip-input" />
+            <label for="masa-carbon" class="chip-label"><span class="masa-dot" style="background:#171717;border-color:rgba(255,255,255,0.3);"></span>Carbón Activado</label>
+          </div>
+          <div class="chip-option">
+            <input type="radio" name="masa" value="Maíz Azul" id="masa-azul" class="chip-input" />
+            <label for="masa-azul" class="chip-label"><span class="masa-dot" style="background:#1d4ed8;"></span>Maíz Azul</label>
           </div>
         </div>
       </div>
@@ -501,32 +542,76 @@
             <label for="prot-chicharron" class="chip-label">Chicharrón</label>
           </div>
           <div class="chip-option">
-            <input type="checkbox" class="chip-input protein-cb" value="Pollo" id="prot-pollo" />
-            <label for="prot-pollo" class="chip-label">Pollo</label>
+            <input type="checkbox" class="chip-input protein-cb" value="Quesillo Salvadoreño Tradicional" id="prot-quesillo-r" checked />
+            <label for="prot-quesillo-r" class="chip-label">Quesillo</label>
           </div>
           <div class="chip-option">
-            <input type="checkbox" class="chip-input protein-cb" value="Camarón" id="prot-camaron" />
-            <label for="prot-camaron" class="chip-label">Camarón</label>
+            <input type="checkbox" class="chip-input protein-cb" value="Loroco con Queso" id="prot-loroco-r" />
+            <label for="prot-loroco-r" class="chip-label">Loroco con Queso</label>
           </div>
           <div class="chip-option">
-            <input type="checkbox" class="chip-input protein-cb" value="Calamar" id="prot-calamar" />
-            <label for="prot-calamar" class="chip-label">Calamar</label>
+            <input type="checkbox" class="chip-input protein-cb" value="Frijoles Volteados" id="prot-frijoles" />
+            <label for="prot-frijoles" class="chip-label">Frijoles Volteados</label>
           </div>
           <div class="chip-option">
-            <input type="checkbox" class="chip-input protein-cb" value="Birria" id="prot-birria" />
+            <input type="checkbox" class="chip-input protein-cb" value="Pollo Deshebrado" id="prot-pollo" />
+            <label for="prot-pollo" class="chip-label">Pollo Deshebrado</label>
+          </div>
+          <div class="chip-option">
+            <input type="checkbox" class="chip-input protein-cb" value="Camarón al Ajillo" id="prot-camaron" />
+            <label for="prot-camaron" class="chip-label">Camarón al Ajillo</label>
+          </div>
+          <div class="chip-option">
+            <input type="checkbox" class="chip-input protein-cb" value="Calamar en su Tinta" id="prot-calamar" />
+            <label for="prot-calamar" class="chip-label">Calamar en su Tinta</label>
+          </div>
+          <div class="chip-option">
+            <input type="checkbox" class="chip-input protein-cb" value="Birria Estilo Jalisco" id="prot-birria" />
             <label for="prot-birria" class="chip-label">Birria</label>
           </div>
           <div class="chip-option">
-            <input type="checkbox" class="chip-input protein-cb" value="Hongo Portobello" id="prot-hongo" />
+            <input type="checkbox" class="chip-input protein-cb" value="Hongo Portobello a la Plancha" id="prot-hongo" />
             <label for="prot-hongo" class="chip-label">Hongo Portobello</label>
           </div>
           <div class="chip-option">
-            <input type="checkbox" class="chip-input protein-cb" value="Tocino" id="prot-tocino" />
-            <label for="prot-tocino" class="chip-label">Tocino</label>
+            <input type="checkbox" class="chip-input protein-cb" value="Tocino Ahumado" id="prot-tocino" />
+            <label for="prot-tocino" class="chip-label">Tocino Ahumado</label>
           </div>
           <div class="chip-option">
-            <input type="checkbox" class="chip-input protein-cb" value="Lomo de Aguja" id="prot-lomo" />
+            <input type="checkbox" class="chip-input protein-cb" value="Lomo de Aguja Deshebrado" id="prot-lomo" />
             <label for="prot-lomo" class="chip-label">Lomo de Aguja</label>
+          </div>
+          <div class="chip-option">
+            <input type="checkbox" class="chip-input protein-cb" value="Chorizo Criollo" id="prot-chorizo" />
+            <label for="prot-chorizo" class="chip-label">Chorizo Criollo</label>
+          </div>
+          <div class="chip-option">
+            <input type="checkbox" class="chip-input protein-cb" value="Pavo Deshebrado" id="prot-pavo" />
+            <label for="prot-pavo" class="chip-label">Pavo Deshebrado</label>
+          </div>
+          <div class="chip-option">
+            <input type="checkbox" class="chip-input protein-cb" value="Pulpo a la Plancha" id="prot-pulpo" />
+            <label for="prot-pulpo" class="chip-label">Pulpo a la Plancha</label>
+          </div>
+          <div class="chip-option">
+            <input type="checkbox" class="chip-input protein-cb" value="Salmón Ahumado" id="prot-salmon" />
+            <label for="prot-salmon" class="chip-label">Salmón Ahumado</label>
+          </div>
+          <div class="chip-option">
+            <input type="checkbox" class="chip-input protein-cb" value="Costilla BBQ Deshebrada" id="prot-costilla" />
+            <label for="prot-costilla" class="chip-label">Costilla BBQ</label>
+          </div>
+          <div class="chip-option">
+            <input type="checkbox" class="chip-input protein-cb" value="Langosta al Mojo" id="prot-langosta" />
+            <label for="prot-langosta" class="chip-label">Langosta al Mojo</label>
+          </div>
+          <div class="chip-option">
+            <input type="checkbox" class="chip-input protein-cb" value="Atún Sellado" id="prot-atun" />
+            <label for="prot-atun" class="chip-label">Atún Sellado</label>
+          </div>
+          <div class="chip-option">
+            <input type="checkbox" class="chip-input protein-cb" value="Carne Molida Sazonada" id="prot-molida" />
+            <label for="prot-molida" class="chip-label">Carne Molida</label>
           </div>
         </div>
       </div>
@@ -552,8 +637,32 @@
             <label for="cheese-vegano" class="chip-label">Mozzarella Vegano</label>
           </div>
           <div class="chip-option">
-            <input type="checkbox" class="chip-input cheese-cb" value="Crema Pura" id="cheese-crema" />
+            <input type="checkbox" class="chip-input cheese-cb" value="Crema Pura Salvadoreña" id="cheese-crema" />
             <label for="cheese-crema" class="chip-label">Crema Pura</label>
+          </div>
+          <div class="chip-option">
+            <input type="checkbox" class="chip-input cheese-cb" value="Queso Cotija" id="cheese-cotija" />
+            <label for="cheese-cotija" class="chip-label">Queso Cotija</label>
+          </div>
+          <div class="chip-option">
+            <input type="checkbox" class="chip-input cheese-cb" value="Queso Oaxaca Fundido" id="cheese-oaxaca" />
+            <label for="cheese-oaxaca" class="chip-label">Queso Oaxaca</label>
+          </div>
+          <div class="chip-option">
+            <input type="checkbox" class="chip-input cheese-cb" value="Queso Manchego Fundido" id="cheese-manchego" />
+            <label for="cheese-manchego" class="chip-label">Manchego Fundido</label>
+          </div>
+          <div class="chip-option">
+            <input type="checkbox" class="chip-input cheese-cb" value="Queso de Cabra" id="cheese-cabra" />
+            <label for="cheese-cabra" class="chip-label">Queso de Cabra</label>
+          </div>
+          <div class="chip-option">
+            <input type="checkbox" class="chip-input cheese-cb" value="Queso Brie Fundido" id="cheese-brie" />
+            <label for="cheese-brie" class="chip-label">Brie Fundido</label>
+          </div>
+          <div class="chip-option">
+            <input type="checkbox" class="chip-input cheese-cb" value="Requesón" id="cheese-requeson" />
+            <label for="cheese-requeson" class="chip-label">Requesón</label>
           </div>
         </div>
       </div>
@@ -567,24 +676,68 @@
         </h3>
         <div class="chip-grid">
           <div class="chip-option">
-            <input type="checkbox" class="chip-input upgrade-cb" value="Loroco" id="upg-loroco" />
-            <label for="upg-loroco" class="chip-label">Loroco</label>
+            <input type="checkbox" class="chip-input upgrade-cb" value="Loroco Fresco" id="upg-loroco" />
+            <label for="upg-loroco" class="chip-label">Loroco Fresco</label>
           </div>
           <div class="chip-option">
-            <input type="checkbox" class="chip-input upgrade-cb" value="Jalapeño" id="upg-jalapeno" />
-            <label for="upg-jalapeno" class="chip-label">Jalapeño</label>
+            <input type="checkbox" class="chip-input upgrade-cb" value="Jalapeño Tatemado" id="upg-jalapeno" />
+            <label for="upg-jalapeno" class="chip-label">Jalapeño Tatemado</label>
           </div>
           <div class="chip-option">
             <input type="checkbox" class="chip-input upgrade-cb" value="Piña Tatemada" id="upg-pina" />
             <label for="upg-pina" class="chip-label">Piña Tatemada</label>
           </div>
           <div class="chip-option">
-            <input type="checkbox" class="chip-input upgrade-cb" value="Albahaca" id="upg-albahaca" />
+            <input type="checkbox" class="chip-input upgrade-cb" value="Albahaca Fresca" id="upg-albahaca" />
             <label for="upg-albahaca" class="chip-label">Albahaca</label>
           </div>
           <div class="chip-option">
             <input type="checkbox" class="chip-input upgrade-cb" value="Ajo Rostizado" id="upg-ajo" />
             <label for="upg-ajo" class="chip-label">Ajo Rostizado</label>
+          </div>
+          <div class="chip-option">
+            <input type="checkbox" class="chip-input upgrade-cb" value="Aguacate Cremoso" id="upg-aguacate" />
+            <label for="upg-aguacate" class="chip-label">Aguacate</label>
+          </div>
+          <div class="chip-option">
+            <input type="checkbox" class="chip-input upgrade-cb" value="Chipotle Ahumado" id="upg-chipotle" />
+            <label for="upg-chipotle" class="chip-label">Chipotle Ahumado</label>
+          </div>
+          <div class="chip-option">
+            <input type="checkbox" class="chip-input upgrade-cb" value="Elote Tatemado" id="upg-elote" />
+            <label for="upg-elote" class="chip-label">Elote Tatemado</label>
+          </div>
+          <div class="chip-option">
+            <input type="checkbox" class="chip-input upgrade-cb" value="Rajas de Chile Poblano" id="upg-rajas" />
+            <label for="upg-rajas" class="chip-label">Rajas Poblano</label>
+          </div>
+          <div class="chip-option">
+            <input type="checkbox" class="chip-input upgrade-cb" value="Tomate Seco" id="upg-tomate-seco" />
+            <label for="upg-tomate-seco" class="chip-label">Tomate Seco</label>
+          </div>
+          <div class="chip-option">
+            <input type="checkbox" class="chip-input upgrade-cb" value="Nopal a la Plancha" id="upg-nopal" />
+            <label for="upg-nopal" class="chip-label">Nopal</label>
+          </div>
+          <div class="chip-option">
+            <input type="checkbox" class="chip-input upgrade-cb" value="Epazote" id="upg-epazote" />
+            <label for="upg-epazote" class="chip-label">Epazote</label>
+          </div>
+          <div class="chip-option">
+            <input type="checkbox" class="chip-input upgrade-cb" value="Aceitunas Manzanilla" id="upg-aceitunas" />
+            <label for="upg-aceitunas" class="chip-label">Aceitunas</label>
+          </div>
+          <div class="chip-option">
+            <input type="checkbox" class="chip-input upgrade-cb" value="Chile Chiltepe" id="upg-chiltepe" />
+            <label for="upg-chiltepe" class="chip-label">Chile Chiltepe</label>
+          </div>
+          <div class="chip-option">
+            <input type="checkbox" class="chip-input upgrade-cb" value="Trufa Negra Rallada" id="upg-trufa" />
+            <label for="upg-trufa" class="chip-label">Trufa Negra</label>
+          </div>
+          <div class="chip-option">
+            <input type="checkbox" class="chip-input upgrade-cb" value="Cilantro y Cebolla Morada" id="upg-cilantro" />
+            <label for="upg-cilantro" class="chip-label">Cilantro y Cebolla</label>
           </div>
         </div>
       </div>
