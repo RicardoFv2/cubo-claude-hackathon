@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -7,19 +7,19 @@
 
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cinzel+Decorative:wght@700;900&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,700&family=Inter:wght@300;400;500;600&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet" />
 
   <script>
     tailwind.config = {
       theme: {
         extend: {
           fontFamily: {
-            display: ['"Cinzel Decorative"', 'serif'],
-            heading: ['Cinzel', 'serif'],
-            mono: ['"IBM Plex Mono"', 'monospace'],
-            body: ['"IBM Plex Sans"', 'sans-serif'],
+            display: ['Fraunces', 'Georgia', 'serif'],
+            body:    ['Inter', 'system-ui', 'sans-serif'],
+            mono:    ['"IBM Plex Mono"', 'monospace'],
           }
         }
       }
@@ -27,384 +27,653 @@
   </script>
 
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; }
-
+    /* ── DESIGN TOKENS ─────────────────────────────────────────── */
     :root {
-      --void:   #080608;
-      --card:   #100e0c;
-      --raised: #181513;
-      --amber:  #d97706;
-      --gold:   #f59e0b;
-      --text:   #fef3c7;
-      --muted:  #57534e;
-      --border: rgba(217,119,6,0.15);
+      --bg:             #faf7f2;
+      --surface:        #fffbf4;
+      --surface-raised: #fff7ea;
+      --border:         #e8ddd0;
+      --border-subtle:  #f0e8dc;
+
+      --text:       #1c1917;
+      --text-muted: #78716c;
+      --text-faint: #a8a29e;
+
+      --amber:      #d97706;
+      --gold:       #f59e0b;
+      --gold-dim:   #fef3c7;
+      --terracotta: #c2410c;
+      --burnt:      #92400e;
+      --fire:       #dc2626;
+      --loroco:     #059669;
+
+      --shadow-card:  0 2px 16px rgba(120,70,15,0.07), 0 1px 3px rgba(0,0,0,0.04);
+      --shadow-hover: 0 6px 28px rgba(120,70,15,0.13), 0 2px 8px rgba(0,0,0,0.06);
     }
 
+    [data-theme="dark"] {
+      --bg:             #0b0907;
+      --surface:        #141210;
+      --surface-raised: #1e1b17;
+      --border:         #2a231c;
+      --border-subtle:  #221d18;
+
+      --text:       #f5ede3;
+      --text-muted: #9d8e84;
+      --text-faint: #5c5148;
+
+      --gold-dim:   #3d2a0a;
+
+      --shadow-card:  0 2px 16px rgba(0,0,0,0.5), 0 1px 3px rgba(0,0,0,0.3);
+      --shadow-hover: 0 8px 40px rgba(217,119,6,0.18), 0 2px 12px rgba(0,0,0,0.5);
+    }
+
+    /* ── BASE ──────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; }
     html { scroll-behavior: smooth; }
 
     body {
-      background-color: var(--void);
-      background-image:
-        radial-gradient(ellipse 90% 55% at 50% -5%, rgba(217,119,6,0.10) 0%, transparent 65%),
-        radial-gradient(ellipse 45% 35% at 5%  90%, rgba(120,40,15,0.07) 0%, transparent 55%);
+      background-color: var(--bg);
       color: var(--text);
-      font-family: 'IBM Plex Sans', sans-serif;
-      min-height: 100vh;
+      font-family: 'Inter', system-ui, sans-serif;
+      min-height: 100dvh;
+      transition: background-color 0.25s, color 0.25s;
     }
 
-    /* ── top amber rule ── */
+    /* comal toasted line at top */
     body::after {
       content: '';
       position: fixed;
       top: 0; left: 0; right: 0;
-      height: 1px;
-      background: linear-gradient(90deg, transparent 5%, var(--amber) 40%, var(--gold) 50%, var(--amber) 60%, transparent 95%);
+      height: 2px;
+      background: linear-gradient(90deg,
+        transparent 5%,
+        var(--terracotta) 25%,
+        var(--amber) 48%,
+        var(--gold) 52%,
+        var(--amber) 68%,
+        var(--terracotta) 85%,
+        transparent 95%
+      );
       z-index: 100;
     }
 
-    /* ── cards ── */
-    .card {
-      background: var(--card);
+    /* ── SCROLLBAR ──────────────────────────────────────────────── */
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    /* ── PANEL CARDS ────────────────────────────────────────────── */
+    .panel-card {
+      background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 0.75rem;
-    }
-    .card-inner {
-      background: var(--raised);
-      border: 1px solid var(--border);
-      border-radius: 0.5rem;
+      border-radius: 1.5rem;
+      box-shadow: var(--shadow-card);
     }
 
-    /* ── inputs ── */
+    .section-card {
+      background: var(--surface-raised);
+      border: 1px solid var(--border-subtle);
+      border-radius: 1rem;
+      padding: 1rem 1.1rem;
+    }
+
+    /* ── TYPOGRAPHY HELPERS ─────────────────────────────────────── */
+    .field-label {
+      display: block;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+
+    .section-eyebrow {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.57rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-faint);
+      display: block;
+    }
+
+    .section-heading {
+      font-family: 'Fraunces', serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--amber);
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    /* ── INGREDIENT CHIPS ───────────────────────────────────────── */
+    .chip-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+
+    .chip-option { position: relative; }
+
+    .chip-input {
+      position: absolute;
+      opacity: 0;
+      width: 1px; height: 1px;
+      pointer-events: none;
+    }
+
+    .chip-label {
+      display: inline-flex;
+      align-items: center;
+      padding: 7px 13px;
+      border-radius: 999px;
+      border: 1.5px solid var(--border);
+      background: var(--surface);
+      color: var(--text-muted);
+      font-size: 0.78rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      user-select: none;
+      min-height: 36px;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    .chip-label:hover {
+      border-color: var(--amber);
+      color: var(--amber);
+      background: rgba(217,119,6,0.05);
+    }
+
+    .chip-input:checked + .chip-label {
+      border-color: var(--amber);
+      background: rgba(217,119,6,0.1);
+      color: var(--amber);
+      box-shadow: 0 0 0 2px rgba(217,119,6,0.2);
+      font-weight: 600;
+    }
+
+    .chip-input:focus-visible + .chip-label {
+      outline: 2px solid var(--amber);
+      outline-offset: 2px;
+    }
+
+    /* ── FIELDS ─────────────────────────────────────────────────── */
     .field {
       width: 100%;
-      background: #09080a;
-      border: 1px solid rgba(217,119,6,0.22);
-      border-radius: 0.375rem;
-      padding: 0.5rem 0.75rem;
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: 0.625rem;
+      padding: 0.6rem 0.875rem;
       color: var(--text);
       font-family: 'IBM Plex Mono', monospace;
-      font-size: 0.8125rem;
+      font-size: 0.8rem;
       transition: border-color 0.18s, box-shadow 0.18s;
+      min-height: 44px;
     }
+
+    .field::placeholder { color: var(--text-faint); }
+
     .field:focus {
       outline: none;
       border-color: var(--amber);
       box-shadow: 0 0 0 3px rgba(217,119,6,0.12);
     }
-    .field option { background: #1a1714; }
 
-    /* ── checkbox ── */
-    .cb { accent-color: var(--amber); width: 14px; height: 14px; cursor: pointer; }
+    /* ── CHECKBOX ───────────────────────────────────────────────── */
+    .cb { accent-color: var(--amber); width: 15px; height: 15px; cursor: pointer; flex-shrink: 0; }
 
-    /* ── range slider ── */
+    /* ── RANGE SLIDER ───────────────────────────────────────────── */
     input[type=range] {
       -webkit-appearance: none; appearance: none;
-      width: 100%; height: 3px; border-radius: 2px; cursor: pointer;
+      width: 100%; height: 4px; border-radius: 2px; cursor: pointer;
       background: linear-gradient(
         to right,
         var(--amber) 0%,
         var(--amber) var(--fill, 11%),
-        #2a2218 var(--fill, 11%),
-        #2a2218 100%
+        var(--border) var(--fill, 11%),
+        var(--border) 100%
       );
     }
     input[type=range]::-webkit-slider-thumb {
       -webkit-appearance: none;
-      width: 16px; height: 16px; border-radius: 50%;
+      width: 18px; height: 18px; border-radius: 50%;
       background: var(--gold);
-      border: 2px solid var(--void);
-      box-shadow: 0 0 10px rgba(245,158,11,0.55);
+      border: 2px solid var(--surface);
+      box-shadow: 0 0 12px rgba(245,158,11,0.5);
       cursor: pointer;
     }
     input[type=range]::-moz-range-thumb {
-      width: 16px; height: 16px; border-radius: 50%;
-      background: var(--gold); border: 2px solid var(--void);
-      box-shadow: 0 0 10px rgba(245,158,11,0.55); cursor: pointer;
+      width: 18px; height: 18px; border-radius: 50%;
+      background: var(--gold); border: 2px solid var(--surface);
+      box-shadow: 0 0 12px rgba(245,158,11,0.5); cursor: pointer;
     }
 
-    /* ── run button ── */
+    /* ── RUN BUTTON ─────────────────────────────────────────────── */
     .btn-run {
       width: 100%;
-      padding: 0.85rem 1.5rem;
-      border-radius: 0.5rem;
+      padding: 1rem 1.5rem;
+      border-radius: 0.875rem;
       border: none;
       cursor: pointer;
-      font-family: 'Cinzel', serif;
-      font-size: 0.78rem;
+      font-family: 'Fraunces', serif;
+      font-size: 1.05rem;
       font-weight: 700;
-      letter-spacing: 0.12em;
-      color: #fef3c7;
-      background: linear-gradient(135deg, #92400e, #b45309 45%, #d97706);
+      font-style: italic;
+      color: #fef9f0;
+      background: linear-gradient(135deg, var(--burnt) 0%, var(--terracotta) 45%, var(--amber) 100%);
       position: relative; overflow: hidden;
       transition: transform 0.2s, box-shadow 0.2s;
+      min-height: 54px;
     }
     .btn-run::after {
       content: '';
       position: absolute; inset: 0;
-      background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.10) 50%, transparent 70%);
-      transform: translateX(-100%);
-      transition: transform 0.45s;
+      background: linear-gradient(120deg, transparent 25%, rgba(255,255,255,0.12) 50%, transparent 75%);
+      transform: translateX(-120%);
+      transition: transform 0.5s;
     }
-    .btn-run:hover:not(:disabled)::after { transform: translateX(100%); }
+    .btn-run:hover:not(:disabled)::after { transform: translateX(120%); }
     .btn-run:hover:not(:disabled) {
-      transform: translateY(-1px);
-      box-shadow: 0 0 28px rgba(217,119,6,0.38);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(194,65,12,0.4), 0 2px 8px rgba(0,0,0,0.2);
     }
+    .btn-run:active:not(:disabled) { transform: translateY(0); }
     .btn-run:disabled { opacity: 0.45; cursor: not-allowed; }
 
-    /* ── region tags ── */
-    .tag { font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem; padding: 2px 8px; border-radius: 99px; font-weight: 500; letter-spacing: 0.06em; }
-    .tag-central    { background: rgba(59,130,246,0.14);  color: #93c5fd; border: 1px solid rgba(59,130,246,0.28); }
-    .tag-oriental   { background: rgba(239,68,68,0.14);   color: #fca5a5; border: 1px solid rgba(239,68,68,0.28); }
-    .tag-occidental { background: rgba(168,85,247,0.14);  color: #d8b4fe; border: 1px solid rgba(168,85,247,0.28); }
-    .tag-paracentral{ background: rgba(34,197,94,0.14);   color: #86efac; border: 1px solid rgba(34,197,94,0.28); }
+    /* ── THEME TOGGLE ───────────────────────────────────────────── */
+    .theme-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      border: 1.5px solid var(--border);
+      background: var(--surface);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.18s;
+    }
+    .theme-btn:hover { border-color: var(--amber); color: var(--amber); }
 
-    /* ── result badges ── */
-    .badge { font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem; padding: 3px 10px; border-radius: 4px; font-weight: 600; letter-spacing: 0.08em; }
-    .badge-yes { background: rgba(22,163,74,0.18);  color: #4ade80; border: 1px solid rgba(74,222,128,0.35); }
-    .badge-no  { background: rgba(220,38,38,0.18);  color: #f87171; border: 1px solid rgba(248,113,113,0.35); }
+    /* ── DIVIDER ────────────────────────────────────────────────── */
+    .hr-comal {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border) 20%, var(--amber) 50%, var(--border) 80%, transparent);
+      opacity: 0.55;
+    }
 
-    /* ── score bar ── */
-    .score-track { height: 4px; background: #1e1a16; border-radius: 2px; overflow: hidden; }
-    .score-fill  { height: 100%; border-radius: 2px; transition: width 0.7s ease; }
+    /* ── REGION TAGS ────────────────────────────────────────────── */
+    .tag {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.57rem;
+      padding: 3px 9px;
+      border-radius: 99px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      white-space: nowrap;
+    }
+    .tag-central     { background: rgba(251,191,36,0.12);  color: #fbbf24; border: 1px solid rgba(251,191,36,0.28); }
+    .tag-oriental    { background: rgba(239,68,68,0.12);   color: #fca5a5; border: 1px solid rgba(239,68,68,0.28); }
+    .tag-occidental  { background: rgba(167,139,250,0.12); color: #c4b5fd; border: 1px solid rgba(167,139,250,0.28); }
+    .tag-paracentral { background: rgba(52,211,153,0.12);  color: #6ee7b7; border: 1px solid rgba(52,211,153,0.28); }
 
-    /* ── log ── */
-    .log-line { font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; line-height: 1.6; }
+    /* ── RESULT BADGES ──────────────────────────────────────────── */
+    .badge {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.59rem;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      line-height: 1.4;
+    }
+    .badge-hot  { background: rgba(245,158,11,0.15);  color: #f59e0b; border: 1px solid rgba(245,158,11,0.4); }
+    .badge-yes  { background: rgba(5,150,105,0.14);   color: #34d399; border: 1px solid rgba(52,211,153,0.35); }
+    .badge-ok   { background: rgba(5,150,105,0.09);   color: #6ee7b7; border: 1px solid rgba(110,231,183,0.28); }
+    .badge-warn { background: rgba(234,88,12,0.14);   color: #fb923c; border: 1px solid rgba(251,146,60,0.35); }
+    .badge-no   { background: rgba(220,38,38,0.14);   color: #f87171; border: 1px solid rgba(248,113,113,0.35); }
 
-    /* ── divider ── */
-    .hr-amber { height: 1px; background: linear-gradient(90deg, transparent, rgba(217,119,6,0.2), transparent); }
+    /* ── SCORE BAR ──────────────────────────────────────────────── */
+    .score-track { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+    .score-fill  { height: 100%; border-radius: 2px; transition: width 0.7s cubic-bezier(0.4,0,0.2,1); }
 
-    /* ── result card animation ── */
+    /* ── LOG ────────────────────────────────────────────────────── */
+    .log-line { font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; line-height: 1.7; }
+
+    /* ── RESULT CARD ANIMATION ──────────────────────────────────── */
     @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(12px); }
+      from { opacity: 0; transform: translateY(10px); }
       to   { opacity: 1; transform: translateY(0); }
     }
-    .result-card { animation: fadeUp 0.35s ease both; }
+    .result-card { animation: fadeUp 0.32s ease both; }
 
     @media (prefers-reduced-motion: reduce) {
       .result-card, .btn-run::after { animation: none; transition: none; }
     }
 
-    /* ── scrollbar ── */
-    ::-webkit-scrollbar { width: 5px; }
-    ::-webkit-scrollbar-track { background: #0a0808; }
-    ::-webkit-scrollbar-thumb { background: #3d2f1a; border-radius: 3px; }
+    /* ── TITLE GLOW ─────────────────────────────────────────────── */
+    .title-glow {
+      text-shadow: 0 0 60px rgba(217,119,6,0.28), 0 2px 4px rgba(0,0,0,0.5);
+    }
+    [data-theme="light"] .title-glow {
+      text-shadow: 0 1px 2px rgba(0,0,0,0.08);
+    }
 
-    .label {
-      display: block;
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 0.65rem;
-      letter-spacing: 0.12em;
-      color: var(--muted);
-      margin-bottom: 6px;
+    /* ── API LOADED PILL ────────────────────────────────────────── */
+    .api-loaded-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0.55rem 0.875rem;
+      background: rgba(5,150,105,0.08);
+      border: 1.5px solid rgba(5,150,105,0.25);
+      border-radius: 0.625rem;
+    }
+    .api-dot {
+      width: 7px; height: 7px;
+      background: #34d399;
+      border-radius: 50%;
+      box-shadow: 0 0 8px #34d399;
+      flex-shrink: 0;
+    }
+
+    /* ── PANEL HEADER ───────────────────────────────────────────── */
+    .panel-title {
+      font-family: 'Fraunces', serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--amber);
+      line-height: 1.2;
     }
   </style>
 </head>
 
 <body>
-<div style="max-width:1280px; margin:0 auto; padding:1.5rem 1.25rem 4rem;">
+<div style="max-width:1380px; margin:0 auto; padding:1.5rem 1.25rem 5rem; position:relative; z-index:1;">
 
   <!-- ═══ HEADER ══════════════════════════════════════════════════ -->
-  <header style="text-align:center; padding-bottom:2.5rem;">
-    <div style="display:flex; align-items:center; justify-content:center; gap:12px; margin-bottom:10px;">
-      <div style="flex:1; max-width:80px; height:1px; background:linear-gradient(to right, transparent, var(--amber));"></div>
-      <span style="font-family:'IBM Plex Mono',monospace; font-size:0.6rem; letter-spacing:0.3em; color:var(--amber); text-transform:uppercase;">Sistema de Evaluación v1.0 — Nemotron El Salvador</span>
-      <div style="flex:1; max-width:80px; height:1px; background:linear-gradient(to left, transparent, var(--amber));"></div>
+  <header style="text-align:center; padding:2rem 0 2.75rem; position:relative;">
+
+    <button id="theme-toggle" class="theme-btn" style="position:absolute; top:0.5rem; right:0;" aria-label="Cambiar tema claro/oscuro">
+      <!-- Sun: shown in dark mode (click to go light) -->
+      <svg id="icon-sun" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" />
+      </svg>
+      <!-- Moon: shown in light mode (click to go dark) -->
+      <svg id="icon-moon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="display:none;">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z" />
+      </svg>
+    </button>
+
+    <!-- eyebrow rule -->
+    <div style="display:flex; align-items:center; justify-content:center; gap:14px; margin-bottom:1.25rem;">
+      <div style="flex:1; max-width:80px; height:1px; background:linear-gradient(to right,transparent,var(--amber));"></div>
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:0.6rem; letter-spacing:0.28em; color:var(--amber); text-transform:uppercase;">Sistema de Evaluación · Claude Sonnet 4.6 · El Salvador</span>
+      <div style="flex:1; max-width:80px; height:1px; background:linear-gradient(to left,transparent,var(--amber));"></div>
     </div>
-    <h1 style="font-family:'Cinzel Decorative',serif; font-size:clamp(1.8rem,5vw,3.2rem); color:#fbbf24; text-shadow: 0 0 50px rgba(217,119,6,0.35), 0 2px 4px rgba(0,0,0,0.8); line-height:1.15; margin-bottom:8px;">
+
+    <h1 class="title-glow" style="font-family:'Fraunces',serif; font-size:clamp(2.2rem,6vw,4rem); font-weight:700; font-style:italic; color:var(--gold); line-height:1.1; margin-bottom:0.75rem;">
       La Pupusería Alquimista
     </h1>
-    <p style="font-family:'IBM Plex Mono',monospace; font-size:0.7rem; color:var(--muted); letter-spacing:0.2em;">
-      MOTOR DE MERCADO · CLAUDE SONNET 4.6 · PROMISE.ALL PARALLEL PIPELINE
+
+    <p style="font-family:'IBM Plex Mono',monospace; font-size:0.63rem; color:var(--text-faint); letter-spacing:0.22em; text-transform:uppercase;">
+      Motor de Mercado · 40 Personas · 4 Macro-Regiones · Promise.all Parallel Pipeline
     </p>
   </header>
 
   <!-- ═══ MAIN GRID ════════════════════════════════════════════════ -->
-  <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(340px,1fr)); gap:1.25rem; margin-bottom:1.5rem;">
+  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(360px,1fr)); gap:1.5rem; margin-bottom:1.5rem;">
 
-    <!-- ─── INPUT PANEL ─────────────────────────────────────────── -->
-    <div class="card" style="padding:1.5rem; display:flex; flex-direction:column; gap:1.1rem;">
+    <!-- ─── EL LABORATORIO ALQUIMISTA ─────────────────────────────── -->
+    <div class="panel-card" style="padding:1.75rem; display:flex; flex-direction:column; gap:1.25rem;">
 
-      <h2 style="font-family:'Cinzel',serif; font-size:0.85rem; color:#fbbf24; letter-spacing:0.1em; display:flex; align-items:center; gap:8px;">
-        <svg width="14" height="14" fill="none" stroke="#d97706" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 3.104v5.714a2.25 2.25 0 0 1-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 0 1 4.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15M14.25 3.104c.251.023.501.05.75.082M19.8 15l-1.8 3.013a2.25 2.25 0 0 1-1.932 1.112H7.932A2.25 2.25 0 0 1 6 18.013L4.2 15M19.8 15H4.2"/></svg>
-        CONFIGURAR PROPUESTA
-      </h2>
+      <!-- panel header -->
+      <div>
+        <div style="display:flex; align-items:center; gap:8px; margin-bottom:3px;">
+          <svg width="15" height="15" fill="none" stroke="var(--amber)" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 3.104v5.714a2.25 2.25 0 0 1-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 0 1 4.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15M14.25 3.104c.251.023.501.05.75.082M19.8 15l-1.8 3.013a2.25 2.25 0 0 1-1.932 1.112H7.932A2.25 2.25 0 0 1 6 18.013L4.2 15M19.8 15H4.2"/>
+          </svg>
+          <h2 class="panel-title">El Laboratorio Alquimista</h2>
+        </div>
+        <span class="section-eyebrow" style="padding-left:23px;">Diseñá tu pupusa · Conquistá el mercado</span>
+      </div>
 
-      <!-- API Key Container -->
+      <!-- API Key -->
       <div id="api-key-container">
-        <label class="label">API KEY — ANTHROPIC</label>
-        <input id="api-key" type="password" class="field mb-2" placeholder="sk-ant-api03-…" autocomplete="off" />
-        <label style="display:flex; align-items:center; gap:6px; font-size:0.68rem; color:#a8a29e; cursor:pointer; user-select:none;">
-          <input type="checkbox" id="remember-key" class="cb" /> Recordar en esta pestaña (Session Storage)
+        <label class="field-label" for="api-key">API Key — Anthropic</label>
+        <input id="api-key" type="password" class="field" placeholder="sk-ant-api03-…" autocomplete="off" style="margin-bottom:0.5rem;" />
+        <label style="display:flex; align-items:center; gap:7px; font-size:0.7rem; color:var(--text-muted); cursor:pointer; user-select:none;">
+          <input type="checkbox" id="remember-key" class="cb" />
+          <span>Recordar en esta pestaña (Session Storage)</span>
         </label>
       </div>
 
-      <!-- Masa -->
-      <div>
-        <label class="label">BASE DE MASA</label>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px 12px;">
-          <label style="display:flex; align-items:center; gap:7px; font-size:0.8rem; color:#d6d3d1; cursor:pointer;">
-            <input type="radio" name="masa" value="Tradicional (Maíz)" class="cb" checked /> Maíz Tradicional
-          </label>
-          <label style="display:flex; align-items:center; gap:7px; font-size:0.8rem; color:#d6d3d1; cursor:pointer;">
-            <input type="radio" name="masa" value="Arroz" class="cb" /> Arroz
-          </label>
-          <label style="display:flex; align-items:center; gap:7px; font-size:0.8rem; color:#d6d3d1; cursor:pointer;">
-            <input type="radio" name="masa" value="Espinaca (Verde)" class="cb" /> Espinaca (Verde)
-          </label>
-          <label style="display:flex; align-items:center; gap:7px; font-size:0.8rem; color:#d6d3d1; cursor:pointer;">
-            <input type="radio" name="masa" value="Remolacha (Rosada)" class="cb" /> Remolacha (Rosada)
-          </label>
-          <label style="display:flex; align-items:center; gap:7px; font-size:0.8rem; color:#d6d3d1; cursor:pointer;">
-            <input type="radio" name="masa" value="Yuca" class="cb" /> Yuca
-          </label>
-          <label style="display:flex; align-items:center; gap:7px; font-size:0.8rem; color:#d6d3d1; cursor:pointer;">
-            <input type="radio" name="masa" value="Plátano Fusion" class="cb" /> Plátano Fusion
-          </label>
+      <!-- MASAS -->
+      <div class="section-card">
+        <span class="section-eyebrow" style="margin-bottom:3px;">La Fundación</span>
+        <h3 class="section-heading">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path stroke-linecap="round" d="M8 12h8M12 8v8"/></svg>
+          Masas
+        </h3>
+        <div class="chip-grid">
+          <div class="chip-option">
+            <input type="radio" name="masa" value="Tradicional (Maíz)" id="masa-maiz" class="chip-input" checked />
+            <label for="masa-maiz" class="chip-label">Maíz Dorado</label>
+          </div>
+          <div class="chip-option">
+            <input type="radio" name="masa" value="Arroz" id="masa-arroz" class="chip-input" />
+            <label for="masa-arroz" class="chip-label">Arroz Blanco</label>
+          </div>
+          <div class="chip-option">
+            <input type="radio" name="masa" value="Espinaca (Verde)" id="masa-espinaca" class="chip-input" />
+            <label for="masa-espinaca" class="chip-label">Espinaca Verde</label>
+          </div>
+          <div class="chip-option">
+            <input type="radio" name="masa" value="Remolacha (Rosada)" id="masa-remolacha" class="chip-input" />
+            <label for="masa-remolacha" class="chip-label">Remolacha Rosada</label>
+          </div>
+          <div class="chip-option">
+            <input type="radio" name="masa" value="Yuca" id="masa-yuca" class="chip-input" />
+            <label for="masa-yuca" class="chip-label">Yuca</label>
+          </div>
+          <div class="chip-option">
+            <input type="radio" name="masa" value="Plátano Fusion" id="masa-platano" class="chip-input" />
+            <label for="masa-platano" class="chip-label">Plátano Fusión</label>
+          </div>
         </div>
       </div>
 
-      <!-- Core Proteins -->
-      <div>
-        <label class="label">PROTEÍNAS PRINCIPALES</label>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px 12px;">
-          <label style="display:flex; align-items:center; gap:7px; font-size:0.8rem; color:#d6d3d1; cursor:pointer;">
-            <input type="checkbox" class="cb protein-cb" value="Chicharrón" checked /> Chicharrón
-          </label>
-          <label style="display:flex; align-items:center; gap:7px; font-size:0.8rem; color:#d6d3d1; cursor:pointer;">
-            <input type="checkbox" class="cb protein-cb" value="Pollo" /> Pollo
-          </label>
-          <label style="display:flex; align-items:center; gap:7px; font-size:0.8rem; color:#d6d3d1; cursor:pointer;">
-            <input type="checkbox" class="cb protein-cb" value="Camarón" /> Camarón
-          </label>
-          <label style="display:flex; align-items:center; gap:7px; font-size:0.8rem; color:#d6d3d1; cursor:pointer;">
-            <input type="checkbox" class="cb protein-cb" value="Calamar" /> Calamar
-          </label>
-          <label style="display:flex; align-items:center; gap:7px; font-size:0.8rem; color:#d6d3d1; cursor:pointer;">
-            <input type="checkbox" class="cb protein-cb" value="Birria" /> Birria
-          </label>
-          <label style="display:flex; align-items:center; gap:7px; font-size:0.8rem; color:#d6d3d1; cursor:pointer;">
-            <input type="checkbox" class="cb protein-cb" value="Hongo Portobello" /> Hongo Portobello
-          </label>
-          <label style="display:flex; align-items:center; gap:7px; font-size:0.8rem; color:#d6d3d1; cursor:pointer;">
-            <input type="checkbox" class="cb protein-cb" value="Tocino" /> Tocino
-          </label>
-          <label style="display:flex; align-items:center; gap:7px; font-size:0.8rem; color:#d6d3d1; cursor:pointer;">
-            <input type="checkbox" class="cb protein-cb" value="Lomo de Aguja" /> Lomo de Aguja
-          </label>
+      <!-- RELLENOS -->
+      <div class="section-card">
+        <span class="section-eyebrow" style="margin-bottom:3px;">El Corazón</span>
+        <h3 class="section-heading">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"/></svg>
+          Rellenos
+        </h3>
+        <div class="chip-grid">
+          <div class="chip-option">
+            <input type="checkbox" class="chip-input protein-cb" value="Chicharrón" id="prot-chicharron" checked />
+            <label for="prot-chicharron" class="chip-label">Chicharrón</label>
+          </div>
+          <div class="chip-option">
+            <input type="checkbox" class="chip-input protein-cb" value="Pollo" id="prot-pollo" />
+            <label for="prot-pollo" class="chip-label">Pollo</label>
+          </div>
+          <div class="chip-option">
+            <input type="checkbox" class="chip-input protein-cb" value="Camarón" id="prot-camaron" />
+            <label for="prot-camaron" class="chip-label">Camarón</label>
+          </div>
+          <div class="chip-option">
+            <input type="checkbox" class="chip-input protein-cb" value="Calamar" id="prot-calamar" />
+            <label for="prot-calamar" class="chip-label">Calamar</label>
+          </div>
+          <div class="chip-option">
+            <input type="checkbox" class="chip-input protein-cb" value="Birria" id="prot-birria" />
+            <label for="prot-birria" class="chip-label">Birria</label>
+          </div>
+          <div class="chip-option">
+            <input type="checkbox" class="chip-input protein-cb" value="Hongo Portobello" id="prot-hongo" />
+            <label for="prot-hongo" class="chip-label">Hongo Portobello</label>
+          </div>
+          <div class="chip-option">
+            <input type="checkbox" class="chip-input protein-cb" value="Tocino" id="prot-tocino" />
+            <label for="prot-tocino" class="chip-label">Tocino</label>
+          </div>
+          <div class="chip-option">
+            <input type="checkbox" class="chip-input protein-cb" value="Lomo de Aguja" id="prot-lomo" />
+            <label for="prot-lomo" class="chip-label">Lomo de Aguja</label>
+          </div>
         </div>
       </div>
 
-      <!-- Cheeses & Fats -->
-      <div>
-        <label class="label">QUESOS & GRASAS</label>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px 12px;">
-          <label style="display:flex; align-items:center; gap:7px; font-size:0.8rem; color:#d6d3d1; cursor:pointer;">
-            <input type="checkbox" class="cb cheese-cb" value="Quesillo Salvadoreño Tradicional" checked /> Quesillo Tradicional
-          </label>
-          <label style="display:flex; align-items:center; gap:7px; font-size:0.8rem; color:#d6d3d1; cursor:pointer;">
-            <input type="checkbox" class="cb cheese-cb" value="Queso de Capa" /> Queso de Capa
-          </label>
-          <label style="display:flex; align-items:center; gap:7px; font-size:0.8rem; color:#d6d3d1; cursor:pointer;">
-            <input type="checkbox" class="cb cheese-cb" value="Queso Mozzarella Vegano" /> Mozzarella Vegano
-          </label>
-          <label style="display:flex; align-items:center; gap:7px; font-size:0.8rem; color:#d6d3d1; cursor:pointer;">
-            <input type="checkbox" class="cb cheese-cb" value="Crema Pura" /> Crema Pura
-          </label>
+      <!-- QUESOS -->
+      <div class="section-card">
+        <span class="section-eyebrow" style="margin-bottom:3px;">La Cremosidad · El Oro Líquido</span>
+        <h3 class="section-heading">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M15.362 5.214A8.252 8.252 0 0 1 12 21 8.25 8.25 0 0 1 6.038 7.047 8.287 8.287 0 0 0 9 9.601a8.983 8.983 0 0 1 3.361-6.867 8.21 8.21 0 0 0 3 2.48Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 18a3.75 3.75 0 0 0 .495-7.468 5.99 5.99 0 0 0-1.925 3.547 5.975 5.975 0 0 1-2.133-1.001A3.75 3.75 0 0 0 12 18Z"/></svg>
+          Quesos & Grasas
+        </h3>
+        <div class="chip-grid">
+          <div class="chip-option">
+            <input type="checkbox" class="chip-input cheese-cb" value="Quesillo Salvadoreño Tradicional" id="cheese-quesillo" checked />
+            <label for="cheese-quesillo" class="chip-label">Quesillo Tradicional</label>
+          </div>
+          <div class="chip-option">
+            <input type="checkbox" class="chip-input cheese-cb" value="Queso de Capa" id="cheese-capa" />
+            <label for="cheese-capa" class="chip-label">Queso de Capa</label>
+          </div>
+          <div class="chip-option">
+            <input type="checkbox" class="chip-input cheese-cb" value="Queso Mozzarella Vegano" id="cheese-vegano" />
+            <label for="cheese-vegano" class="chip-label">Mozzarella Vegano</label>
+          </div>
+          <div class="chip-option">
+            <input type="checkbox" class="chip-input cheese-cb" value="Crema Pura" id="cheese-crema" />
+            <label for="cheese-crema" class="chip-label">Crema Pura</label>
+          </div>
         </div>
       </div>
 
-      <!-- Custom Upgrades & Add-ons -->
-      <div>
-        <label class="label">MEJORAS & EXTRAS</label>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px 12px;">
-          <label style="display:flex; align-items:center; gap:7px; font-size:0.8rem; color:#d6d3d1; cursor:pointer;">
-            <input type="checkbox" class="cb upgrade-cb" value="Loroco" /> Loroco
-          </label>
-          <label style="display:flex; align-items:center; gap:7px; font-size:0.8rem; color:#d6d3d1; cursor:pointer;">
-            <input type="checkbox" class="cb upgrade-cb" value="Jalapeño" /> Jalapeño
-          </label>
-          <label style="display:flex; align-items:center; gap:7px; font-size:0.8rem; color:#d6d3d1; cursor:pointer;">
-            <input type="checkbox" class="cb upgrade-cb" value="Piña Tatemada" /> Piña Tatemada
-          </label>
-          <label style="display:flex; align-items:center; gap:7px; font-size:0.8rem; color:#d6d3d1; cursor:pointer;">
-            <input type="checkbox" class="cb upgrade-cb" value="Albahaca" /> Albahaca
-          </label>
-          <label style="display:flex; align-items:center; gap:7px; font-size:0.8rem; color:#d6d3d1; cursor:pointer;">
-            <input type="checkbox" class="cb upgrade-cb" value="Ajo Rostizado" /> Ajo Rostizado
-          </label>
+      <!-- MEJORAS -->
+      <div class="section-card">
+        <span class="section-eyebrow" style="margin-bottom:3px;">El Toque Final · El Curtido y la Salsa</span>
+        <h3 class="section-heading">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z"/></svg>
+          Mejoras & Extras
+        </h3>
+        <div class="chip-grid">
+          <div class="chip-option">
+            <input type="checkbox" class="chip-input upgrade-cb" value="Loroco" id="upg-loroco" />
+            <label for="upg-loroco" class="chip-label">Loroco</label>
+          </div>
+          <div class="chip-option">
+            <input type="checkbox" class="chip-input upgrade-cb" value="Jalapeño" id="upg-jalapeno" />
+            <label for="upg-jalapeno" class="chip-label">Jalapeño</label>
+          </div>
+          <div class="chip-option">
+            <input type="checkbox" class="chip-input upgrade-cb" value="Piña Tatemada" id="upg-pina" />
+            <label for="upg-pina" class="chip-label">Piña Tatemada</label>
+          </div>
+          <div class="chip-option">
+            <input type="checkbox" class="chip-input upgrade-cb" value="Albahaca" id="upg-albahaca" />
+            <label for="upg-albahaca" class="chip-label">Albahaca</label>
+          </div>
+          <div class="chip-option">
+            <input type="checkbox" class="chip-input upgrade-cb" value="Ajo Rostizado" id="upg-ajo" />
+            <label for="upg-ajo" class="chip-label">Ajo Rostizado</label>
+          </div>
         </div>
       </div>
 
-      <!-- Custom Alchemist Free-Text Input -->
+      <!-- Ingrediente Alquimista Secreto -->
       <div>
-        <label class="label">INYECTAR INGREDIENTE ALQUIMISTA SECRETO</label>
-        <input id="custom-ingredient" type="text" class="field" placeholder="Nutella, Cangrejo, Polvo de Oro..." />
+        <label class="field-label" for="custom-ingredient">
+          <span style="color:var(--terracotta);">✦</span> Inyectar Ingrediente Alquimista Secreto
+        </label>
+        <input id="custom-ingredient" type="text" class="field" placeholder="Nutella, Cangrejo, Polvo de Oro…" />
       </div>
 
-      <!-- Toppings -->
+      <!-- Acompañamientos -->
       <div>
-        <label class="label">ACOMPAÑAMIENTOS</label>
+        <label class="field-label" for="toppings">Acompañamientos</label>
         <input id="toppings" type="text" class="field" value="Curtido, Crema" placeholder="Curtido, crema, salsa roja…" />
       </div>
 
       <!-- Price slider -->
       <div>
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-          <label class="label" style="margin:0;">PRECIO POR PUPUSA</label>
-          <span id="price-display" style="font-family:'IBM Plex Mono',monospace; font-size:0.85rem; font-weight:600; color:var(--gold);">$1.00 USD</span>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.6rem;">
+          <label class="field-label" style="margin:0;">Precio por Pupusa</label>
+          <span id="price-display" style="font-family:'IBM Plex Mono',monospace; font-size:1rem; font-weight:700; color:var(--gold);">$1.00 USD</span>
         </div>
-        <input id="price" type="range" min="0.50" max="5.00" step="0.25" value="1.00" style="--fill:11.1%;" />
-        <div style="display:flex; justify-content:space-between; font-family:'IBM Plex Mono',monospace; font-size:0.6rem; color:#3d3830; margin-top:4px;">
-          <span>$0.50</span><span>$2.75</span><span>$5.00</span>
+        <input id="price" type="range" min="0.50" max="5.00" step="0.25" value="1.00" style="--fill:11.1%;" aria-label="Precio por pupusa" />
+        <div style="display:flex; justify-content:space-between; margin-top:5px;">
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:0.57rem; color:var(--text-faint);">$0.50</span>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:0.57rem; color:var(--text-faint);">$2.75</span>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:0.57rem; color:var(--text-faint);">$5.00</span>
         </div>
       </div>
 
-      <!-- Concept -->
+      <!-- Concepto -->
       <div>
-        <label class="label">PITCH / CONCEPTO (OPCIONAL)</label>
+        <label class="field-label" for="concept">
+          Pitch / Concepto <span style="color:var(--text-faint); letter-spacing:0;">(opcional)</span>
+        </label>
         <input id="concept" type="text" class="field" placeholder="Pupusa artesanal de autor con…" />
       </div>
 
-      <div class="hr-amber"></div>
+      <div class="hr-comal"></div>
 
       <!-- Run button -->
-      <button id="run-btn" class="btn-run">EJECUTAR SIMULACION</button>
+      <button id="run-btn" class="btn-run">Ejecutar Simulación</button>
 
-      <!-- Status log -->
-      <div id="log" style="min-height:60px; display:none; flex-direction:column; gap:2px;"></div>
+      <!-- Log -->
+      <div id="log" style="min-height:52px; display:none; flex-direction:column; gap:3px; padding:0.75rem; background:var(--bg); border-radius:0.75rem; border:1px solid var(--border-subtle);"></div>
     </div>
 
-    <!-- ─── FOCUS GROUP ─────────────────────────────────────────── -->
-    <div class="card" style="padding:1.5rem;">
-      <h2 style="font-family:'Cinzel',serif; font-size:0.85rem; color:#fbbf24; letter-spacing:0.1em; display:flex; align-items:center; gap:8px; margin-bottom:4px;">
-        <svg width="14" height="14" fill="none" stroke="#d97706" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z"/></svg>
-        GRUPO FOCAL ACTIVO
-      </h2>
-      <p style="font-family:'IBM Plex Mono',monospace; font-size:0.6rem; color:var(--muted); letter-spacing:0.15em; margin-bottom:1rem;">40 PERSONAS · 4 MACRO-REGIONES · COHORTE COMPLETA</p>
+    <!-- ─── GRUPO FOCAL ──────────────────────────────────────────── -->
+    <div class="panel-card" style="padding:1.75rem;">
+      <div style="margin-bottom:1.1rem;">
+        <div style="display:flex; align-items:center; gap:8px; margin-bottom:3px;">
+          <svg width="15" height="15" fill="none" stroke="var(--amber)" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z"/>
+          </svg>
+          <h2 class="panel-title">Grupo Focal Activo</h2>
+        </div>
+        <span class="section-eyebrow" style="padding-left:23px;">40 Personas · 4 Macro-Regiones · Cohorte Completa</span>
+      </div>
       <div id="persona-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem;"></div>
     </div>
   </div>
 
   <!-- ═══ RESULTS ══════════════════════════════════════════════════ -->
   <div id="results" style="display:none;">
-    <div class="hr-amber" style="margin:1.5rem 0;"></div>
+    <div class="hr-comal" style="margin:1.5rem 0;"></div>
 
     <!-- Chart -->
-    <div class="card" style="padding:1.5rem; margin-bottom:1.25rem;">
-      <h2 style="font-family:'Cinzel',serif; font-size:0.85rem; color:#fbbf24; letter-spacing:0.1em; margin-bottom:1.25rem;">
-        ANALISIS DE ACEPTACION REGIONAL
-      </h2>
-      <div style="position:relative; height:240px;">
-        <canvas id="chart"></canvas>
+    <div class="panel-card" style="padding:1.75rem; margin-bottom:1.5rem;">
+      <div style="display:flex; align-items:center; gap:8px; margin-bottom:1.25rem;">
+        <svg width="15" height="15" fill="none" stroke="var(--amber)" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z"/>
+        </svg>
+        <h2 class="panel-title">Análisis de Aceptación Regional</h2>
+      </div>
+      <div style="position:relative; height:260px;">
+        <canvas id="chart" aria-label="Gráfico de aceptación por región"></canvas>
       </div>
     </div>
 
-    <!-- Cards -->
-    <h2 style="font-family:'Cinzel',serif; font-size:0.85rem; color:#fbbf24; letter-spacing:0.1em; margin-bottom:1rem;">
-      VOCES DEL MERCADO
-    </h2>
-    <div id="cards" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px,1fr)); gap:1rem;"></div>
+    <!-- Result Cards -->
+    <div style="display:flex; align-items:center; gap:8px; margin-bottom:1.25rem;">
+      <svg width="15" height="15" fill="none" stroke="var(--amber)" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z"/>
+      </svg>
+      <h2 class="panel-title">Voces del Mercado</h2>
+    </div>
+    <div id="cards" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(270px,1fr)); gap:1rem;"></div>
   </div>
 
 </div>
@@ -412,626 +681,65 @@
 <script type="module">
   import Anthropic from 'https://esm.sh/@anthropic-ai/sdk@0.52.0';
 
-  const CONFIG = {
-    apiKey: ''
-  };
+  const CONFIG = { apiKey: '' };
 
+  // ── PERSONAS ─────────────────────────────────────────────────────
   const PERSONAS = [
     // ── CENTRAL REGION (10 profiles) ──
-    {
-      id: "NES-CEN-001",
-      name: "Nayely Guadalupe Hernández Rivas",
-      age: 29,
-      gender: "Femenino",
-      department: "San Salvador",
-      municipality: "San Salvador",
-      region: "Central",
-      occupation: "Asistente administrativa en empresa de logística",
-      education: "Técnico universitario en Administración de Empresas",
-      monthly_income_usd: 850.00,
-      ocean_openness: 73,
-      ocean_neuroticism: 38,
-      profile_summary: "Nayely vive en la colonia Escalón y trabaja en la Zona Rosa. Representa al consumidor urbano aspiracional: dispuesta a pagar precios premium por productos con buena presentación e ingredientes gourmet. Acepta precios de $2.00-$2.50. Valora la experiencia y la higiene."
-    },
-    {
-      id: "NES-CEN-002",
-      name: "Rodrigo José Castillo Vega",
-      age: 24,
-      gender: "Masculino",
-      department: "San Salvador",
-      municipality: "Antiguo Cuscatlán",
-      region: "Central",
-      occupation: "Desarrollador junior / Freelancer",
-      education: "Técnico en Ingeniería de Sistemas",
-      monthly_income_usd: 950.00,
-      ocean_openness: 80,
-      ocean_neuroticism: 45,
-      profile_summary: "Rodrigo es un joven tecnológico que trabaja desde cafés y tiene alta apertura a tendencias internacionales. Le gustan las fusiones exóticas (pupusas de birria o tocino) y paga premium si se puede pedir por app. Critica si percibe falta de innovación."
-    },
-    {
-      id: "NES-CEN-003",
-      name: "Héctor Manuel Flores Ortiz",
-      age: 47,
-      gender: "Masculino",
-      department: "San Salvador",
-      municipality: "Soyapango",
-      region: "Central",
-      occupation: "Motorista de reparto",
-      education: "Bachillerato general",
-      monthly_income_usd: 480.00,
-      ocean_openness: 40,
-      ocean_neuroticism: 55,
-      profile_summary: "Héctor trabaja todo el día manejando en el tráfico de San Salvador. Almuerza en comedores populares y busca comidas pesadas de bajo precio. Sensible al costo, su límite es de $1.00 por pupusa. Prefiere sabores tradicionales abundantes."
-    },
-    {
-      id: "NES-CEN-004",
-      name: "Sofía Abigail Martínez Paz",
-      age: 31,
-      gender: "Femenino",
-      department: "La Libertad",
-      municipality: "Santa Tecla",
-      region: "Central",
-      occupation: "Diseñadora gráfica independiente",
-      education: "Licenciatura en Diseño Gráfico",
-      monthly_income_usd: 750.00,
-      ocean_openness: 65,
-      ocean_neuroticism: 50,
-      profile_summary: "Sofía valora la estética y busca opciones vegetarianas (espinaca, ajo rostizado, hongos). Visita mercaditos orgánicos y prefiere pupuserías con ambiente artístico. Dispuesta a pagar hasta $2.00 por conceptos bien elaborados."
-    },
-    {
-      id: "NES-CEN-005",
-      name: "Gerson Alexis Cruz Torres",
-      age: 35,
-      gender: "Masculino",
-      department: "San Salvador",
-      municipality: "Ilopango",
-      region: "Central",
-      occupation: "Técnico electromecánico",
-      education: "Bachillerato técnico",
-      monthly_income_usd: 550.00,
-      ocean_openness: 48,
-      ocean_neuroticism: 42,
-      profile_summary: "Gerson valora la consistencia y el precio justo. Compra pupusas los viernes al salir del taller en Soyapango. Prefiere pupusas revueltas tradicionales y no le agradan las innovaciones pretenciosas con porciones pequeñas."
-    },
-    {
-      id: "NES-CEN-006",
-      name: "Sandra Elizabeth Ruiz Gómez",
-      age: 42,
-      gender: "Femenino",
-      department: "San Salvador",
-      municipality: "Mejicanos",
-      region: "Central",
-      occupation: "Cajera de supermercado",
-      education: "Bachillerato general",
-      monthly_income_usd: 420.00,
-      ocean_openness: 35,
-      ocean_neuroticism: 60,
-      profile_summary: "Sandra administra estrictamente el presupuesto familiar. Considera que las pupusas gourmet de $2.00 son 'pura paja'. Paga un límite de $0.75 y prefiere comprar en pupuserías locales tradicionales de su colonia."
-    },
-    {
-      id: "NES-CEN-007",
-      name: "Josué David Alvarenga Peña",
-      age: 20,
-      gender: "Masculino",
-      department: "San Salvador",
-      municipality: "San Salvador",
-      region: "Central",
-      occupation: "Estudiante universitario / Agente de Call Center",
-      education: "Estudiante de tercer año de Comunicaciones",
-      monthly_income_usd: 365.00,
-      ocean_openness: 70,
-      ocean_neuroticism: 30,
-      profile_summary: "Josué trabaja a tiempo parcial y tiene un presupuesto limitado, pero le gusta probar cosas nuevas con sus amigos de la universidad. Busca ofertas, promociones en redes sociales y valora que el lugar sea 'instagrammeable'."
-    },
-    {
-      id: "NES-CEN-008",
-      name: "Patricia Leonor Quintanilla",
-      age: 56,
-      gender: "Femenino",
-      department: "La Libertad",
-      municipality: "Colón",
-      region: "Central",
-      occupation: "Costurera independiente",
-      education: "Educación básica completa",
-      monthly_income_usd: 380.00,
-      ocean_openness: 30,
-      ocean_neuroticism: 58,
-      profile_summary: "Patricia trabaja desde su casa cosiendo ropa. Su presupuesto es limitado y prefiere preparar comida en casa. Considera comer fuera como un lujo ocasional; solo compra pupusas tradicionales si están bajo el precio de $0.75."
-    },
-    {
-      id: "NES-CEN-009",
-      name: "Mauricio Edgardo Zelaya",
-      age: 50,
-      gender: "Masculino",
-      department: "San Salvador",
-      municipality: "Antiguo Cuscatlán",
-      region: "Central",
-      occupation: "Gerente de sucursal bancaria",
-      education: "Licenciatura en Economía",
-      monthly_income_usd: 1200.00,
-      ocean_openness: 58,
-      ocean_neuroticism: 40,
-      profile_summary: "Mauricio busca calidad, higiene y buen servicio sin importar el precio. Prefiere pupuserías formales y ejecutivas. Compra pupusas gourmet para reuniones familiares y tolera precios de hasta $3.00 si la calidad lo respalda."
-    },
-    {
-      id: "NES-CEN-010",
-      name: "Valeria Estefanía Pinto",
-      age: 27,
-      gender: "Femenino",
-      department: "San Salvador",
-      municipality: "San Salvador",
-      region: "Central",
-      occupation: "Enfermera graduada",
-      education: "Licenciatura en Enfermería",
-      monthly_income_usd: 680.00,
-      ocean_openness: 75,
-      ocean_neuroticism: 49,
-      profile_summary: "Valeria tiene turnos rotativos en un hospital público. Busca comida rápida y nutritiva por las noches. Valora ingredientes frescos y ligeros (como masa de arroz o espinaca con loroco) y tolera precios de $1.25 a $1.75."
-    },
+    { id:"NES-CEN-001", name:"Nayely Guadalupe Hernández Rivas", age:29, gender:"Femenino", department:"San Salvador", municipality:"San Salvador", region:"Central", occupation:"Asistente administrativa en empresa de logística", education:"Técnico universitario en Administración de Empresas", monthly_income_usd:850.00, ocean_openness:73, ocean_neuroticism:38, profile_summary:"Nayely vive en la colonia Escalón y trabaja en la Zona Rosa. Representa al consumidor urbano aspiracional: dispuesta a pagar precios premium por productos con buena presentación e ingredientes gourmet. Acepta precios de $2.00-$2.50. Valora la experiencia y la higiene." },
+    { id:"NES-CEN-002", name:"Rodrigo José Castillo Vega", age:24, gender:"Masculino", department:"San Salvador", municipality:"Antiguo Cuscatlán", region:"Central", occupation:"Desarrollador junior / Freelancer", education:"Técnico en Ingeniería de Sistemas", monthly_income_usd:950.00, ocean_openness:80, ocean_neuroticism:45, profile_summary:"Rodrigo es un joven tecnológico que trabaja desde cafés y tiene alta apertura a tendencias internacionales. Le gustan las fusiones exóticas (pupusas de birria o tocino) y paga premium si se puede pedir por app. Critica si percibe falta de innovación." },
+    { id:"NES-CEN-003", name:"Héctor Manuel Flores Ortiz", age:47, gender:"Masculino", department:"San Salvador", municipality:"Soyapango", region:"Central", occupation:"Motorista de reparto", education:"Bachillerato general", monthly_income_usd:480.00, ocean_openness:40, ocean_neuroticism:55, profile_summary:"Héctor trabaja todo el día manejando en el tráfico de San Salvador. Almuerza en comedores populares y busca comidas pesadas de bajo precio. Sensible al costo, su límite es de $1.00 por pupusa. Prefiere sabores tradicionales abundantes." },
+    { id:"NES-CEN-004", name:"Sofía Abigail Martínez Paz", age:31, gender:"Femenino", department:"La Libertad", municipality:"Santa Tecla", region:"Central", occupation:"Diseñadora gráfica independiente", education:"Licenciatura en Diseño Gráfico", monthly_income_usd:750.00, ocean_openness:65, ocean_neuroticism:50, profile_summary:"Sofía valora la estética y busca opciones vegetarianas (espinaca, ajo rostizado, hongos). Visita mercaditos orgánicos y prefiere pupuserías con ambiente artístico. Dispuesta a pagar hasta $2.00 por conceptos bien elaborados." },
+    { id:"NES-CEN-005", name:"Gerson Alexis Cruz Torres", age:35, gender:"Masculino", department:"San Salvador", municipality:"Ilopango", region:"Central", occupation:"Técnico electromecánico", education:"Bachillerato técnico", monthly_income_usd:550.00, ocean_openness:48, ocean_neuroticism:42, profile_summary:"Gerson valora la consistencia y el precio justo. Compra pupusas los viernes al salir del taller en Soyapango. Prefiere pupusas revueltas tradicionales y no le agradan las innovaciones pretenciosas con porciones pequeñas." },
+    { id:"NES-CEN-006", name:"Sandra Elizabeth Ruiz Gómez", age:42, gender:"Femenino", department:"San Salvador", municipality:"Mejicanos", region:"Central", occupation:"Cajera de supermercado", education:"Bachillerato general", monthly_income_usd:420.00, ocean_openness:35, ocean_neuroticism:60, profile_summary:"Sandra administra estrictamente el presupuesto familiar. Considera que las pupusas gourmet de $2.00 son 'pura paja'. Paga un límite de $0.75 y prefiere comprar en pupuserías locales tradicionales de su colonia." },
+    { id:"NES-CEN-007", name:"Josué David Alvarenga Peña", age:20, gender:"Masculino", department:"San Salvador", municipality:"San Salvador", region:"Central", occupation:"Estudiante universitario / Agente de Call Center", education:"Estudiante de tercer año de Comunicaciones", monthly_income_usd:365.00, ocean_openness:70, ocean_neuroticism:30, profile_summary:"Josué trabaja a tiempo parcial y tiene un presupuesto limitado, pero le gusta probar cosas nuevas con sus amigos de la universidad. Busca ofertas, promociones en redes sociales y valora que el lugar sea 'instagrammeable'." },
+    { id:"NES-CEN-008", name:"Patricia Leonor Quintanilla", age:56, gender:"Femenino", department:"La Libertad", municipality:"Colón", region:"Central", occupation:"Costurera independiente", education:"Educación básica completa", monthly_income_usd:380.00, ocean_openness:30, ocean_neuroticism:58, profile_summary:"Patricia trabaja desde su casa cosiendo ropa. Su presupuesto es limitado y prefiere preparar comida en casa. Considera comer fuera como un lujo ocasional; solo compra pupusas tradicionales si están bajo el precio de $0.75." },
+    { id:"NES-CEN-009", name:"Mauricio Edgardo Zelaya", age:50, gender:"Masculino", department:"San Salvador", municipality:"Antiguo Cuscatlán", region:"Central", occupation:"Gerente de sucursal bancaria", education:"Licenciatura en Economía", monthly_income_usd:1200.00, ocean_openness:58, ocean_neuroticism:40, profile_summary:"Mauricio busca calidad, higiene y buen servicio sin importar el precio. Prefiere pupuserías formales y ejecutivas. Compra pupusas gourmet para reuniones familiares y tolera precios de hasta $3.00 si la calidad lo respalda." },
+    { id:"NES-CEN-010", name:"Valeria Estefanía Pinto", age:27, gender:"Femenino", department:"San Salvador", municipality:"San Salvador", region:"Central", occupation:"Enfermera graduada", education:"Licenciatura en Enfermería", monthly_income_usd:680.00, ocean_openness:75, ocean_neuroticism:49, profile_summary:"Valeria tiene turnos rotativos en un hospital público. Busca comida rápida y nutritiva por las noches. Valora ingredientes frescos y ligeros (como masa de arroz o espinaca con loroco) y tolera precios de $1.25 a $1.75." },
     // ── ORIENTAL REGION (10 profiles) ──
-    {
-      id: "NES-ORI-001",
-      name: "José \"Don Chepe\" Amaya Portillo",
-      age: 54,
-      gender: "Masculino",
-      department: "San Miguel",
-      municipality: "San Miguel",
-      region: "Oriental",
-      occupation: "Vendedor de mercado / Agricultor de temporada",
-      education: "Bachillerato incompleto",
-      monthly_income_usd: 365.00,
-      ocean_openness: 42,
-      ocean_neuroticism: 61,
-      profile_summary: "Don Chepe es vendedor en el mercado central de San Miguel. Altamente sensible al precio: su límite es de $0.50 por pupusa. Rechaza masas raras o ingredientes extravagantes como ofensa a la tradición migueleña."
-    },
-    {
-      id: "NES-ORI-002",
-      name: "María Santos Benítez Melgar",
-      age: 48,
-      gender: "Femenino",
-      department: "Usulután",
-      municipality: "Jiquilisco",
-      region: "Oriental",
-      occupation: "Vendedora informal de minutas and golosinas",
-      education: "Educación básica incompleta",
-      monthly_income_usd: 280.00,
-      ocean_openness: 35,
-      ocean_neuroticism: 65,
-      profile_summary: "María vive en una zona rural de Usulután. Su economía es de subsistencia. Compra pupusas solo para celebrar cumpleaños o fechas especiales. Paga máximo $0.50 y rechaza cualquier ingrediente exótico."
-    },
-    {
-      id: "NES-ORI-003",
-      name: "Wilmer Alexander Rivas Ortiz",
-      age: 23,
-      gender: "Masculino",
-      department: "La Unión",
-      municipality: "Conchagua",
-      region: "Oriental",
-      occupation: "Pescador artesanal / Guía turístico ocasional",
-      education: "Bachillerato general",
-      monthly_income_usd: 350.00,
-      ocean_openness: 50,
-      ocean_neuroticism: 40,
-      profile_summary: "Wilmer vive en el puerto de La Unión. Come mariscos a diario por su trabajo, pero prefiere pupusas tradicionales de queso o chicharrón. Sensible al precio, busca comer barato en puestos de la playa."
-    },
-    {
-      id: "NES-ORI-004",
-      name: "Blanca Lilian Portillo",
-      age: 38,
-      gender: "Femenino",
-      department: "Morazán",
-      municipality: "San Francisco Gotera",
-      region: "Oriental",
-      occupation: "Promotora de salud comunitaria",
-      education: "Técnico en Enfermería",
-      monthly_income_usd: 450.00,
-      ocean_openness: 45,
-      ocean_neuroticism: 52,
-      profile_summary: "Blanca viaja por cantones rurales de Morazán. Prefiere la comida casera e higiénica. Paga hasta $0.75 por pupusa y valora los ingredientes locales frescos como el loroco y el quesillo tradicional."
-    },
-    {
-      id: "NES-ORI-005",
-      name: "Kevin Josué Lazo Guevara",
-      age: 26,
-      gender: "Masculino",
-      department: "San Miguel",
-      municipality: "El Tránsito",
-      region: "Oriental",
-      occupation: "Ayudante de mecánica automotriz",
-      education: "Educación básica completa",
-      monthly_income_usd: 380.00,
-      ocean_openness: 55,
-      ocean_neuroticism: 48,
-      profile_summary: "Kevin trabaja en un taller en San Miguel. Come pupusas casi todas las noches por comodidad. Prefiere pupusas grandes de chicharrón con mucho curtido y salsa picante. Su presupuesto límite es de $0.75 por unidad."
-    },
-    {
-      id: "NES-ORI-006",
-      name: "Gladys Ondina Majano",
-      age: 62,
-      gender: "Femenino",
-      department: "San Miguel",
-      municipality: "San Miguel",
-      region: "Oriental",
-      occupation: "Ama de casa / Dependiente de remesas",
-      education: "Educación básica incompleta",
-      monthly_income_usd: 320.00,
-      ocean_openness: 25,
-      ocean_neuroticism: 70,
-      profile_summary: "Gladys recibe una remesa mensual de su hijo en EE.UU. Es muy tradicional y religiosa. Detesta que le pongan cosas raras a la comida típica y añora el sabor de las pupusas cocinadas en leña de antes."
-    },
-    {
-      id: "NES-ORI-007",
-      name: "Marvin Geovanny Salmerón",
-      age: 32,
-      gender: "Masculino",
-      department: "La Unión",
-      municipality: "La Unión",
-      region: "Oriental",
-      occupation: "Electricista independiente",
-      education: "Técnico vocacional",
-      monthly_income_usd: 580.00,
-      ocean_openness: 60,
-      ocean_neuroticism: 44,
-      profile_summary: "Marvin realiza instalaciones eléctricas residenciales. Tiene ingresos estables y busca comida de buen sabor al final de su jornada. Acepta pagar hasta $1.00 por pupusas de camarón o pollo si están bien rellenas."
-    },
-    {
-      id: "NES-ORI-008",
-      name: "Irma Yolanda Carballo",
-      age: 45,
-      gender: "Femenino",
-      department: "Usulután",
-      municipality: "Santiago de María",
-      region: "Oriental",
-      occupation: "Empleada doméstica",
-      education: "Educación básica completa",
-      monthly_income_usd: 410.00,
-      ocean_openness: 38,
-      ocean_neuroticism: 57,
-      profile_summary: "Irma trabaja en casas particulares. Es muy económica y cuida el dinero para sus tres hijos. Compra pupusas como cena rápida los fines de semana en la pupusería de la esquina. Su precio máximo es de $0.75."
-    },
-    {
-      id: "NES-ORI-009",
-      name: "Nelson Enrique Canales",
-      age: 58,
-      gender: "Masculino",
-      department: "Morazán",
-      municipality: "Cacaopera",
-      region: "Oriental",
-      occupation: "Agricultor de maíz y frijol",
-      education: "Sin educación formal",
-      monthly_income_usd: 300.00,
-      ocean_openness: 30,
-      ocean_neuroticism: 62,
-      profile_summary: "Nelson cultiva su propia tierra. Considera que pagar más de $0.50 por una pupusa es ridículo porque él conoce el costo de los granos. Absolutamente tradicionalista; rechaza cualquier masa de color o sabor dulce."
-    },
-    {
-      id: "NES-ORI-010",
-      name: "Xiomara Claribel Romero",
-      age: 30,
-      gender: "Femenino",
-      department: "San Miguel",
-      municipality: "San Miguel",
-      region: "Oriental",
-      occupation: "Secretaria en juzgado civil",
-      education: "Técnico en Secretariado",
-      monthly_income_usd: 650.00,
-      ocean_openness: 65,
-      ocean_neuroticism: 47,
-      profile_summary: "Xiomara busca opciones limpias y formales en la ciudad de San Miguel. Prefiere pupusas de arroz con loroco. Acepta precios de hasta $1.25 por pupusa si el local cuenta con aire acondicionado y buen servicio."
-    },
+    { id:"NES-ORI-001", name:"José \"Don Chepe\" Amaya Portillo", age:54, gender:"Masculino", department:"San Miguel", municipality:"San Miguel", region:"Oriental", occupation:"Vendedor de mercado / Agricultor de temporada", education:"Bachillerato incompleto", monthly_income_usd:365.00, ocean_openness:42, ocean_neuroticism:61, profile_summary:"Don Chepe es vendedor en el mercado central de San Miguel. Altamente sensible al precio: su límite es de $0.50 por pupusa. Rechaza masas raras o ingredientes extravagantes como ofensa a la tradición migueleña." },
+    { id:"NES-ORI-002", name:"María Santos Benítez Melgar", age:48, gender:"Femenino", department:"Usulután", municipality:"Jiquilisco", region:"Oriental", occupation:"Vendedora informal de minutas and golosinas", education:"Educación básica incompleta", monthly_income_usd:280.00, ocean_openness:35, ocean_neuroticism:65, profile_summary:"María vive en una zona rural de Usulután. Su economía es de subsistencia. Compra pupusas solo para celebrar cumpleaños o fechas especiales. Paga máximo $0.50 y rechaza cualquier ingrediente exótico." },
+    { id:"NES-ORI-003", name:"Wilmer Alexander Rivas Ortiz", age:23, gender:"Masculino", department:"La Unión", municipality:"Conchagua", region:"Oriental", occupation:"Pescador artesanal / Guía turístico ocasional", education:"Bachillerato general", monthly_income_usd:350.00, ocean_openness:50, ocean_neuroticism:40, profile_summary:"Wilmer vive en el puerto de La Unión. Come mariscos a diario por su trabajo, pero prefiere pupusas tradicionales de queso o chicharrón. Sensible al precio, busca comer barato en puestos de la playa." },
+    { id:"NES-ORI-004", name:"Blanca Lilian Portillo", age:38, gender:"Femenino", department:"Morazán", municipality:"San Francisco Gotera", region:"Oriental", occupation:"Promotora de salud comunitaria", education:"Técnico en Enfermería", monthly_income_usd:450.00, ocean_openness:45, ocean_neuroticism:52, profile_summary:"Blanca viaja por cantones rurales de Morazán. Prefiere la comida casera e higiénica. Paga hasta $0.75 por pupusa y valora los ingredientes locales frescos como el loroco y el quesillo tradicional." },
+    { id:"NES-ORI-005", name:"Kevin Josué Lazo Guevara", age:26, gender:"Masculino", department:"San Miguel", municipality:"El Tránsito", region:"Oriental", occupation:"Ayudante de mecánica automotriz", education:"Educación básica completa", monthly_income_usd:380.00, ocean_openness:55, ocean_neuroticism:48, profile_summary:"Kevin trabaja en un taller en San Miguel. Come pupusas casi todas las noches por comodidad. Prefiere pupusas grandes de chicharrón con mucho curtido y salsa picante. Su presupuesto límite es de $0.75 por unidad." },
+    { id:"NES-ORI-006", name:"Gladys Ondina Majano", age:62, gender:"Femenino", department:"San Miguel", municipality:"San Miguel", region:"Oriental", occupation:"Ama de casa / Dependiente de remesas", education:"Educación básica incompleta", monthly_income_usd:320.00, ocean_openness:25, ocean_neuroticism:70, profile_summary:"Gladys recibe una remesa mensual de su hijo en EE.UU. Es muy tradicional y religiosa. Detesta que le pongan cosas raras a la comida típica y añora el sabor de las pupusas cocinadas en leña de antes." },
+    { id:"NES-ORI-007", name:"Marvin Geovanny Salmerón", age:32, gender:"Masculino", department:"La Unión", municipality:"La Unión", region:"Oriental", occupation:"Electricista independiente", education:"Técnico vocacional", monthly_income_usd:580.00, ocean_openness:60, ocean_neuroticism:44, profile_summary:"Marvin realiza instalaciones eléctricas residenciales. Tiene ingresos estables y busca comida de buen sabor al final de su jornada. Acepta pagar hasta $1.00 por pupusas de camarón o pollo si están bien rellenas." },
+    { id:"NES-ORI-008", name:"Irma Yolanda Carballo", age:45, gender:"Femenino", department:"Usulután", municipality:"Santiago de María", region:"Oriental", occupation:"Empleada doméstica", education:"Educación básica completa", monthly_income_usd:410.00, ocean_openness:38, ocean_neuroticism:57, profile_summary:"Irma trabaja en casas particulares. Es muy económica y cuida el dinero para sus tres hijos. Compra pupusas como cena rápida los fines de semana en la pupusería de la esquina. Su precio máximo es de $0.75." },
+    { id:"NES-ORI-009", name:"Nelson Enrique Canales", age:58, gender:"Masculino", department:"Morazán", municipality:"Cacaopera", region:"Oriental", occupation:"Agricultor de maíz y frijol", education:"Sin educación formal", monthly_income_usd:300.00, ocean_openness:30, ocean_neuroticism:62, profile_summary:"Nelson cultiva su propia tierra. Considera que pagar más de $0.50 por una pupusa es ridículo porque él conoce el costo de los granos. Absolutamente tradicionalista; rechaza cualquier masa de color o sabor dulce." },
+    { id:"NES-ORI-010", name:"Xiomara Claribel Romero", age:30, gender:"Femenino", department:"San Miguel", municipality:"San Miguel", region:"Oriental", occupation:"Secretaria en juzgado civil", education:"Técnico en Secretariado", monthly_income_usd:650.00, ocean_openness:65, ocean_neuroticism:47, profile_summary:"Xiomara busca opciones limpias y formales en la ciudad de San Miguel. Prefiere pupusas de arroz con loroco. Acepta precios de hasta $1.25 por pupusa si el local cuenta con aire acondicionado y buen servicio." },
     // ── OCCIDENTAL REGION (10 profiles) ──
-    {
-      id: "NES-OCC-001",
-      name: "Carlos Ernesto Molina Gutiérrez",
-      age: 41,
-      gender: "Masculino",
-      department: "Santa Ana",
-      municipality: "Santa Ana",
-      region: "Occidental",
-      occupation: "Supervisor de producción en fábrica textil",
-      education: "Bachillerato técnico vocacional",
-      monthly_income_usd: 520.00,
-      ocean_openness: 55,
-      ocean_neuroticism: 47,
-      profile_summary: "Carlos trabaja en la zona industrial de Santa Ana. Evalúa con rigor la consistencia y grosor de la masa antes que el relleno. Acepta variaciones de precio de hasta 15% antes de quejarse. Paga hasta $1.00."
-    },
-    {
-      id: "NES-OCC-002",
-      name: "Silvia Elena Arana Toledo",
-      age: 33,
-      gender: "Femenino",
-      department: "Sonsonate",
-      municipality: "Izalco",
-      region: "Occidental",
-      occupation: "Artesana de alfarería / Vendedora de mercado",
-      education: "Bachillerato general",
-      monthly_income_usd: 450.00,
-      ocean_openness: 60,
-      ocean_neuroticism: 50,
-      profile_summary: "Silvia vende artesanías de barro en Izalco. Prefiere pupusas de yuca o maíz tradicional bien tostadas. Valora la textura crujiente de la masa y castiga si las pupusas quedan grasosas o con la masa cruda."
-    },
-    {
-      id: "NES-OCC-003",
-      name: "Jorge Alberto Escobar",
-      age: 25,
-      gender: "Masculino",
-      department: "Ahuachapán",
-      municipality: "Ahuachapán",
-      region: "Occidental",
-      occupation: "Guía de turismo en fincas de café",
-      education: "Bachillerato general",
-      monthly_income_usd: 365.00,
-      ocean_openness: 58,
-      ocean_neuroticism: 42,
-      profile_summary: "Jorge guía a turistas extranjeros en la Ruta de las Flores. Prefiere pupusas tradicionales pero tolera ingredientes locales como ajo o jalapeño. Su presupuesto es ajustado y prefiere comer barato ($0.60 por unidad)."
-    },
-    {
-      id: "NES-OCC-004",
-      name: "Ana María Flores Lemus",
-      age: 52,
-      gender: "Femenino",
-      department: "Santa Ana",
-      municipality: "Chalchuapa",
-      region: "Occidental",
-      occupation: "Panificadora artesanal",
-      education: "Educación básica completa",
-      monthly_income_usd: 380.00,
-      ocean_openness: 32,
-      ocean_neuroticism: 63,
-      profile_summary: "Ana posee un horno artesanal de pan de dulce en Chalchuapa. Conoce las texturas de la masa perfectamente. Exige masa suave y bien cocinada; penaliza con dureza si la masa se deshace. Su precio tope es de $0.75."
-    },
-    {
-      id: "NES-OCC-005",
-      name: "Marlon Castaneda",
-      age: 28,
-      gender: "Masculino",
-      department: "Sonsonate",
-      municipality: "Sonsonate",
-      region: "Occidental",
-      occupation: "Despachador de aduanas marítimas",
-      education: "Estudios aduaneros",
-      monthly_income_usd: 490.00,
-      ocean_openness: 52,
-      ocean_neuroticism: 46,
-      profile_summary: "Marlon trabaja bajo presión en el puerto de Acajutla. Busca cenar abundante después del trabajo. Prefiere pupusas revueltas tradicionales en masa de maíz. Acepta precios de hasta $1.00 si el tamaño es generoso."
-    },
-    {
-      id: "NES-OCC-006",
-      name: "Teresa de Jesús Calderón",
-      age: 60,
-      gender: "Femenino",
-      department: "Ahuachapán",
-      municipality: "Ataco",
-      region: "Occidental",
-      occupation: "Tejedora de telares de pedal",
-      education: "Educación básica incompleta",
-      monthly_income_usd: 340.00,
-      ocean_openness: 28,
-      ocean_neuroticism: 68,
-      profile_summary: "Teresa teje mantas coloridas en Ataco. Es muy tradicional y cuida cada centavo. Prefiere comer en su casa y considera que las pupuserías turísticas cobran demasiado caro por comida que no tiene la cocción tradicional."
-    },
-    {
-      id: "NES-OCC-007",
-      name: "Walter Alexander Menjívar",
-      age: 36,
-      gender: "Masculino",
-      department: "Santa Ana",
-      municipality: "Metapán",
-      region: "Occidental",
-      occupation: "Operador de horno en planta de cemento",
-      education: "Bachillerato técnico",
-      monthly_income_usd: 680.00,
-      ocean_openness: 47,
-      ocean_neuroticism: 40,
-      profile_summary: "Walter tiene un trabajo físicamente exigente. Come pupusas tres veces por semana en Metapán. Prefiere pupusas de maíz con bastante chicharrón para llenarse. Tolera precios de hasta $1.25 si están bien rellenas."
-    },
-    {
-      id: "NES-OCC-008",
-      name: "Evelyn Vanessa Rivera",
-      age: 30,
-      gender: "Femenino",
-      department: "Santa Ana",
-      municipality: "Santa Ana",
-      region: "Occidental",
-      occupation: "Agente de ventas inmobiliarias",
-      education: "Licenciatura en Mercadeo",
-      monthly_income_usd: 600.00,
-      ocean_openness: 67,
-      ocean_neuroticism: 45,
-      profile_summary: "Evelyn trabaja mostrando propiedades en Santa Ana. Valora la presentación del platillo y prefiere ingredientes limpios y ligeros. Acepta masas alternativas como arroz o espinaca y tolera precios de hasta $1.50."
-    },
-    {
-      id: "NES-OCC-009",
-      name: "René Alonso Figueroa",
-      age: 46,
-      gender: "Masculino",
-      department: "Sonsonate",
-      municipality: "Acajutla",
-      region: "Occidental",
-      occupation: "Estibador portuario",
-      education: "Educación básica completa",
-      monthly_income_usd: 550.00,
-      ocean_openness: 42,
-      ocean_neuroticism: 52,
-      profile_summary: "René descarga barcos cargueros en Acajutla. Necesita mucha energía y busca comida de gran volumen a bajo precio. Detesta las pupusas pequeñas con rellenos exóticos; prefiere las revueltas tradicionales a $0.75."
-    },
-    {
-      id: "NES-OCC-010",
-      name: "Carmen Estela Solís",
-      age: 44,
-      gender: "Femenino",
-      department: "Ahuachapán",
-      municipality: "El Refugio",
-      region: "Occidental",
-      occupation: "Cocinera de comedor escolar público",
-      education: "Educación básica completa",
-      monthly_income_usd: 400.00,
-      ocean_openness: 38,
-      ocean_neuroticism: 59,
-      profile_summary: "Carmen cocina almuerzos escolares a diario. Tiene estándares altos de sazón e higiene y juzga críticamente el sabor y sellado de la masa. Paga máximo $0.75 por pupusas de maíz tradicionales bien hechas."
-    },
+    { id:"NES-OCC-001", name:"Carlos Ernesto Molina Gutiérrez", age:41, gender:"Masculino", department:"Santa Ana", municipality:"Santa Ana", region:"Occidental", occupation:"Supervisor de producción en fábrica textil", education:"Bachillerato técnico vocacional", monthly_income_usd:520.00, ocean_openness:55, ocean_neuroticism:47, profile_summary:"Carlos trabaja en la zona industrial de Santa Ana. Evalúa con rigor la consistencia y grosor de la masa antes que el relleno. Acepta variaciones de precio de hasta 15% antes de quejarse. Paga hasta $1.00." },
+    { id:"NES-OCC-002", name:"Silvia Elena Arana Toledo", age:33, gender:"Femenino", department:"Sonsonate", municipality:"Izalco", region:"Occidental", occupation:"Artesana de alfarería / Vendedora de mercado", education:"Bachillerato general", monthly_income_usd:450.00, ocean_openness:60, ocean_neuroticism:50, profile_summary:"Silvia vende artesanías de barro en Izalco. Prefiere pupusas de yuca o maíz tradicional bien tostadas. Valora la textura crujiente de la masa y castiga si las pupusas quedan grasosas o con la masa cruda." },
+    { id:"NES-OCC-003", name:"Jorge Alberto Escobar", age:25, gender:"Masculino", department:"Ahuachapán", municipality:"Ahuachapán", region:"Occidental", occupation:"Guía de turismo en fincas de café", education:"Bachillerato general", monthly_income_usd:365.00, ocean_openness:58, ocean_neuroticism:42, profile_summary:"Jorge guía a turistas extranjeros en la Ruta de las Flores. Prefiere pupusas tradicionales pero tolera ingredientes locales como ajo o jalapeño. Su presupuesto es ajustado y prefiere comer barato ($0.60 por unidad)." },
+    { id:"NES-OCC-004", name:"Ana María Flores Lemus", age:52, gender:"Femenino", department:"Santa Ana", municipality:"Chalchuapa", region:"Occidental", occupation:"Panificadora artesanal", education:"Educación básica completa", monthly_income_usd:380.00, ocean_openness:32, ocean_neuroticism:63, profile_summary:"Ana posee un horno artesanal de pan de dulce en Chalchuapa. Conoce las texturas de la masa perfectamente. Exige masa suave y bien cocinada; penaliza con dureza si la masa se deshace. Su precio tope es de $0.75." },
+    { id:"NES-OCC-005", name:"Marlon Castaneda", age:28, gender:"Masculino", department:"Sonsonate", municipality:"Sonsonate", region:"Occidental", occupation:"Despachador de aduanas marítimas", education:"Estudios aduaneros", monthly_income_usd:490.00, ocean_openness:52, ocean_neuroticism:46, profile_summary:"Marlon trabaja bajo presión en el puerto de Acajutla. Busca cenar abundante después del trabajo. Prefiere pupusas revueltas tradicionales en masa de maíz. Acepta precios de hasta $1.00 si el tamaño es generoso." },
+    { id:"NES-OCC-006", name:"Teresa de Jesús Calderón", age:60, gender:"Femenino", department:"Ahuachapán", municipality:"Ataco", region:"Occidental", occupation:"Tejedora de telares de pedal", education:"Educación básica incompleta", monthly_income_usd:340.00, ocean_openness:28, ocean_neuroticism:68, profile_summary:"Teresa teje mantas coloridas en Ataco. Es muy tradicional y cuida cada centavo. Prefiere comer en su casa y considera que las pupuserías turísticas cobran demasiado caro por comida que no tiene la cocción tradicional." },
+    { id:"NES-OCC-007", name:"Walter Alexander Menjívar", age:36, gender:"Masculino", department:"Santa Ana", municipality:"Metapán", region:"Occidental", occupation:"Operador de horno en planta de cemento", education:"Bachillerato técnico", monthly_income_usd:680.00, ocean_openness:47, ocean_neuroticism:40, profile_summary:"Walter tiene un trabajo físicamente exigente. Come pupusas tres veces por semana en Metapán. Prefiere pupusas de maíz con bastante chicharrón para llenarse. Tolera precios de hasta $1.25 si están bien rellenas." },
+    { id:"NES-OCC-008", name:"Evelyn Vanessa Rivera", age:30, gender:"Femenino", department:"Santa Ana", municipality:"Santa Ana", region:"Occidental", occupation:"Agente de ventas inmobiliarias", education:"Licenciatura en Mercadeo", monthly_income_usd:600.00, ocean_openness:67, ocean_neuroticism:45, profile_summary:"Evelyn trabaja mostrando propiedades en Santa Ana. Valora la presentación del platillo y prefiere ingredientes limpios y ligeros. Acepta masas alternativas como arroz o espinaca y tolera precios de hasta $1.50." },
+    { id:"NES-OCC-009", name:"René Alonso Figueroa", age:46, gender:"Masculino", department:"Sonsonate", municipality:"Acajutla", region:"Occidental", occupation:"Estibador portuario", education:"Educación básica completa", monthly_income_usd:550.00, ocean_openness:42, ocean_neuroticism:52, profile_summary:"René descarga barcos cargueros en Acajutla. Necesita mucha energía y busca comida de gran volumen a bajo precio. Detesta las pupusas pequeñas con rellenos exóticos; prefiere las revueltas tradicionales a $0.75." },
+    { id:"NES-OCC-010", name:"Carmen Estela Solís", age:44, gender:"Femenino", department:"Ahuachapán", municipality:"El Refugio", region:"Occidental", occupation:"Cocinera de comedor escolar público", education:"Educación básica completa", monthly_income_usd:400.00, ocean_openness:38, ocean_neuroticism:59, profile_summary:"Carmen cocina almuerzos escolares a diario. Tiene estándares altos de sazón e higiene y juzga críticamente el sabor y sellado de la masa. Paga máximo $0.75 por pupusas de maíz tradicionales bien hechas." },
     // ── PARACENTRAL REGION (10 profiles) ──
-    {
-      id: "NES-PAR-001",
-      name: "María Concepción Velásquez Torres",
-      age: 36,
-      gender: "Femenino",
-      department: "La Paz",
-      municipality: "Zacatecoluca",
-      region: "Paracentral",
-      occupation: "Maestra de educación primaria / Pupusera los fines de semana",
-      education: "Licenciatura en Ciencias de la Educación",
-      monthly_income_usd: 680.00,
-      ocean_openness: 68,
-      ocean_neuroticism: 44,
-      profile_summary: "Conchita produce y consume pupusas. Conoce al detalle los costos de materia prima. Acepta de $0.75 a $1.25 si la calidad lo amerita, pero detecta la sobrevaloración al instante. Exige porciones generosas."
-    },
-    {
-      id: "NES-PAR-002",
-      name: "Julio César Barahona",
-      age: 44,
-      gender: "Masculino",
-      department: "Cuscatlán",
-      municipality: "Cojutepeque",
-      region: "Paracentral",
-      occupation: "Elaborador artesanal de embutidos",
-      education: "Bachillerato general",
-      monthly_income_usd: 480.00,
-      ocean_openness: 42,
-      ocean_neuroticism: 56,
-      profile_summary: "Julio prepara chorizos tradicionales en Cojutepeque. Valora los embutidos de calidad y la carne fresca. Le gustan las pupusas con carne de calidad (como chorizo o birria) y rechaza si la carne sabe artificial o vieja. Límite de $1.00."
-    },
-    {
-      id: "NES-PAR-003",
-      name: "Wendy Yamileth Rosales",
-      age: 22,
-      gender: "Femenino",
-      department: "San Vicente",
-      municipality: "San Vicente",
-      region: "Paracentral",
-      occupation: "Estudiante de enfermería / Ventas de ropa online",
-      education: "Estudiante de enfermería",
-      monthly_income_usd: 350.00,
-      ocean_openness: 72,
-      ocean_neuroticism: 38,
-      profile_summary: "Wendy es una joven estudiante que cuida su presupuesto. Comparte pupusas los fines de semana en el parque de San Vicente. Valora las ofertas familiares y las porciones generosas por su dinero. Límite de $0.75."
-    },
-    {
-      id: "NES-PAR-004",
-      name: "Francisco Armando Orellana",
-      age: 50,
-      gender: "Masculino",
-      department: "Cabañas",
-      municipality: "Sensuntepeque",
-      region: "Paracentral",
-      occupation: "Pequeño ganadero de leche",
-      education: "Educación básica completa",
-      monthly_income_usd: 410.00,
-      ocean_openness: 35,
-      ocean_neuroticism: 60,
-      profile_summary: "Francisco produce queso y leche en Cabañas. Es extremadamente exigente con la calidad del queso de la pupusa: si no estira o sabe sintético, lo rechaza. Paga un límite de $0.75 y prefiere comer en zonas rurales."
-    },
-    {
-      id: "NES-PAR-005",
-      name: "Roxana Beatriz Amaya",
-      age: 28,
-      gender: "Femenino",
-      department: "La Paz",
-      municipality: "Olocuilta",
-      region: "Paracentral",
-      occupation: "Palmeadora de pupusas de arroz",
-      education: "Bachillerato general",
-      monthly_income_usd: 520.00,
-      ocean_openness: 60,
-      ocean_neuroticism: 46,
-      profile_summary: "Roxana palmea pupusas de arroz en Olocuilta, la cuna del arroz. Exige masa de arroz suave y fina. Tolera precios de hasta $1.00 si el tamaño y la cocción de la pupusa en la plancha son óptimos."
-    },
-    {
-      id: "NES-PAR-006",
-      name: "Manuel de Jesús Raymundo",
-      age: 55,
-      gender: "Masculino",
-      department: "San Vicente",
-      municipality: "Apastepeque",
-      region: "Paracentral",
-      occupation: "Jornalero de caña de azúcar",
-      education: "Sin educación formal",
-      monthly_income_usd: 320.00,
-      ocean_openness: 30,
-      ocean_neuroticism: 64,
-      profile_summary: "Manuel corta caña bajo el sol. Busca comidas baratas que le quiten el hambre todo el día. Considera comer fuera un gasto que debe evitar; solo compra pupusas tradicionales gigantes cuando están bajo $0.50."
-    },
-    {
-      id: "NES-PAR-007",
-      name: "Karla Tatiana Cisneros",
-      age: 31,
-      gender: "Femenino",
-      department: "Cuscatlán",
-      municipality: "San Pedro Perulapán",
-      region: "Paracentral",
-      occupation: "Artesana de sombreros de palma",
-      education: "Educación básica completa",
-      monthly_income_usd: 430.00,
-      ocean_openness: 50,
-      ocean_neuroticism: 53,
-      profile_summary: "Karla teje sombreros en San Pedro Perulapán. Cuida su presupuesto mensual con mucho cuidado. Compra pupusas revueltas los domingos con su familia. Prefiere locales pequeños e informales con precios de $0.60 a $0.75."
-    },
-    {
-      id: "NES-PAR-008",
-      name: "Edwin Giovanny Portillo",
-      age: 27,
-      gender: "Masculino",
-      department: "La Paz",
-      municipality: "San Luis Talpa",
-      region: "Paracentral",
-      occupation: "Empleado aeroportuario de rampa",
-      education: "Bachillerato técnico",
-      monthly_income_usd: 470.00,
-      ocean_openness: 58,
-      ocean_neuroticism: 42,
-      profile_summary: "Edwin trabaja en el aeropuerto internacional. Busca comida abundante para llevar. Prefiere pupusas de maíz con quesillo y chicharrón que resistan el transporte. Acepta pagar hasta $1.00 si el tamaño es grande."
-    },
-    {
-      id: "NES-PAR-009",
-      name: "Mercedes del Carmen Huezo",
-      age: 65,
-      gender: "Femenino",
-      department: "San Vicente",
-      municipality: "Tecoluca",
-      region: "Paracentral",
-      occupation: "Agricultora de subsistencia / Pensionada del INPEP",
-      education: "Educación básica incompleta",
-      monthly_income_usd: 300.00,
-      ocean_openness: 24,
-      ocean_neuroticism: 68,
-      profile_summary: "Mercedes es una abuela pensionada muy conservadora. Solo come pupusas tradicionales de frijol con queso o loroco. Castiga cualquier ingrediente dulce o carne que no sea de cerdo. Su precio máximo es de $0.50."
-    },
-    {
-      id: "NES-PAR-010",
-      name: "Luis Alonso Henríquez",
-      age: 39,
-      gender: "Masculino",
-      department: "Cabañas",
-      municipality: "Ilobasco",
-      region: "Paracentral",
-      occupation: "Alfarero y modelador de barro",
-      education: "Bachillerato general",
-      monthly_income_usd: 620.00,
-      ocean_openness: 53,
-      ocean_neuroticism: 41,
-      profile_summary: "Luis modela figuras de barro en Ilobasco. Valora el trabajo artesanal y manual. Prefiere comer en comedores de mercado locales y apoya a los pequeños negocios de pupusas de maíz tradicionales. Paga hasta $1.00 por unidad."
-    }
+    { id:"NES-PAR-001", name:"María Concepción Velásquez Torres", age:36, gender:"Femenino", department:"La Paz", municipality:"Zacatecoluca", region:"Paracentral", occupation:"Maestra de educación primaria / Pupusera los fines de semana", education:"Licenciatura en Ciencias de la Educación", monthly_income_usd:680.00, ocean_openness:68, ocean_neuroticism:44, profile_summary:"Conchita produce y consume pupusas. Conoce al detalle los costos de materia prima. Acepta de $0.75 a $1.25 si la calidad lo amerita, pero detecta la sobrevaloración al instante. Exige porciones generosas." },
+    { id:"NES-PAR-002", name:"Julio César Barahona", age:44, gender:"Masculino", department:"Cuscatlán", municipality:"Cojutepeque", region:"Paracentral", occupation:"Elaborador artesanal de embutidos", education:"Bachillerato general", monthly_income_usd:480.00, ocean_openness:42, ocean_neuroticism:56, profile_summary:"Julio prepara chorizos tradicionales en Cojutepeque. Valora los embutidos de calidad y la carne fresca. Le gustan las pupusas con carne de calidad (como chorizo o birria) y rechaza si la carne sabe artificial o vieja. Límite de $1.00." },
+    { id:"NES-PAR-003", name:"Wendy Yamileth Rosales", age:22, gender:"Femenino", department:"San Vicente", municipality:"San Vicente", region:"Paracentral", occupation:"Estudiante de enfermería / Ventas de ropa online", education:"Estudiante de enfermería", monthly_income_usd:350.00, ocean_openness:72, ocean_neuroticism:38, profile_summary:"Wendy es una joven estudiante que cuida su presupuesto. Comparte pupusas los fines de semana en el parque de San Vicente. Valora las ofertas familiares y las porciones generosas por su dinero. Límite de $0.75." },
+    { id:"NES-PAR-004", name:"Francisco Armando Orellana", age:50, gender:"Masculino", department:"Cabañas", municipality:"Sensuntepeque", region:"Paracentral", occupation:"Pequeño ganadero de leche", education:"Educación básica completa", monthly_income_usd:410.00, ocean_openness:35, ocean_neuroticism:60, profile_summary:"Francisco produce queso y leche en Cabañas. Es extremadamente exigente con la calidad del queso de la pupusa: si no estira o sabe sintético, lo rechaza. Paga un límite de $0.75 y prefiere comer en zonas rurales." },
+    { id:"NES-PAR-005", name:"Roxana Beatriz Amaya", age:28, gender:"Femenino", department:"La Paz", municipality:"Olocuilta", region:"Paracentral", occupation:"Palmeadora de pupusas de arroz", education:"Bachillerato general", monthly_income_usd:520.00, ocean_openness:60, ocean_neuroticism:46, profile_summary:"Roxana palmea pupusas de arroz en Olocuilta, la cuna del arroz. Exige masa de arroz suave y fina. Tolera precios de hasta $1.00 si el tamaño y la cocción de la pupusa en la plancha son óptimos." },
+    { id:"NES-PAR-006", name:"Manuel de Jesús Raymundo", age:55, gender:"Masculino", department:"San Vicente", municipality:"Apastepeque", region:"Paracentral", occupation:"Jornalero de caña de azúcar", education:"Sin educación formal", monthly_income_usd:320.00, ocean_openness:30, ocean_neuroticism:64, profile_summary:"Manuel corta caña bajo el sol. Busca comidas baratas que le quiten el hambre todo el día. Considera comer fuera un gasto que debe evitar; solo compra pupusas tradicionales gigantes cuando están bajo $0.50." },
+    { id:"NES-PAR-007", name:"Karla Tatiana Cisneros", age:31, gender:"Femenino", department:"Cuscatlán", municipality:"San Pedro Perulapán", region:"Paracentral", occupation:"Artesana de sombreros de palma", education:"Educación básica completa", monthly_income_usd:430.00, ocean_openness:50, ocean_neuroticism:53, profile_summary:"Karla teje sombreros en San Pedro Perulapán. Cuida su presupuesto mensual con mucho cuidado. Compra pupusas revueltas los domingos con su familia. Prefiere locales pequeños e informales con precios de $0.60 a $0.75." },
+    { id:"NES-PAR-008", name:"Edwin Giovanny Portillo", age:27, gender:"Masculino", department:"La Paz", municipality:"San Luis Talpa", region:"Paracentral", occupation:"Empleado aeroportuario de rampa", education:"Bachillerato técnico", monthly_income_usd:470.00, ocean_openness:58, ocean_neuroticism:42, profile_summary:"Edwin trabaja en el aeropuerto internacional. Busca comida abundante para llevar. Prefiere pupusas de maíz con quesillo y chicharrón que resistan el transporte. Acepta pagar hasta $1.00 si el tamaño es grande." },
+    { id:"NES-PAR-009", name:"Mercedes del Carmen Huezo", age:65, gender:"Femenino", department:"San Vicente", municipality:"Tecoluca", region:"Paracentral", occupation:"Agricultora de subsistencia / Pensionada del INPEP", education:"Educación básica incompleta", monthly_income_usd:300.00, ocean_openness:24, ocean_neuroticism:68, profile_summary:"Mercedes es una abuela pensionada muy conservadora. Solo come pupusas tradicionales de frijol con queso o loroco. Castiga cualquier ingrediente dulce o carne que no sea de cerdo. Su precio máximo es de $0.50." },
+    { id:"NES-PAR-010", name:"Luis Alonso Henríquez", age:39, gender:"Masculino", department:"Cabañas", municipality:"Ilobasco", region:"Paracentral", occupation:"Alfarero y modelador de barro", education:"Bachillerato general", monthly_income_usd:620.00, ocean_openness:53, ocean_neuroticism:41, profile_summary:"Luis modela figuras de barro en Ilobasco. Valora el trabajo artesanal y manual. Prefiere comer en comedores de mercado locales y apoya a los pequeños negocios de pupusas de maíz tradicionales. Paga hasta $1.00 por unidad." },
   ];
 
-  // ── REGION META ──────────────────────────────────────────────────
+  // ── REGION META ───────────────────────────────────────────────────
   const RMETA = {
-    Oriental:    { cls: 'tag-oriental',    hex: '#f87171', hexBg: 'rgba(239,68,68,0.12)'  },
-    Occidental:  { cls: 'tag-occidental',  hex: '#d8b4fe', hexBg: 'rgba(168,85,247,0.12)' },
-    Paracentral: { cls: 'tag-paracentral', hex: '#86efac', hexBg: 'rgba(34,197,94,0.12)'  },
-    Central:     { cls: 'tag-central',     hex: '#93c5fd', hexBg: 'rgba(59,130,246,0.12)' },
+    Oriental:    { cls:'tag-oriental',    hex:'#fca5a5', hexBg:'rgba(239,68,68,0.15)'   },
+    Occidental:  { cls:'tag-occidental',  hex:'#c4b5fd', hexBg:'rgba(167,139,250,0.15)' },
+    Paracentral: { cls:'tag-paracentral', hex:'#6ee7b7', hexBg:'rgba(52,211,153,0.15)'  },
+    Central:     { cls:'tag-central',     hex:'#fbbf24', hexBg:'rgba(251,191,36,0.15)'  },
   };
 
-  // ── PROMPT BUILDER ───────────────────────────────────────────────
+  // ── PROMPT BUILDER ────────────────────────────────────────────────
   const BIAS = {
     Central: {
       id: 'Sos un consumidor del Gran San Salvador — urbano, conectado y con acceso a tendencias gastronómicas internacionales.',
@@ -1058,7 +766,7 @@
   function elasticityBlock(income) {
     if (income < 450)  return { tier:'LOW',           penalize:'Precios sobre $1.50 requieren penalización obligatoria de 30–45 puntos. Sobre $1.00 ya genera estrés financiero visible (-10–20 puntos adicionales).', bonus:'Precios en o bajo $0.50 generan satisfacción genuina y señales de lealtad (+10 puntos).' };
     if (income < 650)  return { tier:'LOWER_MIDDLE',  penalize:'Precios sobre $2.25 penalizan -20–30 puntos. Entre $1.75–$2.25 genera incomodidad moderada (-10–15 puntos).', bonus:'Precios $0.50–$1.00 percibidos como justos (+8 puntos).' };
-    if (income < 900)  return { tier:'MIDDLE',         penalize:'Precios sobre $3.00 penalizan -15–25 puntos salvo justificación premium clara y creíble.', bonus:'Precio $1.25–$2.00 para concepto gourmet bien descrito genera apreciación (+10 puntos).' };
+    if (income < 900)  return { tier:'MIDDLE',        penalize:'Precios sobre $3.00 penalizan -15–25 puntos salvo justificación premium clara y creíble.', bonus:'Precio $1.25–$2.00 para concepto gourmet bien descrito genera apreciación (+10 puntos).' };
     return               { tier:'UPPER_MIDDLE_HIGH', penalize:'Precios BAJO $1.00 para un concepto que se proclama gourmet activan escepticismo reverso (-15 puntos). Sobre $6.00 activan fatiga de lujo (-20 puntos).', bonus:'Precio $2.50–$4.00 para concepto premium bien articulado es el sweet spot (+15 puntos).' };
   }
 
@@ -1108,7 +816,7 @@ EJEMPLO VÁLIDO: {"name":"José Amaya","department":"San Miguel","region":"Orien
 Evaluá la propuesta. Respondé SOLO con el JSON. Nada más.`;
   }
 
-  // ── SANITIZE + PARSE ─────────────────────────────────────────────
+  // ── SANITIZE + PARSE ──────────────────────────────────────────────
   function sanitize(raw) {
     return raw
       .replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/i, '')
@@ -1122,15 +830,15 @@ Evaluá la propuesta. Respondé SOLO con el JSON. Nada más.`;
       return obj;
     } catch (err) {
       console.warn('[PARSE FAIL]', p.name, raw, err.message);
-      return { name: p.name, department: p.department, region: p.region, score: 0, accepted: false, critique: `[Error de parseo — respuesta: ${raw.slice(0,100)}]`, _err: true };
+      return { name:p.name, department:p.department, region:p.region, score:0, accepted:false, critique:`[Error de parseo — respuesta: ${raw.slice(0,100)}]`, _err:true };
     }
   }
 
-  // ── LOG ──────────────────────────────────────────────────────────
+  // ── LOG ───────────────────────────────────────────────────────────
   const logEl = document.getElementById('log');
   function appendLog(msg, type = 'info') {
     logEl.style.display = 'flex';
-    const colors = { info:'#4b4540', success:'#4ade80', error:'#f87171', wait:'#d97706' };
+    const colors = { info:'var(--text-faint)', success:'#34d399', error:'#f87171', wait:'var(--amber)' };
     const icons  = { info:'›', success:'✓', error:'✗', wait:'◌' };
     const div = document.createElement('div');
     div.className = 'log-line';
@@ -1140,93 +848,116 @@ Evaluá la propuesta. Respondé SOLO con el JSON. Nada más.`;
     logEl.scrollTop = logEl.scrollHeight;
   }
 
-  // ── PERSONA CARDS ────────────────────────────────────────────────
+  // ── RENDER PERSONA CARDS ──────────────────────────────────────────
   function renderPersonas() {
     const grid = document.getElementById('persona-grid');
     grid.innerHTML = '';
     PERSONAS.forEach(p => {
       const m = RMETA[p.region] || {};
-      const pct = Math.min(100, (p.monthly_income_usd / 1100) * 100).toFixed(0);
+      const pct = Math.min(100, (p.monthly_income_usd / 1200) * 100).toFixed(0);
       grid.insertAdjacentHTML('beforeend', `
-        <div class="card-inner" style="padding:0.875rem; display:flex; flex-direction:column; gap:8px;">
+        <div style="background:var(--surface-raised); border:1px solid var(--border-subtle); border-radius:0.875rem; padding:0.875rem; display:flex; flex-direction:column; gap:8px;">
           <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:6px;">
             <div style="min-width:0;">
-              <p style="font-family:'IBM Plex Mono',monospace; font-size:0.7rem; font-weight:600; color:#fbbf24; line-height:1.35; overflow-wrap:break-word;">${p.name}</p>
-              <p style="font-family:'IBM Plex Mono',monospace; font-size:0.6rem; color:var(--muted); margin-top:2px;">${p.age}a · ${p.municipality}</p>
+              <p style="font-family:'IBM Plex Mono',monospace; font-size:0.68rem; font-weight:600; color:var(--amber); line-height:1.35; overflow-wrap:break-word;">${p.name}</p>
+              <p style="font-family:'IBM Plex Mono',monospace; font-size:0.58rem; color:var(--text-muted); margin-top:2px;">${p.age}a · ${p.municipality}</p>
             </div>
-            <span class="tag ${m.cls}" style="white-space:nowrap;">${p.region.toUpperCase()}</span>
+            <span class="tag ${m.cls}">${p.region.slice(0,3).toUpperCase()}</span>
           </div>
-          <p style="font-size:0.72rem; color:#78716c; line-height:1.45; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">${p.occupation}</p>
+          <p style="font-size:0.7rem; color:var(--text-muted); line-height:1.45; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">${p.occupation}</p>
           <div>
             <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
-              <span style="font-family:'IBM Plex Mono',monospace; font-size:0.58rem; color:var(--muted);">INGRESO</span>
-              <span style="font-family:'IBM Plex Mono',monospace; font-size:0.58rem; color:#d97706;">$${p.monthly_income_usd}/mo</span>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:0.56rem; color:var(--text-faint);">INGRESO</span>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:0.56rem; color:var(--amber);">$${p.monthly_income_usd}/mo</span>
             </div>
             <div class="score-track">
-              <div class="score-fill" style="width:${pct}%; background:linear-gradient(to right,#92400e,#d97706);"></div>
+              <div class="score-fill" style="width:${pct}%; background:linear-gradient(to right,var(--burnt),var(--amber));"></div>
             </div>
           </div>
-          <div style="display:flex; gap:12px; font-family:'IBM Plex Mono',monospace; font-size:0.58rem; color:var(--muted);">
-            <span>OCEAN-O <span style="color:#a8a29e;">${p.ocean_openness}</span></span>
-            <span>OCEAN-N <span style="color:#a8a29e;">${p.ocean_neuroticism}</span></span>
+          <div style="display:flex; gap:12px; font-family:'IBM Plex Mono',monospace; font-size:0.56rem; color:var(--text-faint);">
+            <span>OCEAN-O <span style="color:var(--text-muted);">${p.ocean_openness}</span></span>
+            <span>OCEAN-N <span style="color:var(--text-muted);">${p.ocean_neuroticism}</span></span>
           </div>
         </div>`);
     });
   }
 
-  // ── RESULT CARDS ─────────────────────────────────────────────────
-  function scoreColor(s) {
-    if (s >= 90) return '#4ade80';
-    if (s >= 75) return '#86efac';
-    if (s >= 60) return '#fde047';
-    if (s >= 40) return '#fb923c';
-    return '#f87171';
+  // ── BADGE LOGIC ───────────────────────────────────────────────────
+  function getBadgeData(score) {
+    if (score >= 90) return { text:'¡SE VENDE COMO PAN CALIENTE! 🔥', cls:'badge-hot' };
+    if (score >= 75) return { text:'¡CON TODO! 👍',                    cls:'badge-yes' };
+    if (score >= 60) return { text:'¡ANDA BIEN! ✓',                    cls:'badge-ok'  };
+    if (score >= 40) return { text:'¡CÁILE CON ESO! 🙅',               cls:'badge-warn'};
+    return                  { text:'¡NI DE CHOTO! 🛑',                  cls:'badge-no'  };
   }
+
+  function scoreColor(s) {
+    if (s >= 90) return '#f59e0b';
+    if (s >= 75) return '#d97706';
+    if (s >= 60) return '#ca8a04';
+    if (s >= 40) return '#ea580c';
+    return '#dc2626';
+  }
+
+  // ── RENDER RESULT CARDS ───────────────────────────────────────────
   function renderCards(results) {
     const grid = document.getElementById('cards');
     grid.innerHTML = '';
     results.forEach((r, i) => {
       const m   = RMETA[r.region] || {};
       const col = scoreColor(r.score);
-      const errNote = r._err ? `<p style="font-family:'IBM Plex Mono',monospace;font-size:0.6rem;color:#7f1d1d;margin-top:4px;">[parse error — fallback]</p>` : '';
+      const bd  = getBadgeData(r.score);
+      const errNote = r._err ? `<p style="font-family:'IBM Plex Mono',monospace;font-size:0.58rem;color:var(--fire);margin-top:4px;">[parse error — fallback]</p>` : '';
       grid.insertAdjacentHTML('beforeend', `
-        <div class="card-inner result-card" style="padding:1rem; display:flex; flex-direction:column; gap:10px; animation-delay:${i*0.07}s;">
+        <div class="result-card" style="background:var(--surface-raised); border:1px solid var(--border-subtle); border-radius:1rem; padding:1rem; display:flex; flex-direction:column; gap:10px; animation-delay:${i*0.06}s;">
           <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:6px;">
             <div style="min-width:0;">
-              <p style="font-family:'IBM Plex Mono',monospace; font-size:0.72rem; font-weight:600; color:#fbbf24; line-height:1.35; overflow-wrap:break-word;">${r.name}</p>
-              <p style="font-family:'IBM Plex Mono',monospace; font-size:0.6rem; color:var(--muted); margin-top:2px;">${r.department}</p>
+              <p style="font-family:'IBM Plex Mono',monospace; font-size:0.7rem; font-weight:600; color:var(--amber); line-height:1.35; overflow-wrap:break-word;">${r.name}</p>
+              <p style="font-family:'IBM Plex Mono',monospace; font-size:0.58rem; color:var(--text-muted); margin-top:2px;">${r.department}</p>
             </div>
-            <span class="tag ${m.cls}" style="white-space:nowrap;">${(r.region||'').toUpperCase()}</span>
+            <span class="tag ${m.cls}">${(r.region||'').slice(0,3).toUpperCase()}</span>
           </div>
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span class="badge ${r.accepted?'badge-yes':'badge-no'}">${r.accepted ? 'SE VENDE' : 'NI DE CHOTO'}</span>
-            <span style="font-family:'IBM Plex Mono',monospace; font-size:1.5rem; font-weight:700; color:${col}; line-height:1;">${r.score}<span style="font-size:0.65rem; color:var(--muted);">/100</span></span>
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap;">
+            <span class="badge ${bd.cls}">${bd.text}</span>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:1.5rem; font-weight:700; color:${col}; line-height:1; flex-shrink:0;">${r.score}<span style="font-size:0.6rem; color:var(--text-faint);">/100</span></span>
           </div>
           <div class="score-track">
             <div class="score-fill" style="width:${r.score}%; background:${col};"></div>
           </div>
-          <p style="font-family:'IBM Plex Mono',monospace; font-size:0.72rem; font-style:italic; color:#d6d3d1; line-height:1.65; min-height:56px;">"${r.critique}"</p>
+          <p style="font-family:'IBM Plex Mono',monospace; font-size:0.7rem; font-style:italic; color:var(--text-muted); line-height:1.7; min-height:52px;">"${r.critique}"</p>
           ${errNote}
         </div>`);
     });
   }
 
-  // ── CHART ────────────────────────────────────────────────────────
+  // ── CHART ─────────────────────────────────────────────────────────
   let chartInst = null;
+  let lastResults = [];
+
   function renderChart(results) {
     if (chartInst) { chartInst.destroy(); chartInst = null; }
     const ctx = document.getElementById('chart').getContext('2d');
-    
-    // Group and average scores by macro-region
     const regions = ['Central', 'Oriental', 'Occidental', 'Paracentral'];
     const regionalScores = regions.map(reg => {
-      const regResults = results.filter(r => r.region === reg);
-      const avg = regResults.length > 0
-        ? Math.round(regResults.reduce((sum, r) => sum + r.score, 0) / regResults.length)
-        : 0;
+      const rr = results.filter(r => r.region === reg);
+      const avg = rr.length > 0 ? Math.round(rr.reduce((s, r) => s + r.score, 0) / rr.length) : 0;
       return { region: reg, score: avg };
     });
 
+    const barColors = regionalScores.map(r => {
+      if (r.score >= 75) return 'rgba(245,158,11,0.75)';
+      if (r.score >= 60) return 'rgba(217,119,6,0.75)';
+      if (r.score >= 40) return 'rgba(234,88,12,0.75)';
+      return 'rgba(220,38,38,0.72)';
+    });
+    const borderColors = regionalScores.map(r => {
+      if (r.score >= 75) return '#f59e0b';
+      if (r.score >= 60) return '#d97706';
+      if (r.score >= 40) return '#ea580c';
+      return '#dc2626';
+    });
+
+    const isDark = document.documentElement.dataset.theme === 'dark';
     chartInst = new Chart(ctx, {
       type: 'bar',
       data: {
@@ -1234,9 +965,9 @@ Evaluá la propuesta. Respondé SOLO con el JSON. Nada más.`;
         datasets: [{
           label: 'Score Promedio',
           data: regionalScores.map(r => r.score),
-          backgroundColor: regionalScores.map(r => (RMETA[r.region]?.hexBg) || 'rgba(217,119,6,0.15)'),
-          borderColor:     regionalScores.map(r => (RMETA[r.region]?.hex)   || '#d97706'),
-          borderWidth: 2, borderRadius: 6, borderSkipped: false,
+          backgroundColor: barColors,
+          borderColor: borderColors,
+          borderWidth: 2, borderRadius: 10, borderSkipped: false,
         }],
       },
       options: {
@@ -1244,54 +975,50 @@ Evaluá la propuesta. Respondé SOLO con el JSON. Nada más.`;
         plugins: {
           legend: { display: false },
           tooltip: {
-            backgroundColor: '#1a1714', borderColor: 'rgba(217,119,6,0.25)', borderWidth: 1,
-            titleColor: '#fef3c7', bodyColor: '#a8a29e',
-            titleFont: { family: 'IBM Plex Mono', size: 11 },
-            bodyFont:  { family: 'IBM Plex Mono', size: 11 },
+            backgroundColor: isDark ? '#1e1b17' : '#fffbf4',
+            borderColor: 'rgba(217,119,6,0.3)', borderWidth: 1,
+            titleColor: isDark ? '#f5ede3' : '#1c1917',
+            bodyColor: isDark ? '#9d8e84' : '#78716c',
+            padding: 10,
+            titleFont: { family:'IBM Plex Mono', size:11, weight:'600' },
+            bodyFont:  { family:'IBM Plex Mono', size:11 },
             callbacks: {
-              label: c => ` Score Promedio: ${c.parsed.y}/100 — ${c.parsed.y >= 60 ? 'APROBADO' : 'RECHAZADO'}`,
+              label: c => ` Score Promedio: ${c.parsed.y}/100 — ${c.parsed.y >= 60 ? '¡APROBADO!' : '¡RECHAZADO!'}`,
             },
           },
         },
         scales: {
           y: {
             min: 0, max: 100,
-            grid: { color: 'rgba(255,255,255,0.04)', drawBorder: false },
+            grid: { color: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.05)', drawBorder: false },
             border: { display: false },
-            ticks: { color: '#57534e', font: { family: 'IBM Plex Mono', size: 10 }, callback: v => v + '%' },
+            ticks: { color: isDark ? '#5c5148' : '#a8a29e', font:{ family:'IBM Plex Mono', size:10 }, callback: v => v + '/100' },
           },
           x: {
             grid: { display: false },
             border: { display: false },
-            ticks: { color: '#a8a29e', font: { family: 'IBM Plex Mono', size: 11 } },
+            ticks: { color: isDark ? '#9d8e84' : '#78716c', font:{ family:'Fraunces', size:13, weight:'600' } },
           },
         },
       },
     });
   }
 
-  // ── SECURE CONFIGURATION SYNC & AUTO-LOADER ──────────────────────
-  const apiKeyInput = document.getElementById('api-key');
+  // ── SECURE CONFIG SYNC & AUTO-LOADER ─────────────────────────────
+  const apiKeyInput  = document.getElementById('api-key');
   const rememberKeyEl = document.getElementById('remember-key');
 
-  // Sync state & storage on input
   apiKeyInput.addEventListener('input', (e) => {
     CONFIG.apiKey = e.target.value.trim();
     if (rememberKeyEl.checked) {
-      if (CONFIG.apiKey) {
-        sessionStorage.setItem('ANTHROPIC_API_KEY', CONFIG.apiKey);
-      } else {
-        sessionStorage.removeItem('ANTHROPIC_API_KEY');
-      }
+      CONFIG.apiKey ? sessionStorage.setItem('ANTHROPIC_API_KEY', CONFIG.apiKey)
+                    : sessionStorage.removeItem('ANTHROPIC_API_KEY');
     }
   });
 
-  // Sync state & storage on checkbox change
   rememberKeyEl.addEventListener('change', (e) => {
     if (e.target.checked) {
-      if (CONFIG.apiKey) {
-        sessionStorage.setItem('ANTHROPIC_API_KEY', CONFIG.apiKey);
-      }
+      if (CONFIG.apiKey) sessionStorage.setItem('ANTHROPIC_API_KEY', CONFIG.apiKey);
     } else {
       sessionStorage.removeItem('ANTHROPIC_API_KEY');
     }
@@ -1302,18 +1029,16 @@ Evaluá la propuesta. Respondé SOLO con el JSON. Nada más.`;
       const container = document.getElementById('api-key-container');
       if (container) {
         container.innerHTML = `
-          <div style="display:flex; flex-direction:column; gap:6px;">
-            <label class="label" style="margin:0;">API KEY — ANTHROPIC</label>
-            <div style="display:flex; align-items:center; gap:8px; padding:0.5rem 0.75rem; background:rgba(22,163,74,0.08); border:1px solid rgba(22,163,74,0.25); border-radius:0.375rem;">
-              <span style="width:7px; height:7px; background:#4ade80; border-radius:50%; display:inline-block; box-shadow:0 0 8px #4ade80;" class="animate-pulse"></span>
-              <span style="font-family:'IBM Plex Mono',monospace; font-size:0.65rem; color:#4ade80; letter-spacing:0.05em; font-weight:600;">CARGADA LOCALMENTE</span>
+          <div>
+            <label class="field-label" style="margin-bottom:0.5rem;">API Key — Anthropic</label>
+            <div class="api-loaded-pill">
+              <span class="api-dot"></span>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:0.65rem; color:#34d399; letter-spacing:0.08em; font-weight:600;">CARGADA LOCALMENTE</span>
             </div>
-          </div>
-        `;
+          </div>`;
       }
     };
 
-    // 1. Try loading from sessionStorage (transient in-memory browser tab storage)
     const cachedKey = sessionStorage.getItem('ANTHROPIC_API_KEY');
     if (cachedKey && /^sk-ant-api\d{2}-[A-Za-z0-9\-_]{80,}$/.test(cachedKey.trim())) {
       CONFIG.apiKey = cachedKey.trim();
@@ -1324,7 +1049,6 @@ Evaluá la propuesta. Respondé SOLO con el JSON. Nada más.`;
       return;
     }
 
-    // 2. Try loading from local config file config.local.json (ignored by git)
     try {
       const resp = await fetch('./config.local.json');
       if (resp.ok) {
@@ -1337,12 +1061,10 @@ Evaluá la propuesta. Respondé SOLO con el JSON. Nada más.`;
           appendLog('Clave API cargada desde config.local.json.', 'success');
         }
       }
-    } catch (err) {
-      // Silent catch: config.local.json doesn't exist or isn't accessible
-    }
+    } catch (_) { /* silent */ }
   }
 
-  // ── CONCURRENCY HELPER ───────────────────────────────────────────
+  // ── CONCURRENCY HELPER ────────────────────────────────────────────
   async function runWithConcurrencyLimit(tasks, limit) {
     const results = [];
     const executing = new Set();
@@ -1352,34 +1074,27 @@ Evaluá la propuesta. Respondé SOLO con el JSON. Nada más.`;
       executing.add(p);
       const clean = () => executing.delete(p);
       p.then(clean, clean);
-      if (executing.size >= limit) {
-        await Promise.race(executing);
-      }
+      if (executing.size >= limit) await Promise.race(executing);
     }
     return Promise.all(results);
   }
 
-  // ── MAIN PIPELINE ────────────────────────────────────────────────
+  // ── MAIN PIPELINE ─────────────────────────────────────────────────
   async function run() {
     const apiInputEl = document.getElementById('api-key');
-    if (apiInputEl) {
-      CONFIG.apiKey = apiInputEl.value.trim();
-    }
-    const apiKey = CONFIG.apiKey;
-    if (!apiKey) { alert('Ingresá tu Anthropic API key para continuar.'); return; }
+    if (apiInputEl) CONFIG.apiKey = apiInputEl.value.trim();
+    if (!CONFIG.apiKey) { alert('Ingresá tu Anthropic API key para continuar.'); return; }
 
     const masaEl = document.querySelector('input[name="masa"]:checked');
     const masa = masaEl ? masaEl.value : 'Tradicional (Maíz)';
-
-    const proteins = [...document.querySelectorAll('input.protein-cb:checked')].map(el => el.value);
-    const cheeses = [...document.querySelectorAll('input.cheese-cb:checked')].map(el => el.value);
-    const upgrades = [...document.querySelectorAll('input.upgrade-cb:checked')].map(el => el.value);
+    const proteins  = [...document.querySelectorAll('input.protein-cb:checked')].map(el => el.value);
+    const cheeses   = [...document.querySelectorAll('input.cheese-cb:checked')].map(el => el.value);
+    const upgrades  = [...document.querySelectorAll('input.upgrade-cb:checked')].map(el => el.value);
     const customIngredient = document.getElementById('custom-ingredient').value.trim();
-    const toppings = document.getElementById('toppings').value.trim();
-    const price    = parseFloat(document.getElementById('price').value);
-    const concept  = document.getElementById('concept').value.trim();
+    const toppings  = document.getElementById('toppings').value.trim();
+    const price     = parseFloat(document.getElementById('price').value);
+    const concept   = document.getElementById('concept').value.trim();
 
-    // Check if at least one ingredient is chosen
     if (!proteins.length && !cheeses.length && !upgrades.length && !customIngredient) {
       alert('Seleccioná al menos un relleno, queso, extra, o inyectá un ingrediente secreto.');
       return;
@@ -1400,16 +1115,16 @@ Evaluá la propuesta. Respondé SOLO con el JSON. Nada más.`;
     ].filter(s => s !== undefined && s !== '').join('\n');
 
     const btn = document.getElementById('run-btn');
-    btn.disabled = true; btn.textContent = 'SIMULANDO...';
+    btn.disabled = true; btn.textContent = 'Simulando…';
     logEl.innerHTML = ''; logEl.style.display = 'none';
     document.getElementById('results').style.display = 'none';
 
-    const client = new Anthropic({ apiKey, dangerouslyAllowBrowser: true });
+    const client = new Anthropic({ apiKey: CONFIG.apiKey, dangerouslyAllowBrowser: true });
 
     const displayRecipe = [
-      fillings ? `${fillings}` : '',
-      upgrades.length ? `${upgrades.join(', ')}` : '',
-      customIngredient ? `${customIngredient}` : ''
+      fillings,
+      upgrades.length ? upgrades.join(', ') : '',
+      customIngredient,
     ].filter(Boolean).join(' + ');
 
     appendLog(`Receta: ${masa} con ${displayRecipe} · $${price.toFixed(2)} USD`, 'info');
@@ -1422,7 +1137,7 @@ Evaluá la propuesta. Respondé SOLO con el JSON. Nada más.`;
           model: 'claude-sonnet-4-6',
           max_tokens: 300,
           system: buildSystem(p),
-          messages: [{ role: 'user', content: userMsg }],
+          messages: [{ role:'user', content:userMsg }],
         });
         const raw = resp.content?.[0]?.text ?? '';
         const parsed = safeparse(raw, p);
@@ -1430,23 +1145,23 @@ Evaluá la propuesta. Respondé SOLO con el JSON. Nada más.`;
         return parsed;
       } catch (err) {
         appendLog(`[${p.region}] Error: ${err.message}`, 'error');
-        return { name: p.name, department: p.department, region: p.region, score: 0, accepted: false, critique: `API error: ${err.message}`, _err: true };
+        return { name:p.name, department:p.department, region:p.region, score:0, accepted:false, critique:`API error: ${err.message}`, _err:true };
       }
     });
 
-    const results = await runWithConcurrencyLimit(tasks, 10);
-    const mean = Math.round(results.reduce((a, r) => a + r.score, 0) / results.length);
+    lastResults = await runWithConcurrencyLimit(tasks, 10);
+    const mean = Math.round(lastResults.reduce((a, r) => a + r.score, 0) / lastResults.length);
 
-    renderChart(results);
-    renderCards(results);
+    renderChart(lastResults);
+    renderCards(lastResults);
     document.getElementById('results').style.display = 'block';
-    document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    document.getElementById('results').scrollIntoView({ behavior:'smooth', block:'start' });
     appendLog(`Simulación completa. Score promedio: ${mean}/100.`, 'success');
 
-    btn.disabled = false; btn.textContent = 'EJECUTAR SIMULACION';
+    btn.disabled = false; btn.textContent = 'Ejecutar Simulación';
   }
 
-  // ── PRICE SLIDER ─────────────────────────────────────────────────
+  // ── PRICE SLIDER ──────────────────────────────────────────────────
   const priceEl   = document.getElementById('price');
   const priceDisp = document.getElementById('price-display');
   priceEl.addEventListener('input', () => {
@@ -1456,7 +1171,27 @@ Evaluá la propuesta. Respondé SOLO con el JSON. Nada más.`;
     priceDisp.textContent = `$${v.toFixed(2)} USD`;
   });
 
-  // ── BOOT ─────────────────────────────────────────────────────────
+  // ── THEME TOGGLE ──────────────────────────────────────────────────
+  const themeBtn  = document.getElementById('theme-toggle');
+  const iconSun   = document.getElementById('icon-sun');
+  const iconMoon  = document.getElementById('icon-moon');
+
+  function syncThemeIcon() {
+    const isDark = document.documentElement.dataset.theme === 'dark';
+    iconSun.style.display  = isDark ? 'block' : 'none';
+    iconMoon.style.display = isDark ? 'none'  : 'block';
+  }
+
+  themeBtn.addEventListener('click', () => {
+    const isDark = document.documentElement.dataset.theme === 'dark';
+    document.documentElement.dataset.theme = isDark ? 'light' : 'dark';
+    syncThemeIcon();
+    if (lastResults.length) renderChart(lastResults);
+  });
+
+  syncThemeIcon();
+
+  // ── BOOT ──────────────────────────────────────────────────────────
   document.getElementById('run-btn').addEventListener('click', run);
   renderPersonas();
   initializeConfig();
