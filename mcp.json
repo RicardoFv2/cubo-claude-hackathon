@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "nemotron-el-salvador": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-sqlite",
+        "/home/ricardo/CUBO/claude_bootcamp/data/nemotron_el_salvador.db"
+      ]
+    }
+  }
+}

@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>La Pupusería Alquimista — Simulador de Mercado</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cinzel+Decorative:wght@700;900&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['"Cinzel Decorative"', 'serif'],
+            heading: ['Cinzel', 'serif'],
+            mono: ['"IBM Plex Mono"', 'monospace'],
+            body: ['"IBM Plex Sans"', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; }
+
+    :root {
+      --void:   #080608;
+      --card:   #100e0c;
+      --raised: #181513;
+      --amber:  #d97706;
+      --gold:   #f59e0b;
+      --text:   #fef3c7;
+      --muted:  #57534e;
+      --border: rgba(217,119,6,0.15);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background-color: var(--void);
+      background-image:
+        radial-gradient(ellipse 90% 55% at 50% -5%, rgba(217,119,6,0.10) 0%, transparent 65%),
+        radial-gradient(ellipse 45% 35% at 5%  90%, rgba(120,40,15,0.07) 0%, transparent 55%);
+      color: var(--text);
+      font-family: 'IBM Plex Sans', sans-serif;
+      min-height: 100vh;
+    }
+
+    /* ── top amber rule ── */
+    body::after {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent 5%, var(--amber) 40%, var(--gold) 50%, var(--amber) 60%, transparent 95%);
+      z-index: 100;
+    }
+
+    /* ── cards ── */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 0.75rem;
+    }
+    .card-inner {
+      background: var(--raised);
+      border: 1px solid var(--border);
+      border-radius: 0.5rem;
+    }
+
+    /* ── inputs ── */
+    .field {
+      width: 100%;
+      background: #09080a;
+      border: 1px solid rgba(217,119,6,0.22);
+      border-radius: 0.375rem;
+      padding: 0.5rem 0.75rem;
+      color: var(--text);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.8125rem;
+      transition: border-color 0.18s, box-shadow 0.18s;
+    }
+    .field:focus {
+      outline: none;
+      border-color: var(--amber);
+      box-shadow: 0 0 0 3px rgba(217,119,6,0.12);
+    }
+    .field option { background: #1a1714; }
+
+    /* ── checkbox ── */
+    .cb { accent-color: var(--amber); width: 14px; height: 14px; cursor: pointer; }
+
+    /* ── range slider ── */
+    input[type=range] {
+      -webkit-appearance: none; appearance: none;
+      width: 100%; height: 3px; border-radius: 2px; cursor: pointer;
+      background: linear-gradient(
+        to right,
+        var(--amber) 0%,
+        var(--amber) var(--fill, 11%),
+        #2a2218 var(--fill, 11%),
+        #2a2218 100%
+      );
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px; height: 16px; border-radius: 50%;
+      background: var(--gold);
+      border: 2px solid var(--void);
+      box-shadow: 0 0 10px rgba(245,158,11,0.55);
+      cursor: pointer;
+    }
+    input[type=range]::-moz-range-thumb {
+      width: 16px; height: 16px; border-radius: 50%;
+      background: var(--gold); border: 2px solid var(--void);
+      box-shadow: 0 0 10px rgba(245,158,11,0.55); cursor: pointer;
+    }
+
+    /* ── run button ── */
+    .btn-run {
+      width: 100%;
+      padding: 0.85rem 1.5rem;
+      border-radius: 0.5rem;
+      border: none;
+      cursor: pointer;
+      font-family: 'Cinzel', serif;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      color: #fef3c7;
+      background: linear-gradient(135deg, #92400e, #b45309 45%, #d97706);
+      position: relative; overflow: hidden;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .btn-run::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.10) 50%, transparent 70%);
+      transform: translateX(-100%);
+      transition: transform 0.45s;
+    }
+    .btn-run:hover:not(:disabled)::after { transform: translateX(100%); }
+    .btn-run:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 0 28px rgba(217,119,6,0.38);
+    }
+    .btn-run:disabled { opacity: 0.45; cursor: not-allowed; }
+
+    /* ── region tags ── */
+    .tag { font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem; padding: 2px 8px; border-radius: 99px; font-weight: 500; letter-spacing: 0.06em; }
+    .tag-central    { background: rgba(59,130,246,0.14);  color: #93c5fd; border: 1px solid rgba(59,130,246,0.28); }
+    .tag-oriental   { background: rgba(239,68,68,0.14);   color: #fca5a5; border: 1px solid rgba(239,68,68,0.28); }
+    .tag-occidental { background: rgba(168,85,247,0.14);  color: #d8b4fe; border: 1px solid rgba(168,85,247,0.28); }
+    .tag-paracentral{ background: rgba(34,197,94,0.14);   color: #86efac; border: 1px solid rgba(34,197,94,0.28); }
+
+    /* ── result badges ── */
+    .badge { font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem; padding: 3px 10px; border-radius: 4px; font-weight: 600; letter-spacing: 0.08em; }
+    .badge-yes { background: rgba(22,163,74,0.18);  color: #4ade80; border: 1px solid rgba(74,222,128,0.35); }
+    .badge-no  { background: rgba(220,38,38,0.18);  color: #f87171; border: 1px solid rgba(248,113,113,0.35); }
+
+    /* ── score bar ── */
+    .score-track { height: 4px; background: #1e1a16; border-radius: 2px; overflow: hidden; }
+    .score-fill  { height: 100%; border-radius: 2px; transition: width 0.7s ease; }
+
+    /* ── log ── */
+    .log-line { font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; line-height: 1.6; }
+
+    /* ── divider ── */
+    .hr-amber { height: 1px; background: linear-gradient(90deg, transparent, rgba(217,119,6,0.2), transparent); }
+
+    /* ── result card animation ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .result-card { animation: fadeUp 0.35s ease both; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .result-card, .btn-run::after { animation: none; transition: none; }
+    }
+
+    /* ── scrollbar ── */
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: #0a0808; }
+    ::-webkit-scrollbar-thumb { background: #3d2f1a; border-radius: 3px; }
+
+    .label {
+      display: block;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+  </style>
+</head>
+
+<body>
+<div style="max-width:1280px; margin:0 auto; padding:1.5rem 1.25rem 4rem;">
+
+  <!-- ═══ HEADER ══════════════════════════════════════════════════ -->
+  <header style="text-align:center; padding-bottom:2.5rem;">
+    <div style="display:flex; align-items:center; justify-content:center; gap:12px; margin-bottom:10px;">
+      <div style="flex:1; max-width:80px; height:1px; background:linear-gradient(to right, transparent, var(--amber));"></div>
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:0.6rem; letter-spacing:0.3em; color:var(--amber); text-transform:uppercase;">Sistema de Evaluación v1.0 — Nemotron El Salvador</span>
+      <div style="flex:1; max-width:80px; height:1px; background:linear-gradient(to left, transparent, var(--amber));"></div>
+    </div>
+    <h1 style="font-family:'Cinzel Decorative',serif; font-size:clamp(1.8rem,5vw,3.2rem); color:#fbbf24; text-shadow: 0 0 50px rgba(217,119,6,0.35), 0 2px 4px rgba(0,0,0,0.8); line-height:1.15; margin-bottom:8px;">
+      La Pupusería Alquimista
+    </h1>
+    <p style="font-family:'IBM Plex Mono',monospace; font-size:0.7rem; color:var(--muted); letter-spacing:0.2em;">
+      MOTOR DE MERCADO · CLAUDE SONNET 4.6 · PROMISE.ALL PARALLEL PIPELINE
+    </p>
+  </header>
+
+  <!-- ═══ MAIN GRID ════════════════════════════════════════════════ -->
+  <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(340px,1fr)); gap:1.25rem; margin-bottom:1.5rem;">
+
+    <!-- ─── INPUT PANEL ─────────────────────────────────────────── -->
+    <div class="card" style="padding:1.5rem; display:flex; flex-direction:column; gap:1.1rem;">
+
+      <h2 style="font-family:'Cinzel',serif; font-size:0.85rem; color:#fbbf24; letter-spacing:0.1em; display:flex; align-items:center; gap:8px;">
+        <svg width="14" height="14" fill="none" stroke="#d97706" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 3.104v5.714a2.25 2.25 0 0 1-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 0 1 4.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15M14.25 3.104c.251.023.501.05.75.082M19.8 15l-1.8 3.013a2.25 2.25 0 0 1-1.932 1.112H7.932A2.25 2.25 0 0 1 6 18.013L4.2 15M19.8 15H4.2"/></svg>
+        CONFIGURAR PROPUESTA
+      </h2>
+
+      <!-- API Key -->
+      <div>
+        <label class="label">API KEY — ANTHROPIC</label>
+        <input id="api-key" type="password" class="field mb-2" placeholder="sk-ant-api03-…" autocomplete="off" />
+        <label style="display:flex; align-items:center; gap:6px; font-size:0.68rem; color:#a8a29e; cursor:pointer; user-select:none;">
+          <input type="checkbox" id="remember-key" class="cb" /> Recordar en esta pestaña (Session Storage)
+        </label>
+      </div>
+
+      <!-- Masa -->
+      <div>
+        <label class="label">BASE DE MASA</label>
+        <select id="masa" class="field" style="cursor:pointer;">
+          <option>Tradicional (Maíz)</option>
+          <option>Arroz</option>
+          <option>Espinaca</option>
+          <option>Remolacha</option>
+          <option>Yuca</option>
+        </select>
+      </div>
+
+      <!-- Fillings -->
+      <div>
+        <label class="label">RELLENOS PRINCIPALES</label>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px 12px;">
+          <label style="display:flex; align-items:center; gap:7px; font-size:0.8rem; color:#d6d3d1; cursor:pointer;">
+            <input type="checkbox" class="cb" value="Chicharrón" checked /> Chicharrón
+          </label>
+          <label style="display:flex; align-items:center; gap:7px; font-size:0.8rem; color:#d6d3d1; cursor:pointer;">
+            <input type="checkbox" class="cb" value="Queso" checked /> Queso
+          </label>
+          <label style="display:flex; align-items:center; gap:7px; font-size:0.8rem; color:#d6d3d1; cursor:pointer;">
+            <input type="checkbox" class="cb" value="Frijoles" /> Frijoles
+          </label>
+          <label style="display:flex; align-items:center; gap:7px; font-size:0.8rem; color:#d6d3d1; cursor:pointer;">
+            <input type="checkbox" class="cb" value="Loroco" /> Loroco
+          </label>
+          <label style="display:flex; align-items:center; gap:7px; font-size:0.8rem; color:#d6d3d1; cursor:pointer;">
+            <input type="checkbox" class="cb" value="Pollo" /> Pollo
+          </label>
+          <label style="display:flex; align-items:center; gap:7px; font-size:0.8rem; color:#d6d3d1; cursor:pointer;">
+            <input type="checkbox" class="cb" value="Camarones" /> Camarones
+          </label>
+        </div>
+      </div>
+
+      <!-- Toppings -->
+      <div>
+        <label class="label">ACOMPAÑAMIENTOS</label>
+        <input id="toppings" type="text" class="field" value="Curtido, Crema" placeholder="Curtido, crema, salsa roja…" />
+      </div>
+
+      <!-- Price slider -->
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <label class="label" style="margin:0;">PRECIO POR PUPUSA</label>
+          <span id="price-display" style="font-family:'IBM Plex Mono',monospace; font-size:0.85rem; font-weight:600; color:var(--gold);">$1.00 USD</span>
+        </div>
+        <input id="price" type="range" min="0.50" max="5.00" step="0.25" value="1.00" style="--fill:11.1%;" />
+        <div style="display:flex; justify-content:space-between; font-family:'IBM Plex Mono',monospace; font-size:0.6rem; color:#3d3830; margin-top:4px;">
+          <span>$0.50</span><span>$2.75</span><span>$5.00</span>
+        </div>
+      </div>
+
+      <!-- Concept -->
+      <div>
+        <label class="label">PITCH / CONCEPTO (OPCIONAL)</label>
+        <input id="concept" type="text" class="field" placeholder="Pupusa artesanal de autor con…" />
+      </div>
+
+      <div class="hr-amber"></div>
+
+      <!-- Run button -->
+      <button id="run-btn" class="btn-run">EJECUTAR SIMULACION</button>
+
+      <!-- Status log -->
+      <div id="log" style="min-height:60px; display:none; flex-direction:column; gap:2px;"></div>
+    </div>
+
+    <!-- ─── FOCUS GROUP ─────────────────────────────────────────── -->
+    <div class="card" style="padding:1.5rem;">
+      <h2 style="font-family:'Cinzel',serif; font-size:0.85rem; color:#fbbf24; letter-spacing:0.1em; display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+        <svg width="14" height="14" fill="none" stroke="#d97706" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z"/></svg>
+        GRUPO FOCAL ACTIVO
+      </h2>
+      <p style="font-family:'IBM Plex Mono',monospace; font-size:0.6rem; color:var(--muted); letter-spacing:0.15em; margin-bottom:1rem;">4 PERSONAS · 4 MACRO-REGIONES · NEMOTRON EL SALVADOR</p>
+      <div id="persona-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem;"></div>
+    </div>
+  </div>
+
+  <!-- ═══ RESULTS ══════════════════════════════════════════════════ -->
+  <div id="results" style="display:none;">
+    <div class="hr-amber" style="margin:1.5rem 0;"></div>
+
+    <!-- Chart -->
+    <div class="card" style="padding:1.5rem; margin-bottom:1.25rem;">
+      <h2 style="font-family:'Cinzel',serif; font-size:0.85rem; color:#fbbf24; letter-spacing:0.1em; margin-bottom:1.25rem;">
+        ANALISIS DE ACEPTACION REGIONAL
+      </h2>
+      <div style="position:relative; height:240px;">
+        <canvas id="chart"></canvas>
+      </div>
+    </div>
+
+    <!-- Cards -->
+    <h2 style="font-family:'Cinzel',serif; font-size:0.85rem; color:#fbbf24; letter-spacing:0.1em; margin-bottom:1rem;">
+      VOCES DEL MERCADO
+    </h2>
+    <div id="cards" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px,1fr)); gap:1rem;"></div>
+  </div>
+
+</div>
+
+<script type="module">
+  import Anthropic from 'https://esm.sh/@anthropic-ai/sdk@0.52.0';
+
+  // ── CENTRALIZED CONFIGURATION (In-Memory Only) ───────────────────
+  const CONFIG = {
+    apiKey: ''
+  };
+
+  // ── PERSONA DATA (fetched from nemotron_el_salvador.db) ───────────
+  const PERSONAS = [
+    {
+      id: 'NES-ORI-001',
+      name: 'José "Don Chepe" Amaya Portillo',
+      age: 54, gender: 'Masculino',
+      department: 'San Miguel', municipality: 'San Miguel', region: 'Oriental',
+      occupation: 'Vendedor de mercado / Agricultor de temporada',
+      education: 'Bachillerato incompleto',
+      monthly_income_usd: 365,
+      ocean_openness: 42, ocean_neuroticism: 61,
+      profile_summary: 'Vendedor de granos básicos en el mercado central de San Miguel. Altamente sensible al precio — cualquier alza de más del 5% lo hace cambiar de proveedor. Precio tope personal: $0.50 por pupusa.',
+    },
+    {
+      id: 'NES-OCC-003',
+      name: 'Carlos Ernesto Molina Gutiérrez',
+      age: 41, gender: 'Masculino',
+      department: 'Santa Ana', municipality: 'Santa Ana', region: 'Occidental',
+      occupation: 'Supervisor de producción en fábrica textil',
+      education: 'Bachillerato técnico vocacional',
+      monthly_income_usd: 520,
+      ocean_openness: 55, ocean_neuroticism: 47,
+      profile_summary: 'Trabajador industrial de Santa Ana. Evalúa la ejecución técnica de la masa antes que el relleno. Acepta variaciones de precio hasta 15%. Prefiere paquetes familiares.',
+    },
+    {
+      id: 'NES-PAR-004',
+      name: 'María Concepción "Conchita" Velásquez Torres',
+      age: 36, gender: 'Femenino',
+      department: 'La Paz', municipality: 'Zacatecoluca', region: 'Paracentral',
+      occupation: 'Maestra / Pupusera los fines de semana',
+      education: 'Licenciatura en Ciencias de la Educación',
+      monthly_income_usd: 680,
+      ocean_openness: 68, ocean_neuroticism: 44,
+      profile_summary: 'Docente y productora artesanal de pupusas. Conoce los costos por dentro. Acepta $0.75–$1.25 si la calidad lo justifica. Detecta sobrevaluación de inmediato.',
+    },
+    {
+      id: 'NES-CEN-002',
+      name: 'Nayely Guadalupe Hernández Rivas',
+      age: 29, gender: 'Femenino',
+      department: 'San Salvador', municipality: 'San Salvador', region: 'Central',
+      occupation: 'Asistente administrativa en empresa de logística',
+      education: 'Técnico universitario en Administración de Empresas',
+      monthly_income_usd: 850,
+      ocean_openness: 73, ocean_neuroticism: 38,
+      profile_summary: 'Profesional joven del Gran San Salvador. Dispuesta a pagar premium con justificación real. Acepta $2.00–$2.50 para conceptos gourmet con historia auténtica.',
+    },
+  ];
+
+  // ── REGION META ──────────────────────────────────────────────────
+  const RMETA = {
+    Oriental:    { cls: 'tag-oriental',    hex: '#f87171', hexBg: 'rgba(239,68,68,0.12)'  },
+    Occidental:  { cls: 'tag-occidental',  hex: '#d8b4fe', hexBg: 'rgba(168,85,247,0.12)' },
+    Paracentral: { cls: 'tag-paracentral', hex: '#86efac', hexBg: 'rgba(34,197,94,0.12)'  },
+    Central:     { cls: 'tag-central',     hex: '#93c5fd', hexBg: 'rgba(59,130,246,0.12)' },
+  };
+
+  // ── PROMPT BUILDER ───────────────────────────────────────────────
+  const BIAS = {
+    Central: {
+      id: 'Sos un consumidor del Gran San Salvador — urbano, conectado y con acceso a tendencias gastronómicas internacionales.',
+      rules: 'Tenés alta apertura a conceptos gourmet. Tu mayor aversión es la "pura paja": marketing vacío sin sustancia. Un precio premium sin justificación real baja tu score entre -25 y -35 puntos automáticamente.',
+      dialect: 'Caliche capitalino moderno. USÁS: "está chivo", "qué buena onda", "pura paja", "está a full", "bicho", "qué chero". Tono directo y sofisticado.',
+    },
+    Oriental: {
+      id: 'Sos del oriente de El Salvador — San Miguel, Usulután, La Unión o Morazán. Creciste comiendo pupusas de chicharrón y queso en el mercado o en casa de tu abuela.',
+      rules: 'Tu apertura a proteínas no tradicionales es MÍNIMA. Ante proteínas exóticas tu primera reacción es desconfianza activa (-15 a -25 puntos). Modificar la masa tradicional activa penalización adicional de -10 puntos.',
+      dialect: 'Caliche del oriente puro. USÁS obligatoriamente: "bróder", "qué chilero" (o "qué poco chilero"), "no me jale", "está bien bacan", "cipote", "shumo", "mamado", "qué babosada". Tono apasionado y honesto.',
+    },
+    Occidental: {
+      id: 'Sos de la zona occidental — Santa Ana, Sonsonate o Ahuachapán. Tu criterio principal es la EJECUCIÓN TÉCNICA DE LA MASA.',
+      rules: 'Antes de evaluar el relleno o el precio, tu mente evalúa: grosor correcto, textura suave pero firme, sellado limpio, cocción pareja. Una masa perfecta sube tu score +15. Una masa mal ejecutada lo baja -20 antes de evaluar cualquier otra cosa.',
+      dialect: 'Caliche occidental reposado. USÁS: "cipote", "chivo", "está bien hecho", "no se puede", "qué bárbaro", "vea pues", "cabal", "ni modo". Hablás con autoridad técnica.',
+    },
+    Paracentral: {
+      id: 'Sos de la zona paracentral — La Paz, Cuscatlán, Cabañas o San Vicente. Tu métrica principal es la ECUACIÓN VOLUMEN-PRECIO.',
+      rules: 'Una pupusa "mini gourmet" (pequeña, elegante y cara) activa rechazo visceral: -30 puntos. Una pupusa generosa en tamaño y relleno sube tu score +20. NADIE te engaña con una pupusa pequeña a precio grande.',
+      dialect: 'Caliche paracentral. USÁS: "chivo", "bien hecho", "está buenazo", "no hay rollo", "vea pues", "cabal", diminutivos frecuentes ("ahorita", "baratito", "cerquita"). Tono cálido pero firme.',
+    },
+  };
+
+  function elasticityBlock(income) {
+    if (income < 450)  return { tier:'LOW',           penalize:'Precios sobre $1.50 requieren penalización obligatoria de 30–45 puntos. Sobre $1.00 ya genera estrés financiero visible (-10–20 puntos adicionales).', bonus:'Precios en o bajo $0.50 generan satisfacción genuina y señales de lealtad (+10 puntos).' };
+    if (income < 650)  return { tier:'LOWER_MIDDLE',  penalize:'Precios sobre $2.25 penalizan -20–30 puntos. Entre $1.75–$2.25 genera incomodidad moderada (-10–15 puntos).', bonus:'Precios $0.50–$1.00 percibidos como justos (+8 puntos).' };
+    if (income < 900)  return { tier:'MIDDLE',         penalize:'Precios sobre $3.00 penalizan -15–25 puntos salvo justificación premium clara y creíble.', bonus:'Precio $1.25–$2.00 para concepto gourmet bien descrito genera apreciación (+10 puntos).' };
+    return               { tier:'UPPER_MIDDLE_HIGH', penalize:'Precios BAJO $1.00 para un concepto que se proclama gourmet activan escepticismo reverso (-15 puntos). Sobre $6.00 activan fatiga de lujo (-20 puntos).', bonus:'Precio $2.50–$4.00 para concepto premium bien articulado es el sweet spot (+15 puntos).' };
+  }
+
+  function buildSystem(p) {
+    const b = BIAS[p.region];
+    const e = elasticityBlock(p.monthly_income_usd);
+    const openMod  = p.ocean_openness  >= 65 ? `Alta apertura OCEAN (${p.ocean_openness}/100): podés dar crédito genuino a conceptos nuevos si están bien presentados (+10 pts con coherencia narrativa real).`
+                   : p.ocean_openness  <= 35 ? `Apertura OCEAN baja (${p.ocean_openness}/100): ves lo nuevo con sospecha por defecto. Penalizás innovaciones sin respaldo (-10 pts adicionales).`
+                   : `Apertura OCEAN moderada (${p.ocean_openness}/100): neutral ante lo nuevo, el concepto debe convencerte con argumentos.`;
+    const neurMod  = p.ocean_neuroticism >= 65 ? `Neuroticismo OCEAN alto (${p.ocean_neuroticism}/100): amplifica tu reacción emocional ante precios percibidos como injustos. Si el precio te parece abusivo, tu crítica es más intensa.`
+                   : p.ocean_neuroticism <= 35 ? `Neuroticismo OCEAN bajo (${p.ocean_neuroticism}/100): tu crítica es racional y medida — no exagerás en ninguna dirección.`
+                   : `Neuroticismo OCEAN moderado (${p.ocean_neuroticism}/100): reacciones proporcionales al estímulo.`;
+
+    return `ERES: ${p.name}. ${p.age} años. ${p.gender}. ${p.municipality}, ${p.department}. Ingreso mensual: $${p.monthly_income_usd} USD.
+Ocupación: ${p.occupation}. Educación: ${p.education}.
+Perfil: ${p.profile_summary}
+
+IDENTIDAD REGIONAL (${p.region.toUpperCase()}):
+${b.id}
+REGLAS DE EVALUACIÓN OBLIGATORIAS: ${b.rules}
+DIALECTO REQUERIDO EN CRITIQUE: ${b.dialect}
+
+ELASTICIDAD PRECIO-INGRESO (Perfil ${e.tier}):
+Penalización activa: ${e.penalize}
+Bonificación activa: ${e.bonus}
+
+MODIFICADORES OCEAN:
+${openMod}
+${neurMod}
+
+CONTRATO DE SALIDA — REGLA ABSOLUTA E IRROMPIBLE:
+Tu respuesta COMPLETA debe ser UN ÚNICO objeto JSON en una sola línea.
+PROHIBIDO ABSOLUTAMENTE: bloques de markdown (triple acento grave de cualquier tipo), texto introductorio antes del JSON, texto explicativo después del JSON, saltos de línea dentro del JSON, comillas simples en lugar de dobles.
+ESQUEMA REQUERIDO EXACTO: {"name":"string","department":"string","region":"string","score":integer_0_to_100,"accepted":boolean,"critique":"string"}
+REGLAS DE CAMPOS:
+- score: integer 0–100. 0–39=rechazo total, 40–59=rechazo con reservas, 60–74=aceptación condicional, 75–89=aceptación clara, 90–100=entusiasmo. DEBE reflejar matemáticamente las bandas de elasticidad.
+- accepted: true si score>=60, false si score<60. Sin excepciones.
+- critique: 1–3 oraciones en Caliche auténtico de tu región. DEBE mencionar explícitamente cómo el precio impacta tu bolsillo. DEBE usar al menos 2 expresiones Caliche regionales específicas.
+EJEMPLO VÁLIDO: {"name":"José Amaya","department":"San Miguel","region":"Oriental","score":28,"accepted":false,"critique":"Bróder, qué mamada de precio, con eso me como tres en el mercado y me sobra pa la fresca. No me jale con esos cuentos de ingrediente fancy que eso sabe igual, cipote."}
+Evaluá la propuesta. Respondé SOLO con el JSON. Nada más.`;
+  }
+
+  // ── SANITIZE + PARSE ─────────────────────────────────────────────
+  function sanitize(raw) {
+    return raw
+      .replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/i, '')
+      .replace(/[\r\n]+/g, ' ').trim();
+  }
+  function safeparse(raw, p) {
+    try {
+      const obj = JSON.parse(sanitize(raw));
+      if (typeof obj.score !== 'number') throw new Error('no score');
+      obj.accepted = obj.score >= 60;
+      return obj;
+    } catch (err) {
+      console.warn('[PARSE FAIL]', p.name, raw, err.message);
+      return { name: p.name, department: p.department, region: p.region, score: 0, accepted: false, critique: `[Error de parseo — respuesta: ${raw.slice(0,100)}]`, _err: true };
+    }
+  }
+
+  // ── LOG ──────────────────────────────────────────────────────────
+  const logEl = document.getElementById('log');
+  function appendLog(msg, type = 'info') {
+    logEl.style.display = 'flex';
+    const colors = { info:'#4b4540', success:'#4ade80', error:'#f87171', wait:'#d97706' };
+    const icons  = { info:'›', success:'✓', error:'✗', wait:'◌' };
+    const div = document.createElement('div');
+    div.className = 'log-line';
+    div.style.color = colors[type] || colors.info;
+    div.textContent = `${icons[type] || '›'} ${msg}`;
+    logEl.appendChild(div);
+    logEl.scrollTop = logEl.scrollHeight;
+  }
+
+  // ── PERSONA CARDS ────────────────────────────────────────────────
+  function renderPersonas() {
+    const grid = document.getElementById('persona-grid');
+    grid.innerHTML = '';
+    PERSONAS.forEach(p => {
+      const m = RMETA[p.region] || {};
+      const pct = Math.min(100, (p.monthly_income_usd / 1100) * 100).toFixed(0);
+      grid.insertAdjacentHTML('beforeend', `
+        <div class="card-inner" style="padding:0.875rem; display:flex; flex-direction:column; gap:8px;">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:6px;">
+            <div style="min-width:0;">
+              <p style="font-family:'IBM Plex Mono',monospace; font-size:0.7rem; font-weight:600; color:#fbbf24; line-height:1.35; overflow-wrap:break-word;">${p.name}</p>
+              <p style="font-family:'IBM Plex Mono',monospace; font-size:0.6rem; color:var(--muted); margin-top:2px;">${p.age}a · ${p.municipality}</p>
+            </div>
+            <span class="tag ${m.cls}" style="white-space:nowrap;">${p.region.toUpperCase()}</span>
+          </div>
+          <p style="font-size:0.72rem; color:#78716c; line-height:1.45; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">${p.occupation}</p>
+          <div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:0.58rem; color:var(--muted);">INGRESO</span>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:0.58rem; color:#d97706;">$${p.monthly_income_usd}/mo</span>
+            </div>
+            <div class="score-track">
+              <div class="score-fill" style="width:${pct}%; background:linear-gradient(to right,#92400e,#d97706);"></div>
+            </div>
+          </div>
+          <div style="display:flex; gap:12px; font-family:'IBM Plex Mono',monospace; font-size:0.58rem; color:var(--muted);">
+            <span>OCEAN-O <span style="color:#a8a29e;">${p.ocean_openness}</span></span>
+            <span>OCEAN-N <span style="color:#a8a29e;">${p.ocean_neuroticism}</span></span>
+          </div>
+        </div>`);
+    });
+  }
+
+  // ── RESULT CARDS ─────────────────────────────────────────────────
+  function scoreColor(s) {
+    if (s >= 90) return '#4ade80';
+    if (s >= 75) return '#86efac';
+    if (s >= 60) return '#fde047';
+    if (s >= 40) return '#fb923c';
+    return '#f87171';
+  }
+  function renderCards(results) {
+    const grid = document.getElementById('cards');
+    grid.innerHTML = '';
+    results.forEach((r, i) => {
+      const m   = RMETA[r.region] || {};
+      const col = scoreColor(r.score);
+      const errNote = r._err ? `<p style="font-family:'IBM Plex Mono',monospace;font-size:0.6rem;color:#7f1d1d;margin-top:4px;">[parse error — fallback]</p>` : '';
+      grid.insertAdjacentHTML('beforeend', `
+        <div class="card-inner result-card" style="padding:1rem; display:flex; flex-direction:column; gap:10px; animation-delay:${i*0.07}s;">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:6px;">
+            <div style="min-width:0;">
+              <p style="font-family:'IBM Plex Mono',monospace; font-size:0.72rem; font-weight:600; color:#fbbf24; line-height:1.35; overflow-wrap:break-word;">${r.name}</p>
+              <p style="font-family:'IBM Plex Mono',monospace; font-size:0.6rem; color:var(--muted); margin-top:2px;">${r.department}</p>
+            </div>
+            <span class="tag ${m.cls}" style="white-space:nowrap;">${(r.region||'').toUpperCase()}</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span class="badge ${r.accepted?'badge-yes':'badge-no'}">${r.accepted ? 'SE VENDE' : 'NI DE CHOTO'}</span>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:1.5rem; font-weight:700; color:${col}; line-height:1;">${r.score}<span style="font-size:0.65rem; color:var(--muted);">/100</span></span>
+          </div>
+          <div class="score-track">
+            <div class="score-fill" style="width:${r.score}%; background:${col};"></div>
+          </div>
+          <p style="font-family:'IBM Plex Mono',monospace; font-size:0.72rem; font-style:italic; color:#d6d3d1; line-height:1.65; min-height:56px;">"${r.critique}"</p>
+          ${errNote}
+        </div>`);
+    });
+  }
+
+  // ── CHART ────────────────────────────────────────────────────────
+  let chartInst = null;
+  function renderChart(results) {
+    if (chartInst) { chartInst.destroy(); chartInst = null; }
+    const ctx = document.getElementById('chart').getContext('2d');
+    chartInst = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: results.map(r => r.region),
+        datasets: [{
+          label: 'Score de Aceptación',
+          data: results.map(r => r.score),
+          backgroundColor: results.map(r => (RMETA[r.region]?.hexBg) || 'rgba(217,119,6,0.15)'),
+          borderColor:     results.map(r => (RMETA[r.region]?.hex)   || '#d97706'),
+          borderWidth: 2, borderRadius: 6, borderSkipped: false,
+        }],
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: '#1a1714', borderColor: 'rgba(217,119,6,0.25)', borderWidth: 1,
+            titleColor: '#fef3c7', bodyColor: '#a8a29e',
+            titleFont: { family: 'IBM Plex Mono', size: 11 },
+            bodyFont:  { family: 'IBM Plex Mono', size: 11 },
+            callbacks: {
+              label: c => ` Score: ${c.parsed.y}/100 — ${c.parsed.y >= 60 ? 'APROBADO' : 'RECHAZADO'}`,
+            },
+          },
+        },
+        scales: {
+          y: {
+            min: 0, max: 100,
+            grid: { color: 'rgba(255,255,255,0.04)', drawBorder: false },
+            border: { display: false },
+            ticks: { color: '#57534e', font: { family: 'IBM Plex Mono', size: 10 }, callback: v => v + '%' },
+          },
+          x: {
+            grid: { display: false },
+            border: { display: false },
+            ticks: { color: '#a8a29e', font: { family: 'IBM Plex Mono', size: 11 } },
+          },
+        },
+      },
+    });
+  }
+
+  // ── SECURE CONFIGURATION SYNC & AUTO-LOADER ──────────────────────
+  const apiKeyInput = document.getElementById('api-key');
+  const rememberKeyEl = document.getElementById('remember-key');
+
+  // Sync state & storage on input
+  apiKeyInput.addEventListener('input', (e) => {
+    CONFIG.apiKey = e.target.value.trim();
+    if (rememberKeyEl.checked) {
+      if (CONFIG.apiKey) {
+        sessionStorage.setItem('ANTHROPIC_API_KEY', CONFIG.apiKey);
+      } else {
+        sessionStorage.removeItem('ANTHROPIC_API_KEY');
+      }
+    }
+  });
+
+  // Sync state & storage on checkbox change
+  rememberKeyEl.addEventListener('change', (e) => {
+    if (e.target.checked) {
+      if (CONFIG.apiKey) {
+        sessionStorage.setItem('ANTHROPIC_API_KEY', CONFIG.apiKey);
+      }
+    } else {
+      sessionStorage.removeItem('ANTHROPIC_API_KEY');
+    }
+  });
+
+  async function initializeConfig() {
+    // 1. Try loading from sessionStorage (transient in-memory browser tab storage)
+    const cachedKey = sessionStorage.getItem('ANTHROPIC_API_KEY');
+    if (cachedKey && /^sk-ant-api\d{2}-[A-Za-z0-9\-_]{80,}$/.test(cachedKey.trim())) {
+      CONFIG.apiKey = cachedKey.trim();
+      apiKeyInput.value = CONFIG.apiKey;
+      rememberKeyEl.checked = true;
+      appendLog('Clave API cargada desde almacenamiento de sesión.', 'success');
+      return;
+    }
+
+    // 2. Try loading from local config file config.local.json (ignored by git)
+    try {
+      const resp = await fetch('./config.local.json');
+      if (resp.ok) {
+        const data = await resp.json();
+        const key = data.apiKey || data.ANTHROPIC_API_KEY;
+        if (key && /^sk-ant-api\d{2}-[A-Za-z0-9\-_]{80,}$/.test(key.trim())) {
+          CONFIG.apiKey = key.trim();
+          apiKeyInput.value = CONFIG.apiKey;
+          appendLog('Clave API cargada desde config.local.json.', 'success');
+        }
+      }
+    } catch (err) {
+      // Silent catch: config.local.json doesn't exist or isn't accessible
+    }
+  }
+
+  // ── MAIN PIPELINE ────────────────────────────────────────────────
+  async function run() {
+    CONFIG.apiKey = apiKeyInput.value.trim();
+    const apiKey = CONFIG.apiKey;
+    if (!apiKey) { alert('Ingresá tu Anthropic API key para continuar.'); return; }
+
+    const masa     = document.getElementById('masa').value;
+    const proteins = [...document.querySelectorAll('input.cb:checked')].map(el => el.value);
+    const toppings = document.getElementById('toppings').value.trim();
+    const price    = parseFloat(document.getElementById('price').value);
+    const concept  = document.getElementById('concept').value.trim();
+
+    if (!proteins.length) { alert('Seleccioná al menos un relleno.'); return; }
+
+    const userMsg = [
+      'PROPUESTA DE PUPUSA PARA EVALUACION:',
+      `  Masa: ${masa}`,
+      `  Proteinas / relleno: ${proteins.join(', ')}`,
+      `  Acompañamientos: ${toppings || 'Ninguno especificado'}`,
+      `  Precio por unidad: $${price.toFixed(2)} USD`,
+      concept ? `  Concepto: "${concept}"` : '',
+      '',
+      'Evaluá esta propuesta según tu perspectiva personal. Respondé SOLO con el JSON requerido.',
+    ].filter(s => s !== undefined).join('\n');
+
+    const btn = document.getElementById('run-btn');
+    btn.disabled = true; btn.textContent = 'SIMULANDO...';
+    logEl.innerHTML = ''; logEl.style.display = 'none';
+    document.getElementById('results').style.display = 'none';
+
+    const client = new Anthropic({ apiKey, dangerouslyAllowBrowser: true });
+
+    appendLog(`Receta: ${masa} · ${proteins.join(' + ')} · $${price.toFixed(2)} USD`, 'info');
+    appendLog('Iniciando 4 agentes en paralelo (Promise.all)…', 'wait');
+
+    const calls = PERSONAS.map(p => (async () => {
+      appendLog(`[${p.region}] Consultando a ${p.name.split('"')[0].trim() || p.name.split(' ')[0]}…`, 'wait');
+      try {
+        const resp = await client.messages.create({
+          model: 'claude-sonnet-4-6',
+          max_tokens: 300,
+          system: buildSystem(p),
+          messages: [{ role: 'user', content: userMsg }],
+        });
+        const raw = resp.content?.[0]?.text ?? '';
+        const parsed = safeparse(raw, p);
+        appendLog(`[${p.region}] ${parsed.score}/100 — ${parsed.accepted ? 'APROBADO' : 'RECHAZADO'}`, parsed.accepted ? 'success' : 'error');
+        return parsed;
+      } catch (err) {
+        appendLog(`[${p.region}] Error: ${err.message}`, 'error');
+        return { name: p.name, department: p.department, region: p.region, score: 0, accepted: false, critique: `API error: ${err.message}`, _err: true };
+      }
+    })());
+
+    const results = await Promise.all(calls);
+    const mean = Math.round(results.reduce((a, r) => a + r.score, 0) / results.length);
+
+    renderChart(results);
+    renderCards(results);
+    document.getElementById('results').style.display = 'block';
+    document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    appendLog(`Simulacion completa. Score promedio: ${mean}/100.`, 'success');
+
+    btn.disabled = false; btn.textContent = 'EJECUTAR SIMULACION';
+  }
+
+  // ── PRICE SLIDER ─────────────────────────────────────────────────
+  const priceEl   = document.getElementById('price');
+  const priceDisp = document.getElementById('price-display');
+  priceEl.addEventListener('input', () => {
+    const v   = parseFloat(priceEl.value);
+    const pct = ((v - 0.5) / (5.0 - 0.5) * 100).toFixed(2) + '%';
+    priceEl.style.setProperty('--fill', pct);
+    priceDisp.textContent = `$${v.toFixed(2)} USD`;
+  });
+
+  // ── BOOT ─────────────────────────────────────────────────────────
+  document.getElementById('run-btn').addEventListener('click', run);
+  renderPersonas();
+  initializeConfig();
+</script>
+</body>
+</html>

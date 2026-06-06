@@ -1,0 +1,58 @@
+# ==============================================================================
+# LA PUPUSERÍA ALQUIMISTA - ENTERPRISE-GRADE GITIGNORE
+# Tailored for Vanilla JS + Local SQLite MCP Architectures
+# ==============================================================================
+
+# --- SECRETS & LOCAL ENVIRONMENT CONFIGURATIONS ---
+# Never commit credentials, API keys, or machine-specific configs
+.env
+.env.json
+.env.local
+.env.*.local
+config.local.js
+config.local.json
+secrets.json
+
+# --- SQLITE DATABASES & ACTIVE TRANSACTION JOURNALS ---
+# Exclude database files, write-ahead logs, and database journal locks
+data/*.db
+data/*.db-journal
+data/*.db-shm
+data/*.db-wal
+data/*.sqlite
+data/*.sqlite3
+data/*.sqlitedb
+*.db
+*.sqlite3
+
+# --- DEVELOPMENT TOOLS & LOCAL MCP CACHES ---
+# Exclude Claude Desktop, Cursor, and Cline project settings/caches
+.claude/
+.cursor/
+.cline/
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+
+# --- DEPENDENCY GRAPH (For potential build tools/bundlers) ---
+node_modules/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# --- SYSTEM & PLATFORM ARTIFACTS ---
+# Exclude operating system specific metadata files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
