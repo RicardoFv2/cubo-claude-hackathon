@@ -413,6 +413,127 @@
       color: var(--amber);
       line-height: 1.2;
     }
+    /* ═══════════════════════════════════════════════════════════
+       FUTURISTIC OVERLAY — capa tech sobre la base salvadoreña
+       ═══════════════════════════════════════════════════════════ */
+
+    /* Dot-grid background en dark mode */
+    [data-theme="dark"] body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: radial-gradient(circle, rgba(217,119,6,0.1) 1px, transparent 1px);
+      background-size: 30px 30px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Shimmer animado en la barra comal superior */
+    @keyframes comal-shimmer {
+      0%   { background-position: -200% center; }
+      100% { background-position:  200% center; }
+    }
+    body::after {
+      background: linear-gradient(90deg,
+        transparent 0%, var(--terracotta) 20%, var(--amber) 45%,
+        var(--gold) 50%, var(--amber) 55%, var(--terracotta) 80%, transparent 100%);
+      background-size: 200% auto;
+      animation: comal-shimmer 3.5s linear infinite;
+    }
+
+    /* Scan line que barre el header */
+    @keyframes scan {
+      0%   { top: 0;    opacity: 0; }
+      6%   {            opacity: 0.45; }
+      94%  {            opacity: 0.45; }
+      100% { top: 100%; opacity: 0; }
+    }
+    header {
+      overflow: hidden;
+    }
+    header::after {
+      content: '';
+      position: absolute;
+      left: 0; right: 0;
+      height: 1px;
+      top: 0;
+      background: linear-gradient(90deg,
+        transparent 5%, var(--amber) 30%, var(--gold) 50%, var(--amber) 70%, transparent 95%);
+      animation: scan 5s ease-in-out infinite;
+      pointer-events: none;
+      z-index: 2;
+      opacity: 0;
+    }
+
+    /* Panel card: hover con glow ámbar + transición suave */
+    .panel-card {
+      transition: box-shadow 0.3s ease, border-color 0.3s ease;
+    }
+    .panel-card:hover {
+      border-color: rgba(217,119,6,0.35);
+      box-shadow: var(--shadow-hover), 0 0 40px rgba(217,119,6,0.07);
+    }
+
+    /* Prefix // en section headings */
+    .section-heading::before {
+      content: '//';
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.68em;
+      font-style: normal;
+      font-weight: 400;
+      color: var(--amber);
+      opacity: 0.4;
+      margin-right: 5px;
+      letter-spacing: -0.04em;
+    }
+
+    /* Chip activo: glow más intenso */
+    .chip-input:checked + .chip-label {
+      box-shadow: 0 0 0 2px rgba(217,119,6,0.25), 0 0 16px rgba(217,119,6,0.14);
+    }
+
+    /* Field focus: glow exterior */
+    .field:focus {
+      box-shadow: 0 0 0 3px rgba(217,119,6,0.12), 0 0 22px rgba(217,119,6,0.09);
+    }
+
+    /* Cursor terminal parpadeante en el log */
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0; }
+    }
+    .log-cursor {
+      display: inline-block;
+      width: 5px;
+      height: 0.72em;
+      background: var(--amber);
+      margin-left: 3px;
+      vertical-align: middle;
+      border-radius: 1px;
+      animation: blink 1.1s step-end infinite;
+    }
+
+    /* Glow en números de score de resultado */
+    .score-num {
+      text-shadow: 0 0 20px currentColor;
+    }
+
+    /* Divider con brillo central pulsante */
+    @keyframes pulse-center {
+      0%, 100% { opacity: 0.45; }
+      50%       { opacity: 0.9; }
+    }
+    .hr-comal {
+      animation: pulse-center 3s ease-in-out infinite;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      body::after, header::after, .hr-comal, .log-cursor {
+        animation: none !important;
+        transition: none !important;
+      }
+    }
+
   </style>
 </head>
 
@@ -993,12 +1114,19 @@ Evaluá la propuesta. Respondé SOLO con el JSON. Nada más.`;
   const logEl = document.getElementById('log');
   function appendLog(msg, type = 'info') {
     logEl.style.display = 'flex';
+    const prev = logEl.querySelector('.log-cursor');
+    if (prev) prev.remove();
     const colors = { info:'var(--text-faint)', success:'#34d399', error:'#f87171', wait:'var(--amber)' };
     const icons  = { info:'›', success:'✓', error:'✗', wait:'◌' };
     const div = document.createElement('div');
     div.className = 'log-line';
     div.style.color = colors[type] || colors.info;
-    div.textContent = `${icons[type] || '›'} ${msg}`;
+    const txt = document.createElement('span');
+    txt.textContent = `${icons[type] || '›'} ${msg}`;
+    const cursor = document.createElement('span');
+    cursor.className = 'log-cursor';
+    div.appendChild(txt);
+    div.appendChild(cursor);
     logEl.appendChild(div);
     logEl.scrollTop = logEl.scrollHeight;
   }
@@ -1100,7 +1228,7 @@ Evaluá la propuesta. Respondé SOLO con el JSON. Nada más.`;
           </div>
           <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap;">
             <span class="badge ${bd.cls}">${bd.text}</span>
-            <span style="font-family:'IBM Plex Mono',monospace; font-size:1.5rem; font-weight:700; color:${col}; line-height:1; flex-shrink:0;">${r.score}<span style="font-size:0.6rem; color:var(--text-faint);">/100</span></span>
+            <span class="score-num" style="font-family:'IBM Plex Mono',monospace; font-size:1.5rem; font-weight:700; color:${col}; line-height:1; flex-shrink:0;">${r.score}<span style="font-size:0.6rem; color:var(--text-faint); text-shadow:none;">/100</span></span>
           </div>
           <div class="score-track">
             <div class="score-fill" style="width:${r.score}%; background:${col};"></div>
