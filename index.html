@@ -242,38 +242,104 @@
       <!-- Masa -->
       <div>
         <label class="label">BASE DE MASA</label>
-        <select id="masa" class="field" style="cursor:pointer;">
-          <option>Tradicional (Maíz)</option>
-          <option>Arroz</option>
-          <option>Espinaca</option>
-          <option>Remolacha</option>
-          <option>Yuca</option>
-        </select>
-      </div>
-
-      <!-- Fillings -->
-      <div>
-        <label class="label">RELLENOS PRINCIPALES</label>
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px 12px;">
           <label style="display:flex; align-items:center; gap:7px; font-size:0.8rem; color:#d6d3d1; cursor:pointer;">
-            <input type="checkbox" class="cb" value="Chicharrón" checked /> Chicharrón
+            <input type="radio" name="masa" value="Tradicional (Maíz)" class="cb" checked /> Maíz Tradicional
           </label>
           <label style="display:flex; align-items:center; gap:7px; font-size:0.8rem; color:#d6d3d1; cursor:pointer;">
-            <input type="checkbox" class="cb" value="Queso" checked /> Queso
+            <input type="radio" name="masa" value="Arroz" class="cb" /> Arroz
           </label>
           <label style="display:flex; align-items:center; gap:7px; font-size:0.8rem; color:#d6d3d1; cursor:pointer;">
-            <input type="checkbox" class="cb" value="Frijoles" /> Frijoles
+            <input type="radio" name="masa" value="Espinaca (Verde)" class="cb" /> Espinaca (Verde)
           </label>
           <label style="display:flex; align-items:center; gap:7px; font-size:0.8rem; color:#d6d3d1; cursor:pointer;">
-            <input type="checkbox" class="cb" value="Loroco" /> Loroco
+            <input type="radio" name="masa" value="Remolacha (Rosada)" class="cb" /> Remolacha (Rosada)
           </label>
           <label style="display:flex; align-items:center; gap:7px; font-size:0.8rem; color:#d6d3d1; cursor:pointer;">
-            <input type="checkbox" class="cb" value="Pollo" /> Pollo
+            <input type="radio" name="masa" value="Yuca" class="cb" /> Yuca
           </label>
           <label style="display:flex; align-items:center; gap:7px; font-size:0.8rem; color:#d6d3d1; cursor:pointer;">
-            <input type="checkbox" class="cb" value="Camarones" /> Camarones
+            <input type="radio" name="masa" value="Plátano Fusion" class="cb" /> Plátano Fusion
           </label>
         </div>
+      </div>
+
+      <!-- Core Proteins -->
+      <div>
+        <label class="label">PROTEÍNAS PRINCIPALES</label>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px 12px;">
+          <label style="display:flex; align-items:center; gap:7px; font-size:0.8rem; color:#d6d3d1; cursor:pointer;">
+            <input type="checkbox" class="cb protein-cb" value="Chicharrón" checked /> Chicharrón
+          </label>
+          <label style="display:flex; align-items:center; gap:7px; font-size:0.8rem; color:#d6d3d1; cursor:pointer;">
+            <input type="checkbox" class="cb protein-cb" value="Pollo" /> Pollo
+          </label>
+          <label style="display:flex; align-items:center; gap:7px; font-size:0.8rem; color:#d6d3d1; cursor:pointer;">
+            <input type="checkbox" class="cb protein-cb" value="Camarón" /> Camarón
+          </label>
+          <label style="display:flex; align-items:center; gap:7px; font-size:0.8rem; color:#d6d3d1; cursor:pointer;">
+            <input type="checkbox" class="cb protein-cb" value="Calamar" /> Calamar
+          </label>
+          <label style="display:flex; align-items:center; gap:7px; font-size:0.8rem; color:#d6d3d1; cursor:pointer;">
+            <input type="checkbox" class="cb protein-cb" value="Birria" /> Birria
+          </label>
+          <label style="display:flex; align-items:center; gap:7px; font-size:0.8rem; color:#d6d3d1; cursor:pointer;">
+            <input type="checkbox" class="cb protein-cb" value="Hongo Portobello" /> Hongo Portobello
+          </label>
+          <label style="display:flex; align-items:center; gap:7px; font-size:0.8rem; color:#d6d3d1; cursor:pointer;">
+            <input type="checkbox" class="cb protein-cb" value="Tocino" /> Tocino
+          </label>
+          <label style="display:flex; align-items:center; gap:7px; font-size:0.8rem; color:#d6d3d1; cursor:pointer;">
+            <input type="checkbox" class="cb protein-cb" value="Lomo de Aguja" /> Lomo de Aguja
+          </label>
+        </div>
+      </div>
+
+      <!-- Cheeses & Fats -->
+      <div>
+        <label class="label">QUESOS & GRASAS</label>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px 12px;">
+          <label style="display:flex; align-items:center; gap:7px; font-size:0.8rem; color:#d6d3d1; cursor:pointer;">
+            <input type="checkbox" class="cb cheese-cb" value="Quesillo Salvadoreño Tradicional" checked /> Quesillo Tradicional
+          </label>
+          <label style="display:flex; align-items:center; gap:7px; font-size:0.8rem; color:#d6d3d1; cursor:pointer;">
+            <input type="checkbox" class="cb cheese-cb" value="Queso de Capa" /> Queso de Capa
+          </label>
+          <label style="display:flex; align-items:center; gap:7px; font-size:0.8rem; color:#d6d3d1; cursor:pointer;">
+            <input type="checkbox" class="cb cheese-cb" value="Queso Mozzarella Vegano" /> Mozzarella Vegano
+          </label>
+          <label style="display:flex; align-items:center; gap:7px; font-size:0.8rem; color:#d6d3d1; cursor:pointer;">
+            <input type="checkbox" class="cb cheese-cb" value="Crema Pura" /> Crema Pura
+          </label>
+        </div>
+      </div>
+
+      <!-- Custom Upgrades & Add-ons -->
+      <div>
+        <label class="label">MEJORAS & EXTRAS</label>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px 12px;">
+          <label style="display:flex; align-items:center; gap:7px; font-size:0.8rem; color:#d6d3d1; cursor:pointer;">
+            <input type="checkbox" class="cb upgrade-cb" value="Loroco" /> Loroco
+          </label>
+          <label style="display:flex; align-items:center; gap:7px; font-size:0.8rem; color:#d6d3d1; cursor:pointer;">
+            <input type="checkbox" class="cb upgrade-cb" value="Jalapeño" /> Jalapeño
+          </label>
+          <label style="display:flex; align-items:center; gap:7px; font-size:0.8rem; color:#d6d3d1; cursor:pointer;">
+            <input type="checkbox" class="cb upgrade-cb" value="Piña Tatemada" /> Piña Tatemada
+          </label>
+          <label style="display:flex; align-items:center; gap:7px; font-size:0.8rem; color:#d6d3d1; cursor:pointer;">
+            <input type="checkbox" class="cb upgrade-cb" value="Albahaca" /> Albahaca
+          </label>
+          <label style="display:flex; align-items:center; gap:7px; font-size:0.8rem; color:#d6d3d1; cursor:pointer;">
+            <input type="checkbox" class="cb upgrade-cb" value="Ajo Rostizado" /> Ajo Rostizado
+          </label>
+        </div>
+      </div>
+
+      <!-- Custom Alchemist Free-Text Input -->
+      <div>
+        <label class="label">INYECTAR INGREDIENTE ALQUIMISTA SECRETO</label>
+        <input id="custom-ingredient" type="text" class="field" placeholder="Nutella, Cangrejo, Polvo de Oro..." />
       </div>
 
       <!-- Toppings -->
@@ -456,6 +522,13 @@ IDENTIDAD REGIONAL (${p.region.toUpperCase()}):
 ${b.id}
 REGLAS DE EVALUACIÓN OBLIGATORIAS: ${b.rules}
 DIALECTO REQUERIDO EN CRITIQUE: ${b.dialect}
+
+Esta propuesta puede incluir ingredientes tradicionales, exóticos o una inyección de ingredientes alquimistas secretos completamente libres (por ejemplo: dulces, mariscos raros, polvos, sopas, etc.).
+Debés evaluar con total honestidad la coherencia del sabor, la seguridad física/comestibilidad y el impacto cultural de estos ingredientes según tu perfil y región:
+  • Central: Abierta a la innovación y estética gourmet, pero detecta y penaliza combinaciones caóticas, sin sentido o de mal sabor ("pura paja").
+  • Oriental: Cero tolerancia a ingredientes dulces o masas raras. Lo percibirás como una ofensa cultural imperdonable y bajarás tu nota drásticamente.
+  • Occidental: Evalúa la viabilidad técnica. Si el ingrediente secreto es demasiado líquido (ej. sopa, jugos) o arruina la textura, penalízalo porque arruinaría la masa.
+  • Paracentral: Valora la saciedad y el volumen. Evalúa si el ingrediente aporta valor real o si es un adorno gourmet innecesario y costoso.
 
 ELASTICIDAD PRECIO-INGRESO (Perfil ${e.tier}):
 Penalización activa: ${e.penalize}
@@ -709,24 +782,36 @@ Evaluá la propuesta. Respondé SOLO con el JSON. Nada más.`;
     const apiKey = CONFIG.apiKey;
     if (!apiKey) { alert('Ingresá tu Anthropic API key para continuar.'); return; }
 
-    const masa     = document.getElementById('masa').value;
-    const proteins = [...document.querySelectorAll('input.cb:checked')].map(el => el.value);
+    const masaEl = document.querySelector('input[name="masa"]:checked');
+    const masa = masaEl ? masaEl.value : 'Tradicional (Maíz)';
+
+    const proteins = [...document.querySelectorAll('input.protein-cb:checked')].map(el => el.value);
+    const cheeses = [...document.querySelectorAll('input.cheese-cb:checked')].map(el => el.value);
+    const upgrades = [...document.querySelectorAll('input.upgrade-cb:checked')].map(el => el.value);
+    const customIngredient = document.getElementById('custom-ingredient').value.trim();
     const toppings = document.getElementById('toppings').value.trim();
     const price    = parseFloat(document.getElementById('price').value);
     const concept  = document.getElementById('concept').value.trim();
 
-    if (!proteins.length) { alert('Seleccioná al menos un relleno.'); return; }
+    // Check if at least one ingredient is chosen
+    if (!proteins.length && !cheeses.length && !upgrades.length && !customIngredient) {
+      alert('Seleccioná al menos un relleno, queso, extra, o inyectá un ingrediente secreto.');
+      return;
+    }
 
+    const fillings = [...proteins, ...cheeses].join(', ');
     const userMsg = [
       'PROPUESTA DE PUPUSA PARA EVALUACION:',
       `  Masa: ${masa}`,
-      `  Proteinas / relleno: ${proteins.join(', ')}`,
+      `  Relleno (Proteínas & Quesos): ${fillings || 'Ninguno especificado'}`,
+      `  Mejoras / Extras: ${upgrades.join(', ') || 'Ninguno'}`,
+      customIngredient ? `  Ingrediente alquimista secreto: ${customIngredient}` : '',
       `  Acompañamientos: ${toppings || 'Ninguno especificado'}`,
       `  Precio por unidad: $${price.toFixed(2)} USD`,
       concept ? `  Concepto: "${concept}"` : '',
       '',
       'Evaluá esta propuesta según tu perspectiva personal. Respondé SOLO con el JSON requerido.',
-    ].filter(s => s !== undefined).join('\n');
+    ].filter(s => s !== undefined && s !== '').join('\n');
 
     const btn = document.getElementById('run-btn');
     btn.disabled = true; btn.textContent = 'SIMULANDO...';
@@ -735,7 +820,13 @@ Evaluá la propuesta. Respondé SOLO con el JSON. Nada más.`;
 
     const client = new Anthropic({ apiKey, dangerouslyAllowBrowser: true });
 
-    appendLog(`Receta: ${masa} · ${proteins.join(' + ')} · $${price.toFixed(2)} USD`, 'info');
+    const displayRecipe = [
+      fillings ? `${fillings}` : '',
+      upgrades.length ? `${upgrades.join(', ')}` : '',
+      customIngredient ? `${customIngredient}` : ''
+    ].filter(Boolean).join(' + ');
+
+    appendLog(`Receta: ${masa} con ${displayRecipe} · $${price.toFixed(2)} USD`, 'info');
     appendLog('Iniciando 4 agentes en paralelo (Promise.all)…', 'wait');
 
     const calls = PERSONAS.map(p => (async () => {
