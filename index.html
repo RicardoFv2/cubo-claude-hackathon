@@ -230,8 +230,8 @@
         CONFIGURAR PROPUESTA
       </h2>
 
-      <!-- API Key -->
-      <div>
+      <!-- API Key Container -->
+      <div id="api-key-container">
         <label class="label">API KEY — ANTHROPIC</label>
         <input id="api-key" type="password" class="field mb-2" placeholder="sk-ant-api03-…" autocomplete="off" />
         <label style="display:flex; align-items:center; gap:6px; font-size:0.68rem; color:#a8a29e; cursor:pointer; user-select:none;">
@@ -656,12 +656,28 @@ Evaluá la propuesta. Respondé SOLO con el JSON. Nada más.`;
   });
 
   async function initializeConfig() {
+    const showLoadedUI = () => {
+      const container = document.getElementById('api-key-container');
+      if (container) {
+        container.innerHTML = `
+          <div style="display:flex; flex-direction:column; gap:6px;">
+            <label class="label" style="margin:0;">API KEY — ANTHROPIC</label>
+            <div style="display:flex; align-items:center; gap:8px; padding:0.5rem 0.75rem; background:rgba(22,163,74,0.08); border:1px solid rgba(22,163,74,0.25); border-radius:0.375rem;">
+              <span style="width:7px; height:7px; background:#4ade80; border-radius:50%; display:inline-block; box-shadow:0 0 8px #4ade80;" class="animate-pulse"></span>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:0.65rem; color:#4ade80; letter-spacing:0.05em; font-weight:600;">CARGADA LOCALMENTE</span>
+            </div>
+          </div>
+        `;
+      }
+    };
+
     // 1. Try loading from sessionStorage (transient in-memory browser tab storage)
     const cachedKey = sessionStorage.getItem('ANTHROPIC_API_KEY');
     if (cachedKey && /^sk-ant-api\d{2}-[A-Za-z0-9\-_]{80,}$/.test(cachedKey.trim())) {
       CONFIG.apiKey = cachedKey.trim();
       apiKeyInput.value = CONFIG.apiKey;
       rememberKeyEl.checked = true;
+      showLoadedUI();
       appendLog('Clave API cargada desde almacenamiento de sesión.', 'success');
       return;
     }
@@ -675,6 +691,7 @@ Evaluá la propuesta. Respondé SOLO con el JSON. Nada más.`;
         if (key && /^sk-ant-api\d{2}-[A-Za-z0-9\-_]{80,}$/.test(key.trim())) {
           CONFIG.apiKey = key.trim();
           apiKeyInput.value = CONFIG.apiKey;
+          showLoadedUI();
           appendLog('Clave API cargada desde config.local.json.', 'success');
         }
       }
@@ -685,7 +702,10 @@ Evaluá la propuesta. Respondé SOLO con el JSON. Nada más.`;
 
   // ── MAIN PIPELINE ────────────────────────────────────────────────
   async function run() {
-    CONFIG.apiKey = apiKeyInput.value.trim();
+    const apiInputEl = document.getElementById('api-key');
+    if (apiInputEl) {
+      CONFIG.apiKey = apiInputEl.value.trim();
+    }
     const apiKey = CONFIG.apiKey;
     if (!apiKey) { alert('Ingresá tu Anthropic API key para continuar.'); return; }
 
