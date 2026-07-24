@@ -1526,16 +1526,14 @@ Evaluá la propuesta. Respondé SOLO con el JSON. Nada más.`;
     });
 
     const barColors = regionalScores.map(r => {
-      if (r.score >= 75) return 'rgba(245,158,11,0.75)';
-      if (r.score >= 60) return 'rgba(217,119,6,0.75)';
-      if (r.score >= 40) return 'rgba(234,88,12,0.75)';
-      return 'rgba(220,38,38,0.72)';
+      if (r.score >= 70) return 'rgba(16, 185, 129, 0.82)';  // Verde (Aprobado)
+      if (r.score >= 50) return 'rgba(245, 158, 11, 0.82)';  // Naranja/Amarillo (Intermedio)
+      return 'rgba(239, 68, 68, 0.82)';                       // Rojo (Bajo)
     });
     const borderColors = regionalScores.map(r => {
-      if (r.score >= 75) return '#f59e0b';
-      if (r.score >= 60) return '#d97706';
-      if (r.score >= 40) return '#ea580c';
-      return '#dc2626';
+      if (r.score >= 70) return '#10b981'; // Verde (Aprobado)
+      if (r.score >= 50) return '#f59e0b'; // Naranja/Amarillo (Intermedio)
+      return '#ef4444';                    // Rojo (Bajo)
     });
 
     const isDark = document.documentElement.dataset.theme === 'dark';
@@ -1560,25 +1558,29 @@ Evaluá la propuesta. Respondé SOLO con el JSON. Nada más.`;
             borderColor: 'rgba(217,119,6,0.3)', borderWidth: 1,
             titleColor: isDark ? '#f5ede3' : '#1c1917',
             bodyColor: isDark ? '#9d8e84' : '#78716c',
-            padding: 10,
-            titleFont: { family:'IBM Plex Mono', size:11, weight:'600' },
-            bodyFont:  { family:'IBM Plex Mono', size:11 },
+            padding: 12,
+            titleFont: { family:'Plus Jakarta Sans', size:12, weight:'700' },
+            bodyFont:  { family:'Plus Jakarta Sans', size:12 },
             callbacks: {
-              label: c => ` Score Promedio: ${c.parsed.y}/100 — ${c.parsed.y >= 60 ? '¡APROBADO!' : '¡RECHAZADO!'}`,
+              label: c => {
+                const s = c.parsed.y;
+                const status = s >= 70 ? '¡APROBADO! ✅' : s >= 50 ? 'INTERMEDIO ⚠️' : '¡RECHAZADO! 🛑';
+                return ` Score Promedio: ${s}/100 — ${status}`;
+              },
             },
           },
         },
         scales: {
           y: {
             min: 0, max: 100,
-            grid: { color: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.05)', drawBorder: false },
+            grid: { color: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.06)', drawBorder: false },
             border: { display: false },
-            ticks: { color: isDark ? '#5c5148' : '#a8a29e', font:{ family:'IBM Plex Mono', size:10 }, callback: v => v + '/100' },
+            ticks: { color: isDark ? '#9d8e84' : '#6b6259', font:{ family:'Plus Jakarta Sans', size:11, weight:'600' }, callback: v => v + '/100' },
           },
           x: {
             grid: { display: false },
             border: { display: false },
-            ticks: { color: isDark ? '#9d8e84' : '#78716c', font:{ family:'Fraunces', size:13, weight:'600' } },
+            ticks: { color: isDark ? '#f5ede3' : '#1c1917', font:{ family:'Fraunces', size:14, weight:'700' } },
           },
         },
       },
