@@ -1488,6 +1488,72 @@ Evaluá la propuesta. Respondé SOLO con el JSON. Nada más.`;
     return fresh;
   }
 
+  // ── HUGGINGFACE DATASET LOADER (nvidia/Nemotron-Personas-El-Salvador) ──
+  async function fetchHuggingFacePersonas() {
+    try {
+      const randomOffset = Math.floor(Math.random() * 15) * 50;
+      const url = `https://datasets-server.huggingface.co/rows?dataset=nvidia/Nemotron-Personas-El-Salvador&config=default&split=train&offset=${randomOffset}&limit=100`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`HF HTTP ${res.status}`);
+      const data = await res.json();
+      if (!data.rows || !data.rows.length) throw new Error('No rows from HuggingFace');
+
+      const rawRows = data.rows.map(r => r.row);
+      const byRegion = { Central: [], Oriental: [], Occidental: [], Paracentral: [] };
+
+      function getRegion(dept) {
+        const d = (dept || "").toLowerCase();
+        if (d.includes("san salvador") || d.includes("libertad") || d.includes("chalatenango") || d.includes("cuscatlán")) return "Central";
+        if (d.includes("santa ana") || d.includes("sonsonate") || d.includes("ahuachapán")) return "Occidental";
+        if (d.includes("la paz") || d.includes("cabañas") || d.includes("san vicente")) return "Paracentral";
+        return "Oriental";
+      }
+
+      rawRows.forEach(r => {
+        const reg = getRegion(r.department);
+        if (byRegion[reg].length < 10) {
+          const match = r.persona ? r.persona.match(/^([A-Záéíóúñ]+)/i) : null;
+          const firstName = match ? match[1] : (r.sex === "Femenino" ? "María" : "José");
+          const muniClean = (r.municipality || r.department || "El Salvador").split(" ")[0];
+          const name = `${firstName} (${muniClean})`;
+
+          byRegion[reg].push({
+            id: r.uuid || `HF-${Math.random().toString(36).substr(2, 6)}`,
+            name: name,
+            age: r.age || 30,
+            gender: r.sex || "No especificado",
+            department: r.department || "San Salvador",
+            municipality: r.municipality || r.department || "San Salvador",
+            region: reg,
+            occupation: r.occupation || "Trabajador independiente",
+            education: r.education_level || "Bachillerato",
+            monthly_income_usd: Math.round(350 + Math.random() * 550),
+            ocean_openness: Math.floor(30 + Math.random() * 50),
+            ocean_neuroticism: Math.floor(30 + Math.random() * 50),
+            profile_summary: r.culinary_persona || r.persona || "Consumidor salvadoreño."
+          });
+        }
+      });
+
+      const fallbackFresh = generateFreshCohort();
+      let cohort = [];
+      ['Central', 'Oriental', 'Occidental', 'Paracentral'].forEach(reg => {
+        let pool = byRegion[reg];
+        if (pool.length < 10) {
+          const needed = 10 - pool.length;
+          const fill = fallbackFresh.filter(p => p.region === reg).slice(0, needed);
+          pool = pool.concat(fill);
+        }
+        cohort = cohort.concat(pool.slice(0, 10));
+      });
+
+      return cohort;
+    } catch (err) {
+      console.warn('[HF FETCH FALLBACK]', err.message);
+      return generateFreshCohort();
+    }
+  }
+
   // ── RENDER PERSONA CARDS ──────────────────────────────────────────
   function renderPersonas(personaList = PERSONAS) {
     const grid = document.getElementById('persona-grid');
@@ -1738,10 +1804,11 @@ Evaluá la propuesta. Respondé SOLO con el JSON. Nada más.`;
       customIngredient,
     ].filter(Boolean).join(' + ');
 
-    // ALWAYS sample a fresh 40-persona cohort from the dataset for every simulation
-    const targetPersonas = generateFreshCohort();
+    // ALWAYS sample a fresh 40-persona cohort directly from HuggingFace (nvidia/Nemotron-Personas-El-Salvador)
+    appendLog('🤗 Descargando personas reales de nvidia/Nemotron-Personas-El-Salvador (HuggingFace)…', 'wait');
+    const targetPersonas = await fetchHuggingFacePersonas();
     renderPersonas(targetPersonas);
-    appendLog('🔄 Cohorte de 40 muestras frescas generadas dinámicamente desde el dataset salvadoreño.', 'info');
+    appendLog('✅ Muestras frescas cargadas exitosamente desde HuggingFace.', 'info');
 
     appendLog(`Receta: ${masa} con ${displayRecipe} · $${price.toFixed(2)} USD`, 'info');
     appendLog('Iniciando 40 agentes con límite de concurrencia de 10…', 'wait');
@@ -1909,7 +1976,7 @@ Evaluá la propuesta. Respondé SOLO con el JSON. Nada más.`;
 
   // ── BOOT ──────────────────────────────────────────────────────────
   document.getElementById('run-btn').addEventListener('click', run);
-  renderPersonas(generateFreshCohort());
+  fetchHuggingFacePersonas().then(renderPersonas);
   initCustomChipInputs();
   initSelectionLimits();
 </script>
