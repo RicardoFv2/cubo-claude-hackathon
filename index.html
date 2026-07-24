@@ -1491,21 +1491,40 @@ Evaluá la propuesta. Respondé SOLO con el JSON. Nada más.`;
         return "Oriental";
       }
 
+      function extractName(r) {
+        const textSources = [r.professional_persona, r.sports_persona, r.culinary_persona, r.family_persona, r.persona];
+        for (const src of textSources) {
+          if (!src) continue;
+          const m = src.match(/^([A-ZáéíóúñÁÉÍÓÚÑ][a-záéíóúñ]+(?:\s+[A-ZáéíóúñÁÉÍÓÚÑ][a-záéíóúñ]+)?),\s*(?:de\s*)?\d+\s*años/i);
+          if (m && m[1]) {
+            const candidate = m[1].trim();
+            const invalidWords = ['En', 'Con', 'De', 'Por', 'Para', 'Como', 'Sobre', 'Tras', 'A', 'Ante', 'Bajo', 'Cada', 'Desde', 'Durante', 'Entre', 'Hacia', 'Hasta', 'Sin'];
+            if (!invalidWords.includes(candidate)) {
+              return candidate;
+            }
+          }
+        }
+        const cfg = MACRO_SAMPLER[getRegion(r.department)];
+        const nameList = r.sex === "Femenino" ? cfg.females : cfg.males;
+        const fn = rand(nameList);
+        const ln = rand(cfg.lasts);
+        return `${fn} ${ln}`;
+      }
+
       rawRows.forEach(r => {
         const reg = getRegion(r.department);
         if (byRegion[reg].length < 10) {
-          const match = r.persona ? r.persona.match(/^([A-Záéíóúñ]+)/i) : null;
-          const firstName = match ? match[1] : (r.sex === "Femenino" ? "María" : "José");
-          const muniClean = (r.municipality || r.department || "El Salvador").split(" ")[0];
-          const name = `${firstName} (${muniClean})`;
+          const personName = extractName(r);
+          const muni = r.municipality || r.department || "El Salvador";
+          const displayName = `${personName} (${muni})`;
 
           byRegion[reg].push({
             id: r.uuid || `HF-${Math.random().toString(36).substr(2, 6)}`,
-            name: name,
+            name: displayName,
             age: r.age || 30,
             gender: r.sex || "No especificado",
             department: r.department || "San Salvador",
-            municipality: r.municipality || r.department || "San Salvador",
+            municipality: muni,
             region: reg,
             occupation: r.occupation || "Trabajador independiente",
             education: r.education_level || "Bachillerato",
@@ -1550,12 +1569,7 @@ Evaluá la propuesta. Respondé SOLO con el JSON. Nada más.`;
       const avgOpen   = personas.length > 0 ? Math.round(personas.reduce((s, p) => s + p.ocean_openness,     0) / personas.length) : 0;
 
       const rows = personas.map(p => {
-        // Shorten name: keep first two words, skip nickname in quotes
-        const cleanName = p.name.replace(/"[^"]*"\s*/g, '');
-        const parts = cleanName.trim().split(/\s+/);
-        const shortName = parts.length >= 3
-          ? `${parts[0]} ${parts[parts.length - 2]} ${parts[parts.length - 1]}`
-          : cleanName;
+        const shortName = p.name;
         const job = p.occupation.split('/')[0].split(' en ')[0].trim();
         const pct = Math.min(100, (p.monthly_income_usd / 1200) * 100).toFixed(0);
 
