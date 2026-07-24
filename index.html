@@ -282,6 +282,12 @@
       border: 1px solid var(--border-subtle);
       border-radius: var(--radius-md);
       overflow: hidden;
+      /* Flex item + overflow:hidden means min-height:auto resolves to 0 here,
+         so #persona-grid's flex-shrink was silently squashing each open
+         accordion to fit instead of letting the grid scroll — the "last
+         persona row is cut in half" bug. Lock natural height, let the
+         parent's overflow-y:auto do the scrolling instead. */
+      flex-shrink: 0;
     }
 
     /* ── TYPOGRAPHY HELPERS ─────────────────────────────────────── */
