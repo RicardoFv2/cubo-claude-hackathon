@@ -120,10 +120,15 @@
       --badge-warn-fg: #9a3412;  --badge-warn-bg: rgba(234,88,12,0.14);  --badge-warn-border: rgba(154,52,18,0.32);
       --badge-no-fg:   #b91c1c;  --badge-no-bg:   rgba(220,38,38,0.14);  --badge-no-border:   rgba(185,28,28,0.32);
 
-      /* ── Score ramp (also drives the score-fill bar) ───────────── */
-      --score-hot:  #b45309;
-      --score-yes:  #a16207;
-      --score-ok:   #854d0e;
+      /* ── Score ramp (also drives the score-fill bar) ───────────────
+         Each stop mirrors its verdict badge foreground so the score number,
+         the fill bar and the badge on a card always read as ONE colour, and
+         the whole ramp speaks the same traffic-light language as the chart:
+         accepted (>=60) → green, warn → orange, reject → red. The 90+ "hot"
+         tier keeps the amber/fire accent on purpose (pan caliente 🔥). */
+      --score-hot:  #92400e;
+      --score-yes:  #065f46;
+      --score-ok:   #065f46;
       --score-warn: #9a3412;
       --score-no:   #b91c1c;
 
@@ -173,10 +178,10 @@
       --badge-no-fg:   #f87171;  --badge-no-border:   rgba(248,113,113,0.35);
 
       --score-hot:  #f59e0b;
-      --score-yes:  #d97706;
-      --score-ok:   #ca8a04;
-      --score-warn: #ea580c;
-      --score-no:   #dc2626;
+      --score-yes:  #34d399;
+      --score-ok:   #6ee7b7;
+      --score-warn: #fb923c;
+      --score-no:   #f87171;
 
       --log-success: #34d399;
       --log-error:   #f87171;
@@ -1099,7 +1104,7 @@
       <button id="run-btn" class="btn-run">Ejecutar Simulación</button>
 
       <!-- Log -->
-      <div id="log" class="mt-4" style="min-height:52px; display:none; flex-direction:column; gap:3px; padding:0.75rem; background:var(--bg); border-radius:var(--radius-md); border:1px solid var(--border-subtle);"></div>
+      <div id="log" class="mt-4" style="min-height:52px; max-height:188px; overflow-y:auto; display:none; flex-direction:column; gap:3px; padding:0.75rem; background:var(--bg); border-radius:var(--radius-md); border:1px solid var(--border-subtle); box-shadow:inset 0 -12px 14px -12px rgba(0,0,0,0.35);"></div>
     </div>
 
     <!-- ─── GRUPO FOCAL ──────────────────────────────────────────────
@@ -1132,10 +1137,12 @@
     <!-- static on purpose: the pre-CTA divider is the only pulsing element -->
     <div id="step-3" class="hr-comal my-10"></div>
 
+    <!-- Verdict hero — the single-glance payoff of the 40-agent run; filled by renderVerdict() -->
+    <div id="verdict" class="panel-card mb-6" style="padding:1.75rem;"></div>
+
     <!-- Chart -->
     <div class="panel-card mb-6" style="padding:1.75rem;">
       <div class="flex items-center gap-2 mb-5">
-        <span class="step-badge">PASO 3 DE 3</span>
         <svg width="15" height="15" fill="none" stroke="var(--amber)" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true">
           <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z"/>
         </svg>
@@ -1419,6 +1426,7 @@ Evaluá la propuesta. Respondé SOLO con el JSON. Nada más.`;
 
   function rand(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
   function randInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+  function shuffle(arr) { const b = arr.slice(); for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [b[i], b[j]] = [b[j], b[i]]; } return b; }
 
   function generateFreshCohort() {
     const fresh = [];
@@ -1426,18 +1434,26 @@ Evaluá la propuesta. Respondé SOLO con el JSON. Nada más.`;
 
     REGIONS.forEach(region => {
       const cfg = MACRO_SAMPLER[region];
+      // Draw names/jobs round-robin from shuffled pools instead of rand()-with-
+      // replacement, so a 10-person cohort spreads across surnames and occupations
+      // (no "Salmerón Salmerón", no "Diseñadora gráfica" ×4) even when this fallback
+      // fires because the HuggingFace fetch failed.
+      const malePool = shuffle(cfg.males);
+      const femalePool = shuffle(cfg.females);
+      const lastPool = shuffle(cfg.lasts);
+      const jobPool = shuffle(cfg.jobs);
+      let mi = 0, fi = 0, li = 0;
       for (let i = 1; i <= 10; i++) {
         const gender = Math.random() > 0.5 ? 'Masculino' : 'Femenino';
-        const nameList = gender === 'Masculino' ? cfg.males : cfg.females;
-        const fn = rand(nameList);
-        const ln1 = rand(cfg.lasts);
-        const ln2 = rand(cfg.lasts);
+        const fn = gender === 'Masculino' ? malePool[mi++ % malePool.length] : femalePool[fi++ % femalePool.length];
+        const ln1 = lastPool[li++ % lastPool.length];
+        const ln2 = lastPool[li++ % lastPool.length];  // consecutive distinct indices → two different surnames
         const fullName = `${fn} ${ln1} ${ln2}`;
 
         const dObj = rand(cfg.depts);
         const dept = dObj.d;
         const muni = rand(dObj.ms);
-        const jObj = rand(cfg.jobs);
+        const jObj = jobPool[(i - 1) % jobPool.length];
 
         const age = randInt(20, 65);
         const income = parseFloat((randInt(jObj.minInc, jObj.maxInc)).toFixed(2));
@@ -1621,6 +1637,69 @@ Evaluá la propuesta. Respondé SOLO con el JSON. Nada más.`;
     return 'var(--score-no)';
   }
 
+  // ── VERDICT HERO ──────────────────────────────────────────────────
+  // The single-glance readout of the whole cohort: global score, verdict,
+  // who buys it, and which regions loved vs. rejected it. Speaks the same
+  // score-colour language as the cards and the chart.
+  function verdictMeta(mean) {
+    if (mean >= 75) return { label:'ACEPTACIÓN FUERTE',       cls:'badge-yes',  rec:'Tenés un ganador: el mercado lo pide con todo. Listo para lanzar con confianza.' };
+    if (mean >= 60) return { label:'ACEPTACIÓN CONDICIONAL',  cls:'badge-ok',   rec:'Anda bien. La aceptación es sólida — afiná el precio o el relleno para despegar.' };
+    if (mean >= 40) return { label:'RECHAZO CON RESERVAS',    cls:'badge-warn', rec:'Hay interés, pero el precio o el concepto todavía frenan la compra.' };
+    return               { label:'RECHAZO DEL MERCADO',       cls:'badge-no',   rec:'El mercado lo rechaza. Replanteá la masa, el relleno o el precio antes de lanzar.' };
+  }
+
+  function statTile(label, big, sub, accent) {
+    return `<div style="background:var(--surface-raised); border:1px solid var(--border-subtle); border-radius:var(--radius-md); padding:13px 15px; min-width:0;">
+      <p style="font-family:'Plus Jakarta Sans',sans-serif; font-size:0.68rem; font-weight:700; letter-spacing:0.05em; text-transform:uppercase; color:var(--text-muted); margin-bottom:5px;">${label}</p>
+      <p style="font-family:'Fraunces',serif; font-weight:700; font-size:1.35rem; line-height:1.1; color:${accent || 'var(--text)'}; overflow:hidden; text-overflow:ellipsis;">${big}</p>
+      <p style="font-size:0.76rem; color:var(--text-muted); margin-top:3px; font-weight:600;">${sub}</p>
+    </div>`;
+  }
+
+  function renderVerdict(results, price) {
+    const el = document.getElementById('verdict');
+    const total = results.length || 1;
+    const mean = Math.round(results.reduce((a, r) => a + r.score, 0) / total);
+    const accepted = results.filter(r => r.accepted).length;
+    const pct = Math.round(accepted / total * 100);
+    const col = scoreColor(mean);
+    const vm = verdictMeta(mean);
+
+    const regAvg = ['Central', 'Oriental', 'Occidental', 'Paracentral'].map(reg => {
+      const rr = results.filter(r => r.region === reg);
+      return { reg, avg: rr.length ? Math.round(rr.reduce((s, r) => s + r.score, 0) / rr.length) : 0, n: rr.length };
+    }).filter(r => r.n > 0);
+    const sorted = [...regAvg].sort((a, b) => b.avg - a.avg);
+    const best = sorted[0] || { reg:'—', avg:0 };
+    const worst = sorted[sorted.length - 1] || { reg:'—', avg:0 };
+    const bestCol  = (RMETA[best.reg]  || {}).rail || 'var(--text)';
+    const worstCol = (RMETA[worst.reg] || {}).rail || 'var(--text)';
+
+    el.innerHTML = `
+      <div class="flex items-center gap-2 mb-5">
+        <span class="step-badge">PASO 3 DE 3</span>
+        <svg width="15" height="15" fill="none" stroke="var(--amber)" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+        </svg>
+        <h2 class="panel-title">Dictamen del Mercado</h2>
+      </div>
+      <div class="grid grid-cols-1 lg:grid-cols-[minmax(230px,auto)_1fr] gap-6 lg:gap-8 items-center">
+        <div class="flex items-center gap-5">
+          <span class="score-num font-sans font-extrabold" style="font-size:clamp(3.1rem,7vw,4.4rem); line-height:0.95; color:${col}; flex-shrink:0;">${mean}<span style="font-size:1.05rem; font-weight:600; color:var(--text-muted); text-shadow:none;">/100</span></span>
+          <div style="min-width:0;">
+            <span class="badge ${vm.cls}" style="font-size:0.82rem;">${vm.label}</span>
+            <p class="text-ink" style="font-size:0.95rem; line-height:1.55; margin-top:9px; max-width:40ch;">${vm.rec}</p>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          ${statTile('Comprarían', `${accepted}<span style="font-size:0.9rem;color:var(--text-muted);font-weight:600;">/${total}</span>`, `${pct}% del grupo focal`)}
+          ${statTile('Precio evaluado', `$${price.toFixed(2)}`, 'por pupusa')}
+          ${statTile('Mejor recibida', best.reg, `${best.avg}/100 promedio`, bestCol)}
+          ${statTile('Reacción más dura', worst.reg, `${worst.avg}/100 promedio`, worstCol)}
+        </div>
+      </div>`;
+  }
+
   // ── RENDER RESULT CARDS ───────────────────────────────────────────
   function renderCards(results) {
     const grid = document.getElementById('cards');
@@ -1666,15 +1745,18 @@ Evaluá la propuesta. Respondé SOLO con el JSON. Nada más.`;
       return { region: reg, score: avg };
     });
 
+    // Bands mirror the card accept logic and the score ramp: >=60 accepted (green),
+    // 40–59 intermediate (amber), <40 rejected (red) — so the chart and the cards
+    // never disagree about whether a region "buys" the recipe.
     const barColors = regionalScores.map(r => {
-      if (r.score >= 70) return 'rgba(16, 185, 129, 0.82)';  // Verde (Aprobado)
-      if (r.score >= 50) return 'rgba(245, 158, 11, 0.82)';  // Naranja/Amarillo (Intermedio)
-      return 'rgba(239, 68, 68, 0.82)';                       // Rojo (Bajo)
+      if (r.score >= 60) return 'rgba(16, 185, 129, 0.82)';  // Verde (Aprobado)
+      if (r.score >= 40) return 'rgba(245, 158, 11, 0.82)';  // Ámbar (Intermedio)
+      return 'rgba(239, 68, 68, 0.82)';                       // Rojo (Rechazado)
     });
     const borderColors = regionalScores.map(r => {
-      if (r.score >= 70) return '#10b981'; // Verde (Aprobado)
-      if (r.score >= 50) return '#f59e0b'; // Naranja/Amarillo (Intermedio)
-      return '#ef4444';                    // Rojo (Bajo)
+      if (r.score >= 60) return '#10b981'; // Verde (Aprobado)
+      if (r.score >= 40) return '#f59e0b'; // Ámbar (Intermedio)
+      return '#ef4444';                    // Rojo (Rechazado)
     });
 
     const isDark = document.documentElement.dataset.theme === 'dark';
@@ -1705,7 +1787,7 @@ Evaluá la propuesta. Respondé SOLO con el JSON. Nada más.`;
             callbacks: {
               label: c => {
                 const s = c.parsed.y;
-                const status = s >= 70 ? '¡APROBADO! ✅' : s >= 50 ? 'INTERMEDIO ⚠️' : '¡RECHAZADO! 🛑';
+                const status = s >= 60 ? '¡APROBADO! ✅' : s >= 40 ? 'INTERMEDIO ⚠️' : '¡RECHAZADO! 🛑';
                 return ` Score Promedio: ${s}/100 — ${status}`;
               },
             },
@@ -1716,7 +1798,7 @@ Evaluá la propuesta. Respondé SOLO con el JSON. Nada más.`;
             min: 0, max: 100,
             grid: { color: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.06)', drawBorder: false },
             border: { display: false },
-            ticks: { color: isDark ? '#9d8e84' : '#6b6259', font:{ family:'Plus Jakarta Sans', size:11, weight:'600' }, callback: v => v + '/100' },
+            ticks: { color: isDark ? '#9d8e84' : '#6b6259', font:{ family:'Plus Jakarta Sans', size:11, weight:'600' }, stepSize: 20, callback: v => v },
           },
           x: {
             grid: { display: false },
@@ -1822,6 +1904,7 @@ Evaluá la propuesta. Respondé SOLO con el JSON. Nada más.`;
     lastResults = await runWithConcurrencyLimit(tasks, 10);
     const mean = Math.round(lastResults.reduce((a, r) => a + r.score, 0) / lastResults.length);
 
+    renderVerdict(lastResults, price);
     renderChart(lastResults);
     renderCards(lastResults);
     document.getElementById('results').style.display = 'block';
