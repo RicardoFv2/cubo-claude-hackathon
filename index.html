@@ -1067,24 +1067,8 @@
 
       </div><!-- /grupo 2 -->
 
-      <!-- ═══ GRUPO 3 · DETALLES FINALES — one cluster, price leads it ═══ -->
+      <!-- ═══ GRUPO 3 · DETALLES FINALES ═══ -->
       <div class="section-card mt-9 flex flex-col gap-4">
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <!-- Ingrediente Alquimista Secreto -->
-          <div>
-            <label class="field-label" for="custom-ingredient">
-              <span class="text-terracotta">✦</span> Ingrediente Secreto
-            </label>
-            <input id="custom-ingredient" type="text" class="field" placeholder="Miel de Panela, Chicharroncitos, Loroco Silvestre…" />
-          </div>
-
-          <!-- Acompañamientos -->
-          <div>
-            <label class="field-label" for="toppings">Acompañamientos</label>
-            <input id="toppings" type="text" class="field" value="Curtido, Crema" placeholder="Curtido, crema, salsa roja…" />
-          </div>
-        </div>
 
         <!-- Price slider — the economically load-bearing input, so it keeps full width -->
         <div>
@@ -1100,7 +1084,7 @@
           </div>
         </div>
 
-        <!-- Concepto — optional, deliberately the quietest field in the cluster -->
+        <!-- Concepto — optional -->
         <div>
           <label class="field-label" for="concept" style="opacity:0.75;">
             Pitch / Concepto <span class="text-faint" style="letter-spacing:0;">(opcional)</span>
@@ -1766,13 +1750,11 @@ Evaluá la propuesta. Respondé SOLO con el JSON. Nada más.`;
     const proteins  = [...document.querySelectorAll('input.protein-cb:checked')].map(el => el.value);
     const cheeses   = [...document.querySelectorAll('input.cheese-cb:checked')].map(el => el.value);
     const upgrades  = [...document.querySelectorAll('input.upgrade-cb:checked')].map(el => el.value);
-    const customIngredient = document.getElementById('custom-ingredient').value.trim();
-    const toppings  = document.getElementById('toppings').value.trim();
     const price     = parseFloat(document.getElementById('price').value);
     const concept   = document.getElementById('concept').value.trim();
 
-    if (!proteins.length && !cheeses.length && !upgrades.length && !customIngredient) {
-      alert('Seleccioná al menos un relleno, queso, extra, o ingrediente secreto.');
+    if (!proteins.length && !cheeses.length && !upgrades.length) {
+      alert('Seleccioná al menos un relleno, queso o extra para tu pupusa.');
       return;
     }
 
@@ -1782,8 +1764,6 @@ Evaluá la propuesta. Respondé SOLO con el JSON. Nada más.`;
       `  Masa: ${masa}`,
       `  Relleno (Proteínas & Quesos): ${fillings || 'Ninguno especificado'}`,
       `  Mejoras / Extras: ${upgrades.join(', ') || 'Ninguno'}`,
-      customIngredient ? `  Ingrediente alquimista secreto: ${customIngredient}` : '',
-      `  Acompañamientos: ${toppings || 'Ninguno especificado'}`,
       `  Precio por unidad: $${price.toFixed(2)} USD`,
       concept ? `  Concepto: "${concept}"` : '',
       '',
@@ -1799,7 +1779,6 @@ Evaluá la propuesta. Respondé SOLO con el JSON. Nada más.`;
     const displayRecipe = [
       fillings,
       upgrades.length ? upgrades.join(', ') : '',
-      customIngredient,
     ].filter(Boolean).join(' + ');
 
     // ALWAYS sample a fresh 40-persona cohort directly from HuggingFace (nvidia/Nemotron-Personas-El-Salvador)
