@@ -60,6 +60,14 @@
   </script>
 
   <style>
+    /* Hallmark · macrostructure: Workbench (in-app builder tool, two-pane +
+     * results, not a marketing page) · genre: editorial · tone: rústico-artesanal
+     * theme: custom-tuned "Comal" — OKLCH-converted, anchored on the pre-existing
+     * amber/terracotta/gold brand family (was raw Tailwind amber-600/500/100 +
+     * orange-700 + amber-800; hue family preserved, moved off stock defaults)
+     * accent: warm/clay ~42° · paper band: light (L 97%) / dark (L 15%)
+     * display: Fraunces 700 roman · body: Plus Jakarta Sans · mono: IBM Plex Mono
+     */
     /* ── DESIGN TOKENS ─────────────────────────────────────────── */
     :root {
       /* Radius scale — every component radius resolves to one of these four steps.
@@ -70,23 +78,28 @@
       --radius-lg: 1rem;     /* 16px — section cards, result cards   */
       --radius-xl: 1.5rem;   /* 24px — outer panel cards             */
 
-      --bg:             #faf7f2;
-      --surface:        #fffbf4;
-      --surface-raised: #fff7ea;
-      --border:         #e8ddd0;
-      --border-subtle:  #f0e8dc;
+      /* Comal palette — hand-tuned OKLCH, not stock Tailwind stops. The old
+         values here were literally amber-600/500/100 + orange-700 + amber-800;
+         this pass keeps the same warm family but shifts the anchor off
+         generic-SaaS-amber toward a fired-clay terracotta, so --amber reads
+         as "el comal" rather than a dashboard accent. */
+      --bg:             oklch(97%   0.012 75);
+      --surface:        oklch(98%   0.010 80);
+      --surface-raised: oklch(96%   0.018 70);
+      --border:         oklch(89%   0.022 60);
+      --border-subtle:  oklch(93%   0.016 65);
 
-      --text:       #1c1917;
-      --text-muted: #6b6259;  /* 5.6:1 on --bg — safe for data-bearing text */
-      --text-faint: #8a827b;  /* decorative only (eyebrows, placeholders)   */
+      --text:       oklch(21% 0.012 45);
+      --text-muted: oklch(47% 0.020 45);  /* ~5.6:1 on --bg — safe for data-bearing text */
+      --text-faint: oklch(57% 0.014 50);  /* decorative only (eyebrows, placeholders)   */
 
-      --amber:      #d97706;
-      --gold:       #f59e0b;
-      --gold-dim:   #fef3c7;
-      --terracotta: #c2410c;
-      --burnt:      #92400e;
-      --fire:       #dc2626;
-      --loroco:     #059669;
+      --amber:      oklch(58% 0.160 42);   /* clay-fired ember — primary accent */
+      --gold:       oklch(78% 0.140 70);   /* warm ember-glow — secondary highlight */
+      --gold-dim:   oklch(96% 0.045 85);
+      --terracotta: oklch(54% 0.170 35);
+      --burnt:      oklch(45% 0.110 44);
+      --fire:       oklch(56% 0.190 26);
+      --loroco:     oklch(56% 0.110 152);
 
       /* ── Region accents ──────────────────────────────────────────
          Single source of truth for region colour: the .tag-* classes,
@@ -141,17 +154,17 @@
     }
 
     [data-theme="dark"] {
-      --bg:             #0b0907;
-      --surface:        #141210;
-      --surface-raised: #1e1b17;
-      --border:         #2a231c;
-      --border-subtle:  #221d18;
+      --bg:             oklch(15% 0.010 45);
+      --surface:        oklch(18% 0.012 42);
+      --surface-raised: oklch(22% 0.016 44);
+      --border:         oklch(27% 0.018 42);
+      --border-subtle:  oklch(24% 0.016 42);
 
-      --text:       #f5ede3;
-      --text-muted: #9d8e84;
-      --text-faint: #8a7f74;
+      --text:       oklch(93% 0.020 75);
+      --text-muted: oklch(65% 0.020 50);
+      --text-faint: oklch(58% 0.016 48);
 
-      --gold-dim:   #3d2a0a;
+      --gold-dim:   oklch(28% 0.050 75);
 
       /* Dark-mode accents keep the original pastel-on-tint treatment —
          these already cleared contrast comfortably against the dark surfaces. */
@@ -187,7 +200,7 @@
       --log-error:   #f87171;
 
       --shadow-card:  0 2px 16px rgba(0,0,0,0.5), 0 1px 3px rgba(0,0,0,0.3);
-      --shadow-hover: 0 8px 40px rgba(217,119,6,0.18), 0 2px 12px rgba(0,0,0,0.5);
+      --shadow-hover: 0 8px 40px rgba(178,92,48,0.18), 0 2px 12px rgba(0,0,0,0.5);
     }
 
     /* ── BASE ──────────────────────────────────────────────────── */
@@ -252,7 +265,7 @@
       padding: 22px;
       border-left: 4px solid var(--amber);
       background:
-        linear-gradient(90deg, rgba(217,119,6,0.05), transparent 42%),
+        linear-gradient(90deg, color-mix(in oklch, var(--amber) 5%, transparent), transparent 42%),
         var(--surface-raised);
     }
     .section-card--compact {
@@ -315,7 +328,7 @@
       text-transform: uppercase;
       display: inline-flex;
       align-items: center;
-      box-shadow: 0 1px 4px rgba(217,119,6,0.3);
+      box-shadow: 0 1px 4px color-mix(in oklch, var(--amber) 30%, transparent);
     }
 
     /* ── INGREDIENT CHIPS ───────────────────────────────────────── */
@@ -365,14 +378,14 @@
     .chip-label:hover {
       border-color: var(--amber);
       color: var(--amber);
-      background: rgba(217,119,6,0.06);
+      background: color-mix(in oklch, var(--amber) 6%, transparent);
     }
 
     .chip-input:checked + .chip-label {
       border-color: var(--amber);
-      background: rgba(217,119,6,0.12);
+      background: color-mix(in oklch, var(--amber) 12%, transparent);
       color: var(--amber);
-      box-shadow: 0 0 0 2px rgba(217,119,6,0.22);
+      box-shadow: 0 0 0 2px color-mix(in oklch, var(--amber) 22%, transparent);
       font-weight: 700;
     }
 
@@ -407,7 +420,7 @@
     .field:focus {
       outline: none;
       border-color: var(--amber);
-      box-shadow: 0 0 0 3px rgba(217,119,6,0.12);
+      box-shadow: 0 0 0 3px color-mix(in oklch, var(--amber) 12%, transparent);
     }
 
     /* ── CHECKBOX ───────────────────────────────────────────────── */
@@ -430,16 +443,20 @@
       width: 18px; height: 18px; border-radius: 50%;
       background: var(--gold);
       border: 2px solid var(--surface);
-      box-shadow: 0 0 12px rgba(245,158,11,0.5);
+      box-shadow: 0 1px 4px color-mix(in oklch, var(--gold) 55%, transparent);
       cursor: pointer;
     }
     input[type=range]::-moz-range-thumb {
       width: 18px; height: 18px; border-radius: 50%;
       background: var(--gold); border: 2px solid var(--surface);
-      box-shadow: 0 0 12px rgba(245,158,11,0.5); cursor: pointer;
+      box-shadow: 0 1px 4px color-mix(in oklch, var(--gold) 55%, transparent); cursor: pointer;
     }
 
-    /* ── RUN BUTTON ─────────────────────────────────────────────── */
+    /* ── RUN BUTTON — tacto de comal, no de botón SaaS ─────────────
+       Antes: roman italic + barrida de brillo diagonal (::after sweep) al
+       hover. Ambas son tells genéricos. Ahora: tipografía recta, y el
+       "calor" vive en .btn-run.scanning (arriba) mientras corre el
+       pipeline — no en un efecto decorativo permanente al pasar el mouse. */
     .btn-run {
       width: 100%;
       padding: 1rem 1.5rem;
@@ -449,24 +466,16 @@
       font-family: 'Fraunces', serif;
       font-size: 1.05rem;
       font-weight: 700;
-      font-style: italic;
+      letter-spacing: 0.01em;
       color: #fef9f0;
       background: linear-gradient(135deg, var(--burnt) 0%, var(--terracotta) 45%, var(--amber) 100%);
-      position: relative; overflow: hidden;
+      position: relative;
       transition: transform 0.2s, box-shadow 0.2s;
       min-height: 54px;
     }
-    .btn-run::after {
-      content: '';
-      position: absolute; inset: 0;
-      background: linear-gradient(120deg, transparent 25%, rgba(255,255,255,0.12) 50%, transparent 75%);
-      transform: translateX(-120%);
-      transition: transform 0.5s;
-    }
-    .btn-run:hover:not(:disabled)::after { transform: translateX(120%); }
     .btn-run:hover:not(:disabled) {
       transform: translateY(-2px);
-      box-shadow: 0 8px 32px rgba(194,65,12,0.4), 0 2px 8px rgba(0,0,0,0.2);
+      box-shadow: 0 8px 24px color-mix(in oklch, var(--terracotta) 40%, transparent), 0 2px 8px rgba(0,0,0,0.2);
     }
     .btn-run:active:not(:disabled) { transform: translateY(0); }
     .btn-run:disabled { opacity: 0.45; cursor: not-allowed; }
@@ -539,15 +548,64 @@
     .result-card { animation: fadeUp 0.32s ease both; }
 
     @media (prefers-reduced-motion: reduce) {
-      .result-card, .btn-run::after { animation: none; transition: none; }
+      .result-card { animation: none; transition: none; }
     }
 
-    /* ── TITLE GLOW ─────────────────────────────────────────────── */
+    /* ── TITLE — impresión, no neón ────────────────────────────────
+       Antes: halo de 60px de blur (glow genérico de dashboard). Ahora:
+       una sombra de profundidad discreta, como tinta prensada. */
     .title-glow {
-      text-shadow: 0 0 60px rgba(217,119,6,0.28), 0 2px 4px rgba(0,0,0,0.5);
+      text-shadow: 0 2px 4px rgba(0,0,0,0.45);
     }
     [data-theme="light"] .title-glow {
       text-shadow: 0 1px 2px rgba(0,0,0,0.08);
+    }
+
+    /* Subrayado a mano bajo el título — reemplaza la itálica (que Hallmark
+       prohíbe en headers) como forma de darle carácter al nombre de marca.
+       Un solo trazo de pincel, dibujado en CSS puro, no una fuente cursiva. */
+    .hero-title { position: relative; display: inline-block; font-style: normal; }
+    .hero-title::after {
+      content: '';
+      position: absolute;
+      left: 2%; right: 4%; bottom: -0.14em;
+      height: 0.1em;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 10' preserveAspectRatio='none'%3E%3Cpath d='M2 6 Q 30 2, 55 6 T 105 5 T 150 7 T 198 4' fill='none' stroke='%23000' stroke-width='6' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-size: 100% 100%;
+      background-repeat: no-repeat;
+      opacity: 0.4;
+    }
+    [data-theme="dark"] .hero-title::after { filter: invert(72%) sepia(45%) saturate(600%) hue-rotate(-10deg); opacity: 0.55; }
+    [data-theme="light"] .hero-title::after { filter: invert(30%) sepia(70%) saturate(900%) hue-rotate(-10deg); opacity: 0.5; }
+
+    /* Ticket-tag — el eyebrow como talón de recibo, no como regla+caption
+       genérica de dashboard. Borde punteado = perforación de recibo. */
+    .ticket-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5em;
+      padding: 0.4em 0.9em;
+      border: 1.5px dashed color-mix(in oklch, var(--amber) 45%, var(--border));
+      border-radius: 999px;
+      background: color-mix(in oklch, var(--amber) 5%, transparent);
+    }
+
+    /* Sello — pequeña marca circular rotada junto al subtítulo. Reemplaza
+       el glow parejo del header con un único gesto gráfico con intención. */
+    .sello {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.1em; height: 2.1em;
+      border-radius: 50%;
+      border: 1.5px solid color-mix(in oklch, var(--amber) 55%, var(--border));
+      color: var(--amber);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.6rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      transform: rotate(-8deg);
+      flex-shrink: 0;
     }
 
     /* ── REGION ACCORDION ──────────────────────────────────────── */
@@ -564,7 +622,7 @@
       border-radius: var(--radius-md);
       transition: background 0.15s;
     }
-    .region-summary:hover { background: rgba(217,119,6,0.05); }
+    .region-summary:hover { background: color-mix(in oklch, var(--amber) 5%, transparent); }
 
     .chevron {
       flex-shrink: 0;
@@ -591,16 +649,22 @@
       line-height: 1.2;
     }
     /* ═══════════════════════════════════════════════════════════
-       FUTURISTIC OVERLAY — capa tech sobre la base salvadoreña
+       SEÑAS DEL MERCADO — textura de petate + comal, no de dashboard.
+       Reemplaza la capa "tech overlay" (grid de puntos, scanline, glow
+       parejo en todo) por texturas con raíz material: tejido de palma
+       en modo oscuro, borde de recibo en el veredicto, calor real (no
+       neón) en la interacción. Todo construido en CSS puro (sin assets).
        ═══════════════════════════════════════════════════════════ */
 
-    /* Dot-grid background en dark mode */
+    /* Tejido de petate — cruce diagonal muy tenue, sólo en modo oscuro,
+       donde una superficie completamente plana se siente a pantalla. */
     [data-theme="dark"] body::before {
       content: '';
       position: fixed;
       inset: 0;
-      background-image: radial-gradient(circle, rgba(217,119,6,0.1) 1px, transparent 1px);
-      background-size: 30px 30px;
+      background-image:
+        repeating-linear-gradient(45deg,  color-mix(in oklch, var(--amber) 6%, transparent) 0 1px, transparent 1px 13px),
+        repeating-linear-gradient(-45deg, color-mix(in oklch, var(--amber) 6%, transparent) 0 1px, transparent 1px 13px);
       pointer-events: none;
       z-index: 0;
     }
@@ -618,36 +682,36 @@
       animation: comal-shimmer 3.5s linear infinite;
     }
 
-    /* Scan line — was an always-on header sweep; repurposed into a one-shot cue
-       that runs on the CTA only while the 40-agent pipeline is in flight, so the
-       app's actual hero moment gets the motion instead of the idle chrome. */
-    @keyframes scan {
-      0%   { top: 0;    opacity: 0; }
-      12%  {            opacity: 0.85; }
-      88%  {            opacity: 0.85; }
-      100% { top: 100%; opacity: 0; }
+    /* Se calienta — reemplaza el scanline neón por un brillo de borde que
+       sube de temperatura mientras corren las 40 personas, como si el botón
+       mismo estuviera sobre el comal. Un solo efecto, no una barrida óptica. */
+    @keyframes toasting {
+      0%, 100% { box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--gold) 45%, transparent); }
+      50%      { box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--gold) 85%, transparent), 0 0 0 3px color-mix(in oklch, var(--gold) 18%, transparent); }
     }
-    .btn-run.scanning::before {
-      content: '';
-      position: absolute;
-      left: 0; right: 0;
-      height: 2px;
-      top: 0;
-      background: linear-gradient(90deg,
-        transparent 4%, var(--gold) 28%, #fff4dc 50%, var(--gold) 72%, transparent 96%);
-      animation: scan 1.5s ease-in-out infinite;
-      pointer-events: none;
-      z-index: 2;
-      opacity: 0;
-    }
+    .btn-run.scanning { animation: toasting 1.3s ease-in-out infinite; }
 
-    /* Panel card: hover con glow ámbar + transición suave */
+    /* Panel card: al pasar el mouse, el borde se define — sin halo de neón */
     .panel-card {
       transition: box-shadow 0.3s ease, border-color 0.3s ease;
     }
     .panel-card:hover {
-      border-color: rgba(217,119,6,0.35);
-      box-shadow: var(--shadow-hover), 0 0 40px rgba(217,119,6,0.07);
+      border-color: color-mix(in oklch, var(--amber) 40%, var(--border));
+      box-shadow: var(--shadow-hover);
+    }
+
+    /* Borde de recibo — el veredicto es el "ticket" que entrega el
+       simulador, así que llega perforado como uno. CSS puro, sin imagen. */
+    #verdict { position: relative; }
+    #verdict::before {
+      content: '';
+      position: absolute;
+      top: -7px; left: 14px; right: 14px;
+      height: 14px;
+      background-image: radial-gradient(circle at 10px 50%, var(--bg) 0 6px, transparent 6px 100%);
+      background-size: 20px 100%;
+      background-repeat: repeat-x;
+      pointer-events: none;
     }
 
     /* Prefix // en section headings */
@@ -663,14 +727,9 @@
       letter-spacing: -0.04em;
     }
 
-    /* Chip activo: glow más intenso */
+    /* Chip activo: anillo definido, sin halo difuso */
     .chip-input:checked + .chip-label {
-      box-shadow: 0 0 0 2px rgba(217,119,6,0.25), 0 0 16px rgba(217,119,6,0.14);
-    }
-
-    /* Field focus: glow exterior */
-    .field:focus {
-      box-shadow: 0 0 0 3px rgba(217,119,6,0.12), 0 0 22px rgba(217,119,6,0.09);
+      box-shadow: 0 0 0 2px color-mix(in oklch, var(--amber) 28%, transparent);
     }
 
     /* Cursor terminal parpadeante en el log */
@@ -688,14 +747,6 @@
       border-radius: 1px;
       animation: blink 1.1s step-end infinite;
     }
-
-    /* Glow en números de score de resultado.
-       Dark only — on the light surface the halo bleeds into the paper and
-       eats the contrast the score ramp was tuned for. */
-    .score-num {
-      text-shadow: 0 0 20px currentColor;
-    }
-    [data-theme="light"] .score-num { text-shadow: none; }
 
     /* Divider con brillo central pulsante — opt-in via --pulse so only the
        pre-CTA divider animates; a second pulsing rule next to the freshly
@@ -734,11 +785,11 @@
     .add-chip-btn:hover {
       border-color: var(--amber);
       color: var(--amber);
-      background: rgba(217,119,6,0.07);
+      background: color-mix(in oklch, var(--amber) 7%, transparent);
     }
 
     @media (prefers-reduced-motion: reduce) {
-      body::after, .btn-run.scanning::before, .hr-comal--pulse, .log-cursor {
+      body::after, .btn-run.scanning, .hr-comal--pulse, .log-cursor {
         animation: none !important;
         transition: none !important;
       }
@@ -764,19 +815,18 @@
       </svg>
     </button>
 
-    <!-- eyebrow rule -->
-    <div class="flex items-center justify-center gap-3.5 mb-5">
-      <div class="flex-1 max-w-20 h-px" style="background:linear-gradient(to right,transparent,var(--amber));"></div>
-      <span class="font-mono text-ember uppercase" style="font-size:0.6rem; letter-spacing:0.28em;">Sistema de Evaluación · Claude Sonnet 4.6 · El Salvador</span>
-      <div class="flex-1 max-w-20 h-px" style="background:linear-gradient(to left,transparent,var(--amber));"></div>
+    <!-- eyebrow: talón de recibo, no regla+caption -->
+    <div class="mb-6" style="display:flex; justify-content:center;">
+      <span class="ticket-tag font-mono text-ember uppercase" style="font-size:0.62rem; letter-spacing:0.14em;">Sistema de Evaluación · Claude Sonnet 4.6 · El Salvador</span>
     </div>
 
-    <h1 class="title-glow font-display font-bold italic text-gold mb-3" style="font-size:clamp(2.2rem,6vw,4rem); line-height:1.1;">
+    <h1 class="hero-title title-glow font-display font-bold text-gold mb-4" style="font-size:clamp(2.2rem,6vw,4rem); line-height:1.1;">
       La Pupusería Alquimista
     </h1>
 
-    <p class="font-sans font-semibold text-muted uppercase tracking-wider mb-6" style="font-size:0.8rem;">
-      Simulador de Mercado Socio-Demográfico · 40 Personas Sintéticas · El Salvador
+    <p class="mb-6" style="display:flex; align-items:center; justify-content:center; gap:0.6rem;">
+      <span class="sello" aria-hidden="true">SV</span>
+      <span class="font-sans font-semibold text-muted uppercase tracking-wider" style="font-size:0.8rem; text-align:left;">Simulador de Mercado<br>Socio-Demográfico · El Salvador</span>
     </p>
 
     <!-- ═══ GUIDED STEPPER NAVIGATION ("No Perderse") ═══ -->
@@ -1798,7 +1848,7 @@ Evaluá la propuesta. Respondé SOLO con el JSON. Nada más.`;
           legend: { display: false },
           tooltip: {
             backgroundColor: isDark ? '#1e1b17' : '#fffbf4',
-            borderColor: 'rgba(217,119,6,0.3)', borderWidth: 1,
+            borderColor: 'rgba(178,92,48,0.3)', borderWidth: 1,
             titleColor: isDark ? '#f5ede3' : '#1c1917',
             bodyColor: isDark ? '#9d8e84' : '#78716c',
             padding: 12,

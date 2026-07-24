@@ -1,0 +1,63 @@
+/* Hallmark · macrostructure: Workbench · genre: editorial · tone: rústico-artesanal
+ * theme: custom-tuned "Comal" (OKLCH, anchored on the existing amber/terracotta/gold brand family)
+ * Portable export of the tokens used in index.html. index.html defines these inline
+ * (single-file architecture per CLAUDE.md); this file is the drop-in copy for reuse
+ * elsewhere. Keep both in sync by hand if either changes.
+ */
+
+:root {
+  /* Radius scale */
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+
+  /* Surfaces */
+  --bg:             oklch(97% 0.012 75);
+  --surface:        oklch(98% 0.010 80);
+  --surface-raised:  oklch(96% 0.018 70);
+  --border:         oklch(89% 0.022 60);
+  --border-subtle:  oklch(93% 0.016 65);
+
+  /* Ink */
+  --text:       oklch(21% 0.012 45);
+  --text-muted: oklch(47% 0.020 45);
+  --text-faint: oklch(57% 0.014 50);
+
+  /* Accent family — "Comal" */
+  --amber:      oklch(58% 0.160 42);
+  --gold:       oklch(78% 0.140 70);
+  --gold-dim:   oklch(96% 0.045 85);
+  --terracotta: oklch(54% 0.170 35);
+  --burnt:      oklch(45% 0.110 44);
+  --fire:       oklch(56% 0.190 26);
+  --loroco:     oklch(56% 0.110 152);
+
+  /* Type */
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-body:    'Plus Jakarta Sans', Inter, system-ui, sans-serif;
+  --font-mono:    'IBM Plex Mono', monospace;
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+
+  --shadow-card:  0 2px 16px rgba(120,70,15,0.07), 0 1px 3px rgba(0,0,0,0.04);
+  --shadow-hover: 0 6px 28px rgba(120,70,15,0.13), 0 2px 8px rgba(0,0,0,0.06);
+}
+
+[data-theme="dark"] {
+  --bg:             oklch(15% 0.010 45);
+  --surface:        oklch(18% 0.012 42);
+  --surface-raised:  oklch(22% 0.016 44);
+  --border:         oklch(27% 0.018 42);
+  --border-subtle:  oklch(24% 0.016 42);
+
+  --text:       oklch(93% 0.020 75);
+  --text-muted: oklch(65% 0.020 50);
+  --text-faint: oklch(58% 0.016 48);
+
+  --gold-dim: oklch(28% 0.050 75);
+
+  --shadow-card:  0 2px 16px rgba(0,0,0,0.5), 0 1px 3px rgba(0,0,0,0.3);
+  --shadow-hover: 0 8px 40px rgba(178,92,48,0.18), 0 2px 12px rgba(0,0,0,0.5);
+}
