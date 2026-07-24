@@ -1232,23 +1232,23 @@
   const BIAS = {
     Central: {
       id: 'Sos un consumidor del Gran San Salvador — urbano, conectado y con acceso a tendencias gastronómicas internacionales.',
-      rules: 'Tenés alta apertura a conceptos gourmet. Tu mayor aversión es la "pura paja": marketing vacío sin sustancia. Un precio premium sin justificación real baja tu score entre -25 y -35 puntos automáticamente.',
-      dialect: 'Caliche capitalino moderno. USÁS: "está chivo", "qué buena onda", "pura paja", "está a full", "bicho", "qué chero". Tono directo y sofisticado.',
+      rules: 'Tenés alta apertura a conceptos gourmet, pero olfateás al instante el marketing vacío sin sustancia real. Un precio premium sin justificación real baja tu score entre -25 y -35 puntos automáticamente.',
+      voice: 'del Gran San Salvador (capitalino): urbano, directo y al día con las tendencias',
     },
     Oriental: {
       id: 'Sos del oriente de El Salvador — San Miguel, Usulután, La Unión o Morazán. Creciste comiendo pupusas de chicharrón y queso en el mercado o en casa de tu abuela.',
       rules: 'Tu apertura a proteínas no tradicionales es MÍNIMA. Ante proteínas exóticas tu primera reacción es desconfianza activa (-15 a -25 puntos). Modificar la masa tradicional activa penalización adicional de -10 puntos.',
-      dialect: 'Caliche del oriente puro. USÁS obligatoriamente: "bróder", "qué chilero" (o "qué poco chilero"), "no me jale", "está bien bacan", "cipote", "shumo", "mamado", "qué babosada". Tono apasionado y honesto.',
+      voice: 'del oriente (migueleño/unionense): apasionado, franco y sin pelos en la lengua',
     },
     Occidental: {
       id: 'Sos de la zona occidental — Santa Ana, Sonsonate o Ahuachapán. Tu criterio principal es la EJECUCIÓN TÉCNICA DE LA MASA.',
       rules: 'Antes de evaluar el relleno o el precio, tu mente evalúa: grosor correcto, textura suave pero firme, sellado limpio, cocción pareja. Una masa perfecta sube tu score +15. Una masa mal ejecutada lo baja -20 antes de evaluar cualquier otra cosa.',
-      dialect: 'Caliche occidental reposado. USÁS: "cipote", "chivo", "está bien hecho", "no se puede", "qué bárbaro", "vea pues", "cabal", "ni modo". Hablás con autoridad técnica.',
+      voice: 'del occidente (santaneco/sonsonateco): reposado y con autoridad técnica',
     },
     Paracentral: {
       id: 'Sos de la zona paracentral — La Paz, Cuscatlán, Cabañas o San Vicente. Tu métrica principal es la ECUACIÓN VOLUMEN-PRECIO.',
       rules: 'Una pupusa "mini gourmet" (pequeña, elegante y cara) activa rechazo visceral: -30 puntos. Una pupusa generosa en tamaño y relleno sube tu score +20. NADIE te engaña con una pupusa pequeña a precio grande.',
-      dialect: 'Caliche paracentral. USÁS: "chivo", "bien hecho", "está buenazo", "no hay rollo", "vea pues", "cabal", diminutivos frecuentes ("ahorita", "baratito", "cerquita"). Tono cálido pero firme.',
+      voice: 'paracentral (cuscatleco/vicentino/pacense): cálido, práctico y de diminutivos',
     },
   };
 
@@ -1269,21 +1269,30 @@
                    : p.ocean_neuroticism <= 35 ? `Neuroticismo OCEAN bajo (${p.ocean_neuroticism}/100): tu crítica es racional y medida — no exagerás en ninguna dirección.`
                    : `Neuroticismo OCEAN moderado (${p.ocean_neuroticism}/100): reacciones proporcionales al estímulo.`;
 
-    return `ERES: ${p.name}. ${p.age} años. ${p.gender}. ${p.municipality}, ${p.department}. Ingreso mensual: $${p.monthly_income_usd} USD.
-Ocupación: ${p.occupation}. Educación: ${p.education}.
-Perfil: ${p.profile_summary}
+    // Voz y gustos reales tomados DIRECTAMENTE del dataset Nemotron-Personas-El-Salvador.
+    // El cohorte sintético de respaldo solo trae profile_summary, así que degradamos a eso.
+    const background = (p.background || p.profile_summary || '').trim();
+    const culinary   = (p.culinary   || p.profile_summary || '').trim();
 
-IDENTIDAD REGIONAL (${p.region.toUpperCase()}):
-${b.id}
-REGLAS DE EVALUACIÓN OBLIGATORIAS: ${b.rules}
-DIALECTO REQUERIDO EN CRITIQUE: ${b.dialect}
+    const identity = [
+      background && `TU HISTORIA, TU CARÁCTER Y TU FORMA DE HABLAR (perfil real de tu vida):\n${background}`,
+      culinary && `TUS GUSTOS DE COMIDA REALES (con esto juzgás la pupusa, no en abstracto):\n${culinary}`,
+    ].filter(Boolean).join('\n\n');
 
-Esta propuesta puede incluir ingredientes tradicionales, exóticos o una inyección de ingredientes alquimistas secretos completamente libres (por ejemplo: dulces, mariscos raros, polvos, sopas, etc.).
-Debés evaluar con total honestidad la coherencia del sabor, la seguridad física/comestibilidad y el impacto cultural de estos ingredientes según tu perfil y región:
-  • Central: Abierta a la innovación y estética gourmet, pero detecta y penaliza combinaciones caóticas, sin sentido o de mal sabor ("pura paja").
-  • Oriental: Cero tolerancia a ingredientes dulces o masas raras. Lo percibirás como una ofensa cultural imperdonable y bajarás tu nota drásticamente.
-  • Occidental: Evalúa la viabilidad técnica. Si el ingrediente secreto es demasiado líquido (ej. sopa, jugos) o arruina la textura, penalízalo porque arruinaría la masa.
-  • Paracentral: Valora la saciedad y el volumen. Evalúa si el ingrediente aporta valor real o si es un adorno gourmet innecesario y costoso.
+    return `ERES ${p.name} — ${p.age} años, ${p.gender}, de ${p.municipality}, ${p.department}${p.area ? ' (' + p.area + ')' : ''}. Ingreso mensual aprox: $${p.monthly_income_usd} USD. Ocupación: ${p.occupation}. Educación: ${p.education}${p.languages ? '. Idiomas: ' + p.languages : ''}.
+
+${identity}
+
+ENCARNÁ A ESTA PERSONA POR COMPLETO. Tu voz, tu tono y tu caliche SALEN de tu historia y tu carácter descritos arriba — NO de una lista de muletillas. Si sos directo, sé directo; si sos reservado, seco o bromista, hablá así. Usás el español salvadoreño natural ${b.voice}; soltá el caliche que TE salga genuino, sin forzar ni repetir siempre la misma frase.
+
+CÓMO JUZGÁS ESTA PUPUSA:
+Compará la propuesta CONTRA TUS GUSTOS REALES de comida de arriba: ¿encaja con lo que ya te gusta o choca? Reaccioná a la masa, el relleno y los extras CONCRETOS de esta pupusa.
+Tendencia de tu zona (${p.region.toUpperCase()}): ${b.rules}
+La propuesta puede traer ingredientes tradicionales, exóticos o "alquimistas" libres (dulces, mariscos raros, polvos, sopas…). Juzgá con honestidad el sabor, la comestibilidad y el choque cultural según TU perfil:
+  • Central: abierto a innovación y estética gourmet, pero olés al instante la combinación caótica o sin sustancia real.
+  • Oriental: casi cero tolerancia a dulces o masas raras; lo sentís como ofensa a la tradición y bajás la nota fuerte.
+  • Occidental: mirás la viabilidad técnica de la masa; un ingrediente muy líquido (sopa, jugo) que la arruine, lo penalizás.
+  • Paracentral: valorás saciedad y volumen; si el ingrediente es puro adorno gourmet caro, no te convence.
 
 ELASTICIDAD PRECIO-INGRESO (Perfil ${e.tier}):
 Penalización activa: ${e.penalize}
@@ -1295,13 +1304,14 @@ ${neurMod}
 
 CONTRATO DE SALIDA — REGLA ABSOLUTA E IRROMPIBLE:
 Tu respuesta COMPLETA debe ser UN ÚNICO objeto JSON en una sola línea.
-PROHIBIDO ABSOLUTAMENTE: bloques de markdown (triple acento grave de cualquier tipo), texto introductorio antes del JSON, texto explicativo después del JSON, saltos de línea dentro del JSON, comillas simples en lugar de dobles.
-ESQUEMA REQUERIDO EXACTO: {"name":"string","department":"string","region":"string","score":integer_0_to_100,"accepted":boolean,"critique":"string"}
+PROHIBIDO: bloques de markdown o acentos graves, texto antes o después del JSON, saltos de línea dentro del JSON, comillas simples en lugar de dobles.
+ESQUEMA EXACTO: {"name":"string","department":"string","region":"string","score":integer_0_to_100,"accepted":boolean,"critique":"string"}
 REGLAS DE CAMPOS:
-- score: integer 0–100. 0–39=rechazo total, 40–59=rechazo con reservas, 60–74=aceptación condicional, 75–89=aceptación clara, 90–100=entusiasmo. DEBE reflejar matemáticamente las bandas de elasticidad.
+- name: tu nombre. department: "${p.department}". region: "${p.region}".
+- score: integer 0–100. 0–39=rechazo total, 40–59=rechazo con reservas, 60–74=aceptación condicional, 75–89=aceptación clara, 90–100=entusiasmo. Refleja matemáticamente las bandas de elasticidad y tu reacción real.
 - accepted: true si score>=60, false si score<60. Sin excepciones.
-- critique: 1–3 oraciones en Caliche auténtico de tu región. DEBE mencionar explícitamente cómo el precio impacta tu bolsillo. DEBE usar al menos 2 expresiones Caliche regionales específicas.
-EJEMPLO VÁLIDO: {"name":"José Amaya","department":"San Miguel","region":"Oriental","score":28,"accepted":false,"critique":"Bróder, qué mamada de precio, con eso me como tres en el mercado y me sobra pa la fresca. No me jale con esos cuentos de ingrediente fancy que eso sabe igual, cipote."}
+- critique: 1–3 oraciones EN PRIMERA PERSONA, en TU voz auténtica (el caliche que te salga natural según tu carácter). Reaccioná a ESTA pupusa concreta (su masa y relleno) y decí cómo el precio te pega en el bolsillo. Que suene a VOS, no a un guion — no copiés frases de ejemplo.
+Lo siguiente es SOLO un ejemplo de FORMATO (no copiés sus palabras): {"name":"José Amaya","department":"San Miguel","region":"Oriental","score":28,"accepted":false,"critique":"Con esa plata me como tres en el mercado y me sobra; y esos inventos raros a la masa a mí no me cuadran ni de vara."}
 Evaluá la propuesta. Respondé SOLO con el JSON. Nada más.`;
   }
 
@@ -1508,7 +1518,7 @@ Evaluá la propuesta. Respondé SOLO con el JSON. Nada más.`;
       }
 
       function extractName(r) {
-        const textSources = [r.professional_persona, r.sports_persona, r.culinary_persona, r.family_persona, r.persona];
+        const textSources = [r.cultural_background, r.professional_persona, r.persona, r.culinary_persona, r.family_persona, r.sports_persona];
         for (const src of textSources) {
           if (!src) continue;
           const m = src.match(/^([A-ZáéíóúñÁÉÍÓÚÑ][a-záéíóúñ]+(?:\s+[A-ZáéíóúñÁÉÍÓÚÑ][a-záéíóúñ]+)?),\s*(?:de\s*)?\d+\s*años/i);
@@ -1547,7 +1557,13 @@ Evaluá la propuesta. Respondé SOLO con el JSON. Nada más.`;
             monthly_income_usd: Math.round(350 + Math.random() * 550),
             ocean_openness: Math.floor(30 + Math.random() * 50),
             ocean_neuroticism: Math.floor(30 + Math.random() * 50),
-            profile_summary: r.culinary_persona || r.persona || "Consumidor salvadoreño."
+            profile_summary: r.culinary_persona || r.persona || "Consumidor salvadoreño.",
+            // Authentic voice + real food tastes straight from the dataset — these
+            // drive the persona's dialect in buildSystem instead of hardcoded slang.
+            background: r.cultural_background || r.persona || "",
+            culinary: r.culinary_persona || "",
+            area: r.area || "",
+            languages: r.languages_spoken || "español"
           });
         }
       });
@@ -1642,11 +1658,14 @@ Evaluá la propuesta. Respondé SOLO con el JSON. Nada más.`;
   // who buys it, and which regions loved vs. rejected it. Speaks the same
   // score-colour language as the cards and the chart.
   function verdictMeta(mean) {
-    if (mean >= 75) return { label:'ACEPTACIÓN FUERTE',       cls:'badge-yes',  rec:'Tenés un ganador: el mercado lo pide con todo. Listo para lanzar con confianza.' };
-    if (mean >= 60) return { label:'ACEPTACIÓN CONDICIONAL',  cls:'badge-ok',   rec:'Anda bien. La aceptación es sólida — afiná el precio o el relleno para despegar.' };
-    if (mean >= 40) return { label:'RECHAZO CON RESERVAS',    cls:'badge-warn', rec:'Hay interés, pero el precio o el concepto todavía frenan la compra.' };
-    return               { label:'RECHAZO DEL MERCADO',       cls:'badge-no',   rec:'El mercado lo rechaza. Replanteá la masa, el relleno o el precio antes de lanzar.' };
+    if (mean >= 75) return { label:'ACEPTACIÓN FUERTE',       cls:'badge-yes',  phrase:'una aceptación fuerte',      rec:'Tenés un ganador: el mercado lo pide con todo. Listo para lanzar con confianza.' };
+    if (mean >= 60) return { label:'ACEPTACIÓN CONDICIONAL',  cls:'badge-ok',   phrase:'una aceptación condicional', rec:'Anda bien. La aceptación es sólida — afiná el precio o el relleno para despegar.' };
+    if (mean >= 40) return { label:'RECHAZO CON RESERVAS',    cls:'badge-warn', phrase:'un rechazo con reservas',    rec:'Hay interés, pero el precio o el concepto todavía frenan la compra.' };
+    return               { label:'RECHAZO DEL MERCADO',       cls:'badge-no',   phrase:'el rechazo del mercado',     rec:'El mercado lo rechaza. Replanteá la masa, el relleno o el precio antes de lanzar.' };
   }
+
+  // Escapes user-supplied ingredient text before it goes into innerHTML.
+  function esc(s) { return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c])); }
 
   function statTile(label, big, sub, accent) {
     return `<div style="background:var(--surface-raised); border:1px solid var(--border-subtle); border-radius:var(--radius-md); padding:13px 15px; min-width:0;">
@@ -1656,7 +1675,7 @@ Evaluá la propuesta. Respondé SOLO con el JSON. Nada más.`;
     </div>`;
   }
 
-  function renderVerdict(results, price) {
+  function renderVerdict(results, price, dish) {
     const el = document.getElementById('verdict');
     const total = results.length || 1;
     const mean = Math.round(results.reduce((a, r) => a + r.score, 0) / total);
@@ -1664,6 +1683,7 @@ Evaluá la propuesta. Respondé SOLO con el JSON. Nada más.`;
     const pct = Math.round(accepted / total * 100);
     const col = scoreColor(mean);
     const vm = verdictMeta(mean);
+    const dishTxt = esc(dish && dish.trim() ? dish.trim() : 'tu receta');
 
     const regAvg = ['Central', 'Oriental', 'Occidental', 'Paracentral'].map(reg => {
       const rr = results.filter(r => r.region === reg);
@@ -1683,13 +1703,13 @@ Evaluá la propuesta. Respondé SOLO con el JSON. Nada más.`;
         </svg>
         <h2 class="panel-title">Dictamen del Mercado</h2>
       </div>
+      <p style="font-family:'Fraunces',serif; font-size:clamp(1.15rem,2.5vw,1.5rem); font-weight:600; line-height:1.4; color:var(--text); margin-bottom:1.4rem; max-width:60ch;">
+        Tu pupusa de <em style="font-style:italic; font-weight:700; color:var(--amber);">${dishTxt}</em> tendría <strong style="font-weight:700; color:${col};">${vm.phrase}</strong>: la comprarían <strong style="font-weight:700; color:${col};">${pct}%</strong> del grupo focal.
+      </p>
       <div class="grid grid-cols-1 lg:grid-cols-[minmax(230px,auto)_1fr] gap-6 lg:gap-8 items-center">
         <div class="flex items-center gap-5">
           <span class="score-num font-sans font-extrabold" style="font-size:clamp(3.1rem,7vw,4.4rem); line-height:0.95; color:${col}; flex-shrink:0;">${mean}<span style="font-size:1.05rem; font-weight:600; color:var(--text-muted); text-shadow:none;">/100</span></span>
-          <div style="min-width:0;">
-            <span class="badge ${vm.cls}" style="font-size:0.82rem;">${vm.label}</span>
-            <p class="text-ink" style="font-size:0.95rem; line-height:1.55; margin-top:9px; max-width:40ch;">${vm.rec}</p>
-          </div>
+          <p class="text-ink" style="font-size:0.95rem; line-height:1.55; max-width:40ch; min-width:0;">${vm.rec}</p>
         </div>
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
           ${statTile('Comprarían', `${accepted}<span style="font-size:0.9rem;color:var(--text-muted);font-weight:600;">/${total}</span>`, `${pct}% del grupo focal`)}
@@ -1869,6 +1889,15 @@ Evaluá la propuesta. Respondé SOLO con el JSON. Nada más.`;
       upgrades.length ? upgrades.join(', ') : '',
     ].filter(Boolean).join(' + ');
 
+    // Short "pupusa de …" label for the verdict headline: the fillings define the
+    // dish (fall back to the extras, then the masa); strip the "(La Unión)"-style
+    // qualifiers and join the last item with "y" so it reads as natural Spanish.
+    const dishItems = (proteins.length || cheeses.length) ? [...proteins, ...cheeses] : upgrades;
+    const dishClean = dishItems.map(s => s.replace(/\s*\([^)]*\)/g, '').trim()).filter(Boolean);
+    const dish = dishClean.length <= 1
+      ? (dishClean[0] || masa.replace(/\s*\([^)]*\)/g, '').trim())
+      : dishClean.slice(0, -1).join(', ') + ' y ' + dishClean[dishClean.length - 1];
+
     // ALWAYS sample a fresh 40-persona cohort directly from HuggingFace (nvidia/Nemotron-Personas-El-Salvador)
     appendLog('🤗 Descargando personas reales de nvidia/Nemotron-Personas-El-Salvador (HuggingFace)…', 'wait');
     const targetPersonas = await fetchHuggingFacePersonas();
@@ -1904,7 +1933,7 @@ Evaluá la propuesta. Respondé SOLO con el JSON. Nada más.`;
     lastResults = await runWithConcurrencyLimit(tasks, 10);
     const mean = Math.round(lastResults.reduce((a, r) => a + r.score, 0) / lastResults.length);
 
-    renderVerdict(lastResults, price);
+    renderVerdict(lastResults, price, dish);
     renderChart(lastResults);
     renderCards(lastResults);
     document.getElementById('results').style.display = 'block';
