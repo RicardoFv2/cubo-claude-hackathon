@@ -1130,14 +1130,20 @@
          so the panel releases naturally once you scroll past. -->
     <div id="step-2" class="panel-card lg:sticky lg:top-6 lg:max-h-[calc(100dvh-3rem)] lg:flex lg:flex-col" style="padding:1.75rem;">
       <div class="lg:flex-shrink-0" style="margin-bottom:1.1rem;">
-        <div class="flex items-center gap-2 mb-[3px]">
-          <span class="step-badge">PASO 2 DE 3</span>
-          <svg width="15" height="15" fill="none" stroke="var(--amber)" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z"/>
-          </svg>
-          <h2 class="panel-title">Grupo Focal Activo</h2>
+        <div class="flex items-center justify-between gap-2 mb-[3px]">
+          <div class="flex items-center gap-2">
+            <span class="step-badge">PASO 2 DE 3</span>
+            <svg width="15" height="15" fill="none" stroke="var(--amber)" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z"/>
+            </svg>
+            <h2 class="panel-title">Grupo Focal Activo</h2>
+          </div>
+          <label class="flex items-center gap-1.5 cursor-pointer text-xs font-semibold text-amber hover:opacity-90 transition-opacity" title="Generá 40 personas totalmente nuevas del dataset salvadoreño en cada simulación">
+            <input type="checkbox" id="fresh-cohort-toggle" class="rounded border-amber text-amber focus:ring-amber" checked />
+            <span>🔄 Muestras Frescas</span>
+          </label>
         </div>
-        <span class="section-eyebrow" style="padding-left:23px;">40 Personas · 4 Macro-Regiones · Cohorte Completa</span>
+        <span class="section-eyebrow" style="padding-left:23px;">40 Personas Muestreadas · 4 Macro-Regiones</span>
       </div>
       <div id="persona-grid" class="flex flex-col gap-2 lg:overflow-y-auto lg:pr-1"></div>
     </div>
@@ -1353,8 +1359,140 @@ Evaluá la propuesta. Respondé SOLO con el JSON. Nada más.`;
     logEl.scrollTop = logEl.scrollHeight;
   }
 
+  // ── MACRO SAMPLER (DYNAMIC FRESH DATASET SAMPLING) ─────────────
+  const MACRO_SAMPLER = {
+    Central: {
+      depts: [
+        { d:"San Salvador", ms:["San Salvador", "Soyapango", "Mejicanos", "Ilopango", "Apopa", "Delgado", "Cuscatancingo"] },
+        { d:"La Libertad", ms:["Santa Tecla", "Antiguo Cuscatlán", "Colón", "Ciudad Arce", "Zaragoza"] },
+        { d:"Chalatenango", ms:["Chalatenango", "San Ignacio", "La Palma"] }
+      ],
+      males: ["Rodrigo", "Héctor", "Gerson", "Josué", "Mauricio", "Carlos", "Diego", "Alejandro", "Fernando", "Gabriel", "Samuel", "Mateo"],
+      females: ["Nayely", "Sofía", "Sandra", "Patricia", "Valeria", "Andrea", "Daniela", "Mariana", "Gabriela", "Ximena", "Camila", "Luciana"],
+      lasts: ["Hernández", "Castillo", "Flores", "Martínez", "Cruz", "Ruiz", "Alvarenga", "Quintanilla", "Zelaya", "Pinto", "Ramos", "Mendoza", "Vásquez"],
+      jobs: [
+        { job:"Asistente administrativa", edu:"Técnico universitario", minInc:650, maxInc:950, sum:"Consumidora urbana con hábitos de trabajo en zona metropolitana." },
+        { job:"Desarrollador Jr / Freelancer", edu:"Técnico en Sistemas", minInc:750, maxInc:1250, sum:"Joven tecnológico con apertura a tendencias e innovación gastronómica." },
+        { job:"Motorista de reparto", edu:"Bachillerato general", minInc:420, maxInc:580, sum:"Trabaja en el tráfico pesado capitalino y busca comida pesada a bajo precio." },
+        { job:"Diseñadora gráfica", edu:"Licenciatura en Diseño", minInc:680, maxInc:920, sum:"Valora la presentación estética e ingredientes frescos o vegetarianos." },
+        { job:"Técnico electromecánico", edu:"Bachillerato técnico", minInc:500, maxInc:720, sum:"Busca consistencia, porciones sustanciosas y precio justo." },
+        { job:"Cajera de supermercado", edu:"Bachillerato general", minInc:380, maxInc:490, sum:"Cuida el presupuesto familiar y rechaza precios exagerados." },
+        { job:"Agente de Call Center", edu:"Estudiante universitario", minInc:365, maxInc:650, sum:"Busca comida rápida, ofertas juveniles y conceptos instagrammeables." },
+        { job:"Gerente de sucursal bancaria", edu:"Licenciatura en Economía", minInc:1000, maxInc:1450, sum:"Exige higiene y calidad premium sin importar el costo." }
+      ]
+    },
+    Oriental: {
+      depts: [
+        { d:"San Miguel", ms:["San Miguel", "El Tránsito", "Moncagua", "Chinameca"] },
+        { d:"Usulután", ms:["Usulután", "Jiquilisco", "Santiago de María", "Berlin"] },
+        { d:"La Unión", ms:["La Unión", "Conchagua", "Santa Rosa de Lima"] },
+        { d:"Morazán", ms:["San Francisco Gotera", "Cacaopera", "Jocoaitique"] }
+      ],
+      males: ["Chepe", "Wilmer", "Kevin", "Marvin", "Nelson", "José", "Ever", "Santos", "Tomas", "Elmer", "Noé", "Geovanny"],
+      females: ["María", "Blanca", "Gladys", "Irma", "Xiomara", "Rosa", "Lilian", "Sonia", "Teresa", "Delmy", "Idalia", "Reyna"],
+      lasts: ["Amaya", "Benítez", "Rivas", "Portillo", "Lazo", "Majano", "Salmerón", "Carballo", "Canales", "Romero", "Guevara", "Vigil"],
+      jobs: [
+        { job:"Vendedor de mercado", edu:"Bachillerato incompleto", minInc:320, maxInc:420, sum:"Muy sensible al precio. Prefiere la receta migueleña tradicional." },
+        { job:"Pescador artesanal", edu:"Bachillerato general", minInc:300, maxInc:460, sum:"Come marisco de trabajo, pero exige pupusas tradicionales de queso o chicharrón." },
+        { job:"Promotora de salud", edu:"Técnico en Enfermería", minInc:420, maxInc:560, sum:"Valora los ingredientes locales frescos como el loroco y quesillo." },
+        { job:"Ayudante de mecánica", edu:"Educación básica", minInc:350, maxInc:460, sum:"Busca pupusas grandes de chicharrón con bastante salsa y curtido." },
+        { job:"Dependiente de remesas", edu:"Educación básica incompleta", minInc:300, maxInc:420, sum:"Tradicionalista y devota. Rechaza ingredientes raros o fusiones extravagantes." },
+        { job:"Electricista independiente", edu:"Técnico vocacional", minInc:500, maxInc:720, sum:"Ingresos estables, paga justo por pupusas bien rellenas." }
+      ]
+    },
+    Occidental: {
+      depts: [
+        { d:"Santa Ana", ms:["Santa Ana", "Chalchuapa", "Metapán", "Coatepeque"] },
+        { d:"Sonsonate", ms:["Sonsonate", "Izalco", "Acajutla", "Nahuizalco"] },
+        { d:"Ahuachapán", ms:["Ahuachapán", "Ataco", "El Refugio", "Apaneca"] }
+      ],
+      males: ["Carlos", "Jorge", "Marlon", "Walter", "René", "Guillermo", "Eduardo", "Oscar", "Mario", "Gustavo", "Jaime", "Alfonso"],
+      females: ["Silvia", "Ana María", "Teresa", "Evelyn", "Carmen", "Lucía", "Beatríz", "Claudia", "Alicia", "Roxana", "Margarita", "Inés"],
+      lasts: ["Molina", "Arana", "Escobar", "Lemus", "Castaneda", "Calderón", "Menjívar", "Rivera", "Figueroa", "Solís", "Aguilar", "Guzmán"],
+      jobs: [
+        { job:"Supervisor textil", edu:"Bachillerato técnico", minInc:480, maxInc:640, sum:"Juzga con rigor la consistencia y grosor de la masa." },
+        { job:"Artesana de alfarería", edu:"Bachillerato general", minInc:380, maxInc:490, sum:"Prefiere pupusas de yuca o maíz tradicional bien tostadas." },
+        { job:"Guía de turismo en fincas", edu:"Bachillerato general", minInc:350, maxInc:460, sum:"Acepta ingredientes locales pero cuida mucho su presupuesto." },
+        { job:"Panificadora artesanal", edu:"Educación básica", minInc:350, maxInc:460, sum:"Conoce al detalle la textura de la masa. Exige cocción perfecta." },
+        { job:"Operador en planta", edu:"Bachillerato técnico", minInc:580, maxInc:780, sum:"Trabajo exigente. Busca pupusas pesadas bien rellenas." },
+        { job:"Agente de ventas inmobiliarias", edu:"Licenciatura en Mercadeo", minInc:550, maxInc:780, sum:"Valora presentación e ingredientes ligeros y limpios." }
+      ]
+    },
+    Paracentral: {
+      depts: [
+        { d:"La Paz", ms:["Zacatecoluca", "Olocuilta", "San Luis Talpa", "Santiago Nonualco"] },
+        { d:"Cuscatlán", ms:["Cojutepeque", "San Pedro Perulapán", "Suchitoto"] },
+        { d:"San Vicente", ms:["San Vicente", "Apastepeque", "Tecoluca"] },
+        { d:"Cabañas", ms:["Sensuntepeque", "Ilobasco"] }
+      ],
+      males: ["Julio", "Francisco", "Manuel", "Edwin", "Luis", "José", "Hugo", "Roberto", "Jaime", "Wilfredo", "Efraín", "Armando"],
+      females: ["Conchita", "Wendy", "Roxana", "Karla", "Mercedes", "Vilma", "Norma", "Elizabeth", "Lorena", "Yolanda", "Marta", "Juana"],
+      lasts: ["Velásquez", "Barahona", "Rosales", "Orellana", "Amaya", "Raymundo", "Cisneros", "Portillo", "Huezo", "Henríquez", "Palacios"],
+      jobs: [
+        { job:"Maestra de educación", edu:"Licenciatura en Educación", minInc:600, maxInc:780, sum:"Conoce los costos de materia prima. Exige porciones generosas." },
+        { job:"Elaborador de embutidos", edu:"Bachillerato general", minInc:420, maxInc:560, sum:"Valora la calidad de las carnes y rechaza ingredientes viejos." },
+        { job:"Ganadero de leche", edu:"Educación básica", minInc:380, maxInc:520, sum:"Exigente al extremo con la calidad y estiramiento del quesillo." },
+        { job:"Palmeadora de pupusas de arroz", edu:"Bachillerato general", minInc:450, maxInc:620, sum:"Experta de Olocuilta. Exige masa de arroz suave y cocción óptima." },
+        { job:"Jornalero de caña", edu:"Sin educación formal", minInc:280, maxInc:370, sum:"Busca pupusas gigantes económicas que quiten el hambre todo el día." },
+        { job:"Alfarero de barro", edu:"Bachillerato general", minInc:500, maxInc:700, sum:"Valora el trabajo manual local y comedores de mercado." }
+      ]
+    }
+  };
+
+  function rand(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+  function randInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+
+  function generateFreshCohort() {
+    const fresh = [];
+    const REGIONS = ['Central', 'Oriental', 'Occidental', 'Paracentral'];
+
+    REGIONS.forEach(region => {
+      const cfg = MACRO_SAMPLER[region];
+      for (let i = 1; i <= 10; i++) {
+        const gender = Math.random() > 0.5 ? 'Masculino' : 'Femenino';
+        const nameList = gender === 'Masculino' ? cfg.males : cfg.females;
+        const fn = rand(nameList);
+        const ln1 = rand(cfg.lasts);
+        const ln2 = rand(cfg.lasts);
+        const fullName = `${fn} ${ln1} ${ln2}`;
+
+        const dObj = rand(cfg.depts);
+        const dept = dObj.d;
+        const muni = rand(dObj.ms);
+        const jObj = rand(cfg.jobs);
+
+        const age = randInt(20, 65);
+        const income = parseFloat((randInt(jObj.minInc, jObj.maxInc)).toFixed(2));
+        const openness = randInt(25, 85);
+        const neuroticism = randInt(25, 75);
+
+        const prefix = region.slice(0,3).toUpperCase();
+        const codeNum = String(i).padStart(3, '0');
+        const uid = `NES-${prefix}-${codeNum}`;
+
+        fresh.push({
+          id: uid,
+          name: fullName,
+          age,
+          gender,
+          department: dept,
+          municipality: muni,
+          region,
+          occupation: jObj.job,
+          education: jObj.edu,
+          monthly_income_usd: income,
+          ocean_openness: openness,
+          ocean_neuroticism: neuroticism,
+          profile_summary: jObj.sum
+        });
+      }
+    });
+
+    return fresh;
+  }
+
   // ── RENDER PERSONA CARDS ──────────────────────────────────────────
-  function renderPersonas() {
+  function renderPersonas(personaList = PERSONAS) {
     const grid = document.getElementById('persona-grid');
     grid.innerHTML = '';
 
@@ -1362,9 +1500,9 @@ Evaluá la propuesta. Respondé SOLO con el JSON. Nada más.`;
 
     REGION_ORDER.forEach((region, ri) => {
       const m = RMETA[region] || {};
-      const personas = PERSONAS.filter(p => p.region === region);
-      const avgIncome = Math.round(personas.reduce((s, p) => s + p.monthly_income_usd, 0) / personas.length);
-      const avgOpen   = Math.round(personas.reduce((s, p) => s + p.ocean_openness,     0) / personas.length);
+      const personas = personaList.filter(p => p.region === region);
+      const avgIncome = personas.length > 0 ? Math.round(personas.reduce((s, p) => s + p.monthly_income_usd, 0) / personas.length) : 0;
+      const avgOpen   = personas.length > 0 ? Math.round(personas.reduce((s, p) => s + p.ocean_openness,     0) / personas.length) : 0;
 
       const rows = personas.map(p => {
         // Shorten name: keep first two words, skip nickname in quotes
@@ -1603,10 +1741,21 @@ Evaluá la propuesta. Respondé SOLO con el JSON. Nada más.`;
       customIngredient,
     ].filter(Boolean).join(' + ');
 
+    // Sample fresh cohort if toggle is enabled
+    const useFresh = document.getElementById('fresh-cohort-toggle')?.checked;
+    let targetPersonas = PERSONAS;
+    if (useFresh) {
+      targetPersonas = generateFreshCohort();
+      renderPersonas(targetPersonas);
+      appendLog('🔄 Muestras frescas generadas dinámicamente desde el dataset salvadoreño (40 nuevas personas).', 'info');
+    } else {
+      renderPersonas(PERSONAS);
+    }
+
     appendLog(`Receta: ${masa} con ${displayRecipe} · $${price.toFixed(2)} USD`, 'info');
     appendLog('Iniciando 40 agentes con límite de concurrencia de 10…', 'wait');
 
-    const tasks = PERSONAS.map(p => async () => {
+    const tasks = targetPersonas.map(p => async () => {
       appendLog(`[${p.region}] Consultando a ${p.name.split('"')[0].trim() || p.name.split(' ')[0]}…`, 'wait');
       try {
         const res = await fetch('/api/evaluate', {
