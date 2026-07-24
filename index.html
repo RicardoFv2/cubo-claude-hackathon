@@ -70,13 +70,14 @@
      */
     /* ── DESIGN TOKENS ─────────────────────────────────────────── */
     :root {
-      /* Radius scale — every component radius resolves to one of these four steps.
-         .panel-card intentionally sits on the widest step so the outer container
-         always reads rounder than the cards nested inside it. */
-      --radius-sm: 0.5rem;   /*  8px — badges, small buttons, inputs */
-      --radius-md: 0.75rem;  /* 12px — CTA, region accordion panels  */
-      --radius-lg: 1rem;     /* 16px — section cards, result cards   */
-      --radius-xl: 1.5rem;   /* 24px — outer panel cards             */
+      /* Radius scale — cut paper/ticket, not soft-app-bubble. The old scale
+         (8/12/16/24px, maxed toward pill everywhere) is the single most
+         recognisable "generic Tailwind SaaS" tell there is — sharper and
+         more restrained reads as printed material, not a component kit. */
+      --radius-sm: 0.1875rem; /*  3px — badges, small buttons, inputs */
+      --radius-md: 0.3125rem; /*  5px — CTA, region accordion panels  */
+      --radius-lg: 0.5rem;    /*  8px — section cards, result cards   */
+      --radius-xl: 0.875rem;  /* 14px — outer panel cards             */
 
       /* Comal palette — hand-tuned OKLCH, not stock Tailwind stops. The old
          values here were literally amber-600/500/100 + orange-700 + amber-800;
@@ -149,8 +150,8 @@
       --log-success: #047857;
       --log-error:   #b91c1c;
 
-      --shadow-card:  0 2px 16px rgba(120,70,15,0.07), 0 1px 3px rgba(0,0,0,0.04);
-      --shadow-hover: 0 6px 28px rgba(120,70,15,0.13), 0 2px 8px rgba(0,0,0,0.06);
+      --shadow-card:  2px 2px 0 rgba(120,70,15,0.09), 0 1px 2px rgba(0,0,0,0.05);
+      --shadow-hover: 3px 3px 0 rgba(120,70,15,0.16), 0 2px 4px rgba(0,0,0,0.08);
     }
 
     [data-theme="dark"] {
@@ -199,8 +200,8 @@
       --log-success: #34d399;
       --log-error:   #f87171;
 
-      --shadow-card:  0 2px 16px rgba(0,0,0,0.5), 0 1px 3px rgba(0,0,0,0.3);
-      --shadow-hover: 0 8px 40px rgba(178,92,48,0.18), 0 2px 12px rgba(0,0,0,0.5);
+      --shadow-card:  2px 2px 0 rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.3);
+      --shadow-hover: 3px 3px 0 rgba(178,92,48,0.28), 0 2px 6px rgba(0,0,0,0.4);
     }
 
     /* ── BASE ──────────────────────────────────────────────────── */
@@ -360,7 +361,7 @@
       align-items: center;
       gap: 7px;
       padding: 8px 14px;
-      border-radius: 999px;
+      border-radius: var(--radius-sm);
       border: 1.5px solid var(--border);
       background: var(--surface);
       color: var(--text);
@@ -452,32 +453,33 @@
       box-shadow: 0 1px 4px color-mix(in oklch, var(--gold) 55%, transparent); cursor: pointer;
     }
 
-    /* ── RUN BUTTON — tacto de comal, no de botón SaaS ─────────────
-       Antes: roman italic + barrida de brillo diagonal (::after sweep) al
-       hover. Ambas son tells genéricos. Ahora: tipografía recta, y el
-       "calor" vive en .btn-run.scanning (arriba) mientras corre el
-       pipeline — no en un efecto decorativo permanente al pasar el mouse. */
+    /* ── RUN BUTTON — bloque de tinta estampado, no botón SaaS ─────
+       Antes: itálica + degradado diagonal + brillo suave al hover — los
+       tres tells más genéricos de un CTA de IA. Ahora: color plano,
+       sombra dura desplazada (como un sello de tinta sobre papel), y el
+       "calor" vive en .btn-run.scanning mientras corre el pipeline. */
     .btn-run {
       width: 100%;
       padding: 1rem 1.5rem;
       border-radius: var(--radius-md);
-      border: none;
+      border: 1.5px solid var(--burnt);
       cursor: pointer;
       font-family: 'Fraunces', serif;
       font-size: 1.05rem;
       font-weight: 700;
       letter-spacing: 0.01em;
       color: #fef9f0;
-      background: linear-gradient(135deg, var(--burnt) 0%, var(--terracotta) 45%, var(--amber) 100%);
+      background: var(--terracotta);
       position: relative;
-      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 3px 3px 0 var(--burnt);
+      transition: transform 0.15s, box-shadow 0.15s;
       min-height: 54px;
     }
     .btn-run:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 24px color-mix(in oklch, var(--terracotta) 40%, transparent), 0 2px 8px rgba(0,0,0,0.2);
+      transform: translate(-2px, -2px);
+      box-shadow: 5px 5px 0 var(--burnt);
     }
-    .btn-run:active:not(:disabled) { transform: translateY(0); }
+    .btn-run:active:not(:disabled) { transform: translate(0, 0); box-shadow: 1px 1px 0 var(--burnt); }
     .btn-run:disabled { opacity: 0.45; cursor: not-allowed; }
 
     /* ── THEME TOGGLE ───────────────────────────────────────────── */
@@ -507,7 +509,7 @@
       font-family: 'Plus Jakarta Sans', sans-serif;
       font-size: 0.72rem;
       padding: 4px 10px;
-      border-radius: 99px;
+      border-radius: var(--radius-sm);
       font-weight: 700;
       letter-spacing: 0.05em;
       white-space: nowrap;
@@ -606,6 +608,23 @@
       letter-spacing: 0.02em;
       transform: rotate(-8deg);
       flex-shrink: 0;
+    }
+
+    /* Talón de recibo numerado — reemplaza el círculo de wizard genérico
+       en el stepper. Esquina recortada, no aro perfecto. */
+    .stub-num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 1.5em; height: 1.5em;
+      flex-shrink: 0;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.72rem;
+      font-weight: 800;
+      background: var(--border);
+      color: var(--text);
+      border: 1.5px solid transparent;
+      clip-path: polygon(0 0, 100% 0, 100% 100%, 30% 100%, 0 70%);
     }
 
     /* ── REGION ACCORDION ──────────────────────────────────────── */
@@ -829,20 +848,21 @@
       <span class="font-sans font-semibold text-muted uppercase tracking-wider" style="font-size:0.8rem; text-align:left;">Simulador de Mercado<br>Socio-Demográfico · El Salvador</span>
     </p>
 
-    <!-- ═══ GUIDED STEPPER NAVIGATION ("No Perderse") ═══ -->
-    <nav class="flex flex-wrap items-center justify-center gap-3 p-3 rounded-2xl border border-border bg-surface-raised max-w-3xl mx-auto shadow-sm">
-      <a href="#step-1" class="flex items-center gap-2.5 px-4 py-2 rounded-xl text-sm font-bold transition-all hover:bg-ember/15 text-ember bg-amber/10 border border-amber/30">
-        <span class="w-6 h-6 rounded-full bg-amber text-white flex items-center justify-center text-xs font-extrabold">1</span>
+    <!-- ═══ GUIDED STEPPER NAVIGATION ("No Perderse") ═══
+         Talones de recibo numerados, no círculos de wizard genérico. -->
+    <nav class="flex flex-wrap items-center justify-center gap-3 p-3 rounded-lg border border-border bg-surface-raised max-w-3xl mx-auto shadow-sm">
+      <a href="#step-1" class="flex items-center gap-2.5 px-4 py-2 rounded-md text-sm font-bold transition-all hover:bg-ember/15 text-ember bg-amber/10 border border-amber/30">
+        <span class="stub-num" style="background:var(--amber); color:#fff; border-color:var(--amber);">1</span>
         <span>Armá tu Receta & Precio</span>
       </a>
       <span class="text-muted hidden sm:inline">→</span>
-      <a href="#step-2" class="flex items-center gap-2.5 px-4 py-2 rounded-xl text-sm font-bold transition-all hover:bg-ember/15 text-muted hover:text-ember">
-        <span class="w-6 h-6 rounded-full bg-border text-text flex items-center justify-center text-xs font-extrabold">2</span>
+      <a href="#step-2" class="flex items-center gap-2.5 px-4 py-2 rounded-md text-sm font-bold transition-all hover:bg-ember/15 text-muted hover:text-ember">
+        <span class="stub-num">2</span>
         <span>Grupo Focal (40 Personas)</span>
       </a>
       <span class="text-muted hidden sm:inline">→</span>
-      <a href="#step-3" class="flex items-center gap-2.5 px-4 py-2 rounded-xl text-sm font-bold transition-all hover:bg-ember/15 text-muted hover:text-ember">
-        <span class="w-6 h-6 rounded-full bg-border text-text flex items-center justify-center text-xs font-extrabold">3</span>
+      <a href="#step-3" class="flex items-center gap-2.5 px-4 py-2 rounded-md text-sm font-bold transition-all hover:bg-ember/15 text-muted hover:text-ember">
+        <span class="stub-num">3</span>
         <span>Resultados & Dictamen</span>
       </a>
     </nav>
