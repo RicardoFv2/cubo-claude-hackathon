@@ -1112,8 +1112,8 @@
          pinning it keeps the cohort in view instead of leaving dead space
          beside the lower half of the form. #results sits outside this grid,
          so the panel releases naturally once you scroll past. -->
-    <div id="step-2" class="panel-card lg:sticky lg:top-6 lg:max-h-[calc(100dvh-3rem)] lg:flex lg:flex-col" style="padding:1.75rem 1.75rem 1.25rem;">
-      <div class="lg:flex-shrink-0" style="margin-bottom:1.1rem;">
+    <div id="step-2" class="panel-card lg:sticky lg:top-6 max-h-[75vh] lg:max-h-[calc(100dvh-3rem)] flex flex-col overflow-hidden" style="padding:1.5rem 1.5rem 0.75rem;">
+      <div class="flex-shrink-0" style="margin-bottom:0.9rem;">
         <div class="flex items-center gap-2 mb-[3px]">
           <span class="step-badge">PASO 2 DE 3</span>
           <svg width="15" height="15" fill="none" stroke="var(--amber)" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true">
@@ -1123,7 +1123,7 @@
         </div>
         <span class="section-eyebrow" style="padding-left:23px;">40 Muestras del Dataset · 4 Macro-Regiones</span>
       </div>
-      <div id="persona-grid" class="flex flex-col gap-2 overflow-y-auto max-h-[65vh] lg:max-h-none lg:flex-1 pr-1 pb-6"></div>
+      <div id="persona-grid" class="flex flex-col gap-2 overflow-y-auto min-h-0 flex-1 pr-1.5 pb-6" style="scroll-behavior:smooth;"></div>
     </div>
   </div>
 
@@ -1586,7 +1586,7 @@ Evaluá la propuesta. Respondé SOLO con el JSON. Nada más.`;
       }).join('');
 
       grid.insertAdjacentHTML('beforeend', `
-        <details class="region-panel" ${ri === 0 ? 'open' : ''}>
+        <details class="region-panel" ${ri === 0 ? 'open' : ''} style="margin-bottom:0.5rem;">
           <summary class="region-summary">
             <span class="tag ${m.cls}">${region.toUpperCase()}</span>
             <span style="flex:1; font-family:'Fraunces',serif; font-size:1.05rem; font-weight:700; color:var(--text);">${region}</span>
@@ -1595,7 +1595,7 @@ Evaluá la propuesta. Respondé SOLO con el JSON. Nada más.`;
               <path stroke-linecap="round" stroke-linejoin="round" d="m19 9-7 7-7-7"/>
             </svg>
           </summary>
-          <div style="padding:4px 14px 16px;">
+          <div style="padding:4px 12px 24px;">
             ${rows}
           </div>
         </details>`);
