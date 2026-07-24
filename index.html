@@ -269,7 +269,7 @@
     .field-label {
       display: block;
       font-family: 'Plus Jakarta Sans', sans-serif;
-      font-size: 0.8rem;
+      font-size: 0.82rem;
       font-weight: 700;
       letter-spacing: 0.05em;
       text-transform: uppercase;
@@ -279,9 +279,9 @@
 
     .section-eyebrow {
       font-family: 'Plus Jakarta Sans', sans-serif;
-      font-size: 0.78rem;
-      font-weight: 600;
-      letter-spacing: 0.08em;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
       text-transform: uppercase;
       color: var(--amber);
       display: block;
@@ -289,7 +289,7 @@
 
     .section-heading {
       font-family: 'Fraunces', serif;
-      font-size: 1.08rem;
+      font-size: 1.12rem;
       font-weight: 700;
       color: var(--amber);
       margin-bottom: 0.75rem;
@@ -300,7 +300,7 @@
 
     .step-badge {
       font-family: 'Plus Jakarta Sans', sans-serif;
-      font-size: 0.7rem;
+      font-size: 0.75rem;
       font-weight: 800;
       padding: 3px 9px;
       border-radius: var(--radius-sm);
@@ -1077,7 +1077,7 @@
             <span id="price-display" class="font-mono text-gold" style="font-size:1.35rem; font-weight:700; line-height:1;">$1.00 USD</span>
           </div>
           <input id="price" type="range" min="0.50" max="5.00" step="0.25" value="1.00" style="--fill:11.1%;" aria-label="Precio por pupusa" />
-          <div class="flex justify-between mt-1.5 font-mono text-muted" style="font-size:0.57rem;">
+          <div class="flex justify-between mt-1.5 font-mono text-muted" style="font-size:0.78rem; font-weight:600;">
             <span>$0.50</span>
             <span>$2.75</span>
             <span>$5.00</span>
@@ -1576,11 +1576,11 @@ Evaluá la propuesta. Respondé SOLO con el JSON. Nada más.`;
           <div class="persona-row">
             <div style="width:4px; min-height:30px; background:${m.rail}; border-radius:2px; flex-shrink:0; opacity:0.9; align-self:stretch;"></div>
             <div style="flex:1; min-width:0;">
-              <p style="font-size:0.875rem; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${shortName}</p>
-              <p style="font-size:0.75rem; color:var(--text-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:2px;">${p.age} años · ${job}</p>
+              <p style="font-size:0.9rem; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${shortName}</p>
+              <p style="font-size:0.82rem; font-weight:600; color:var(--text-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:2px;">${p.age} años · ${job}</p>
             </div>
             <div style="flex-shrink:0; text-align:right; display:flex; flex-direction:column; justify-content:center;">
-              <span style="font-family:'Plus Jakarta Sans',sans-serif; font-size:0.92rem; color:var(--amber); font-weight:800; text-align:right;">$${p.monthly_income_usd} <span style="font-size:0.68rem; font-weight:600; opacity:0.8;">/ mes</span></span>
+              <span style="font-family:'Plus Jakarta Sans',sans-serif; font-size:0.92rem; color:var(--amber); font-weight:800; text-align:right;">$${p.monthly_income_usd} <span style="font-size:0.72rem; font-weight:600; opacity:0.85;">/ mes</span></span>
             </div>
           </div>`;
       }).join('');
@@ -1590,7 +1590,7 @@ Evaluá la propuesta. Respondé SOLO con el JSON. Nada más.`;
           <summary class="region-summary">
             <span class="tag ${m.cls}">${region.toUpperCase()}</span>
             <span style="flex:1; font-family:'Fraunces',serif; font-size:1.05rem; font-weight:700; color:var(--text);">${region}</span>
-            <span style="font-family:'Plus Jakarta Sans',sans-serif; font-size:0.8rem; font-weight:800; color:var(--amber);">$${avgIncome} / mes <span style="font-size:0.68rem; font-weight:600; color:var(--text-muted);">(promedio)</span></span>
+            <span style="font-family:'Plus Jakarta Sans',sans-serif; font-size:0.82rem; font-weight:800; color:var(--amber);">$${avgIncome} / mes <span style="font-size:0.72rem; font-weight:600; color:var(--text-muted);">(promedio)</span></span>
             <svg class="chevron" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round" d="m19 9-7 7-7-7"/>
             </svg>
@@ -1629,24 +1629,24 @@ Evaluá la propuesta. Respondé SOLO con el JSON. Nada más.`;
       const m   = RMETA[r.region] || {};
       const col = scoreColor(r.score);
       const bd  = getBadgeData(r.score);
-      const errNote = r._err ? `<p style="font-family:'Plus Jakarta Sans',sans-serif;font-size:0.72rem;color:var(--fire);margin-top:4px;">[parse error — fallback]</p>` : '';
+      const errNote = r._err ? `<p style="font-family:'Plus Jakarta Sans',sans-serif;font-size:0.78rem;color:var(--fire);margin-top:4px;">[parse error — fallback]</p>` : '';
       grid.insertAdjacentHTML('beforeend', `
         <div class="result-card" style="background:var(--surface-raised); border:1px solid var(--border-subtle); border-radius:var(--radius-lg); padding:1.25rem; display:flex; flex-direction:column; gap:12px; animation-delay:${i*0.06}s;">
           <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
             <div style="min-width:0;">
-              <p style="font-family:'Plus Jakarta Sans',sans-serif; font-size:0.875rem; font-weight:700; color:var(--amber); line-height:1.35; overflow-wrap:break-word;">${r.name}</p>
-              <p style="font-family:'Plus Jakarta Sans',sans-serif; font-size:0.75rem; font-weight:500; color:var(--text-muted); margin-top:2px;">${r.department}</p>
+              <p style="font-family:'Plus Jakarta Sans',sans-serif; font-size:0.95rem; font-weight:700; color:var(--amber); line-height:1.35; overflow-wrap:break-word;">${r.name}</p>
+              <p style="font-family:'Plus Jakarta Sans',sans-serif; font-size:0.8rem; font-weight:600; color:var(--text-muted); margin-top:2px;">${r.department}</p>
             </div>
             <span class="tag ${m.cls}">${(r.region||'').slice(0,3).toUpperCase()}</span>
           </div>
           <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap;">
             <span class="badge ${bd.cls}">${bd.text}</span>
-            <span class="score-num" style="font-family:'Plus Jakarta Sans',sans-serif; font-size:1.65rem; font-weight:800; color:${col}; line-height:1; flex-shrink:0;">${r.score}<span style="font-size:0.75rem; font-weight:600; color:var(--text-muted); text-shadow:none;">/100</span></span>
+            <span class="score-num" style="font-family:'Plus Jakarta Sans',sans-serif; font-size:1.75rem; font-weight:800; color:${col}; line-height:1; flex-shrink:0;">${r.score}<span style="font-size:0.8rem; font-weight:600; color:var(--text-muted); text-shadow:none;">/100</span></span>
           </div>
           <div class="score-track">
             <div class="score-fill" style="width:${r.score}%; background:${col};"></div>
           </div>
-          <p style="font-family:'Plus Jakarta Sans',sans-serif; font-size:0.9rem; font-weight:500; color:var(--text); line-height:1.6; min-height:56px;">"${r.critique}"</p>
+          <p style="font-family:'Plus Jakarta Sans',sans-serif; font-size:0.92rem; font-weight:500; color:var(--text); line-height:1.65; min-height:56px;">"${r.critique}"</p>
           ${errNote}
         </div>`);
     });
