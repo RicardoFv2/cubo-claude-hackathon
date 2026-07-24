@@ -818,14 +818,14 @@
 
       <!-- MASAS -->
       <div class="section-card section-card--lead">
-        <span class="section-eyebrow" style="margin-bottom:3px;">La Fundación</span>
+        <span class="section-eyebrow" style="margin-bottom:3px;">La Fundación · Seleccioná 1 masa</span>
         <h3 class="section-heading">
           <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path stroke-linecap="round" d="M8 12h8M12 8v8"/></svg>
-          Masas
+          Masas <span class="text-xs font-normal text-muted ml-auto">(Máx. 1)</span>
         </h3>
         <div class="chip-grid">
           <div class="chip-option">
-            <input type="radio" name="masa" value="Tradicional (Maíz)" id="masa-maiz" class="chip-input" checked />
+            <input type="radio" name="masa" value="Tradicional (Maíz)" id="masa-maiz" class="chip-input" />
             <label for="masa-maiz" class="chip-label"><span class="masa-dot" style="background:#f59e0b;border-color:rgba(0,0,0,0.1);"></span>Maíz Dorado</label>
           </div>
           <div class="chip-option">
@@ -891,18 +891,18 @@
 
       <!-- RELLENOS -->
       <div class="section-card">
-        <span class="section-eyebrow" style="margin-bottom:3px;">El Corazón</span>
+        <span class="section-eyebrow" style="margin-bottom:3px;">El Corazón · Seleccioná máximo 2</span>
         <h3 class="section-heading">
           <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"/></svg>
-          Rellenos
+          Rellenos <span class="text-xs font-normal text-muted ml-auto">(Máx. 2)</span>
         </h3>
         <div class="chip-grid">
           <div class="chip-option">
-            <input type="checkbox" class="chip-input protein-cb" value="Chicharrón" id="prot-chicharron" checked />
+            <input type="checkbox" class="chip-input protein-cb" value="Chicharrón" id="prot-chicharron" />
             <label for="prot-chicharron" class="chip-label">Chicharrón</label>
           </div>
           <div class="chip-option">
-            <input type="checkbox" class="chip-input protein-cb" value="Quesillo Salvadoreño Tradicional" id="prot-quesillo-r" checked />
+            <input type="checkbox" class="chip-input protein-cb" value="Quesillo Salvadoreño Tradicional" id="prot-quesillo-r" />
             <label for="prot-quesillo-r" class="chip-label">Quesillo</label>
           </div>
           <div class="chip-option">
@@ -989,14 +989,14 @@
 
       <!-- QUESOS -->
       <div class="section-card section-card--compact">
-        <span class="section-eyebrow" style="margin-bottom:3px;">La Cremosidad · El Oro Líquido</span>
+        <span class="section-eyebrow" style="margin-bottom:3px;">La Cremosidad · Seleccioná máximo 2</span>
         <h3 class="section-heading">
           <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M15.362 5.214A8.252 8.252 0 0 1 12 21 8.25 8.25 0 0 1 6.038 7.047 8.287 8.287 0 0 0 9 9.601a8.983 8.983 0 0 1 3.361-6.867 8.21 8.21 0 0 0 3 2.48Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 18a3.75 3.75 0 0 0 .495-7.468 5.99 5.99 0 0 0-1.925 3.547 5.975 5.975 0 0 1-2.133-1.001A3.75 3.75 0 0 0 12 18Z"/></svg>
-          Quesos & Grasas
+          Quesos & Grasas <span class="text-xs font-normal text-muted ml-auto">(Máx. 2)</span>
         </h3>
         <div class="chip-grid">
           <div class="chip-option">
-            <input type="checkbox" class="chip-input cheese-cb" value="Quesillo Salvadoreño Tradicional" id="cheese-quesillo" checked />
+            <input type="checkbox" class="chip-input cheese-cb" value="Quesillo Salvadoreño Tradicional" id="cheese-quesillo" />
             <label for="cheese-quesillo" class="chip-label">Quesillo Tradicional</label>
           </div>
           <div class="chip-option">
@@ -1616,7 +1616,12 @@ Evaluá la propuesta. Respondé SOLO con el JSON. Nada más.`;
   // ── MAIN PIPELINE ─────────────────────────────────────────────────
   async function run() {
     const masaEl = document.querySelector('input[name="masa"]:checked');
-    const masa = masaEl ? masaEl.value : 'Tradicional (Maíz)';
+    if (!masaEl) {
+      alert('Por favor seleccioná 1 tipo de masa para la pupusa.');
+      return;
+    }
+    const masa = masaEl.value;
+
     const proteins  = [...document.querySelectorAll('input.protein-cb:checked')].map(el => el.value);
     const cheeses   = [...document.querySelectorAll('input.cheese-cb:checked')].map(el => el.value);
     const upgrades  = [...document.querySelectorAll('input.upgrade-cb:checked')].map(el => el.value);
@@ -1626,7 +1631,7 @@ Evaluá la propuesta. Respondé SOLO con el JSON. Nada más.`;
     const concept   = document.getElementById('concept').value.trim();
 
     if (!proteins.length && !cheeses.length && !upgrades.length && !customIngredient) {
-      alert('Seleccioná al menos un relleno, queso, extra, o inyectá un ingrediente secreto.');
+      alert('Seleccioná al menos un relleno, queso, extra, o ingrediente secreto.');
       return;
     }
 
@@ -1695,6 +1700,23 @@ Evaluá la propuesta. Respondé SOLO con el JSON. Nada más.`;
     btn.classList.remove('scanning');
   }
 
+  // ── SELECTION LIMITS ENFORCER (MAX 2 RELLENOS, MAX 2 QUESOS) ─────
+  function initSelectionLimits() {
+    function setupMax(selector, maxAllowed, categoryName) {
+      document.addEventListener('change', (e) => {
+        if (e.target && e.target.matches(selector)) {
+          const checked = document.querySelectorAll(`${selector}:checked`);
+          if (checked.length > maxAllowed) {
+            e.target.checked = false;
+            alert(`Solo podés seleccionar un máximo de ${maxAllowed} ${categoryName}.`);
+          }
+        }
+      });
+    }
+    setupMax('.protein-cb', 2, 'rellenos');
+    setupMax('.cheese-cb', 2, 'quesos');
+  }
+
   // ── PRICE SLIDER ──────────────────────────────────────────────────
   const priceEl   = document.getElementById('price');
   const priceDisp = document.getElementById('price-display');
@@ -1753,7 +1775,20 @@ Evaluá la propuesta. Respondé SOLO con el JSON. Nada más.`;
         chipInput.value = val;
         chipInput.id = uid;
         chipInput.className = cls;
-        chipInput.checked = true;
+
+        // Respect selection limits when adding custom chips
+        if (!isRadio) {
+          const selector = type === 'protein' ? '.protein-cb' : type === 'cheese' ? '.cheese-cb' : null;
+          if (selector) {
+            const count = document.querySelectorAll(`${selector}:checked`).length;
+            chipInput.checked = count < 2;
+            if (count >= 2) alert(`Ya tenés 2 ${type === 'protein' ? 'rellenos' : 'quesos'} seleccionados. El nuevo ingrediente se agregó desmarcado.`);
+          } else {
+            chipInput.checked = true;
+          }
+        } else {
+          chipInput.checked = true;
+        }
 
         const label = document.createElement('label');
         label.htmlFor = uid;
@@ -1786,6 +1821,7 @@ Evaluá la propuesta. Respondé SOLO con el JSON. Nada más.`;
   document.getElementById('run-btn').addEventListener('click', run);
   renderPersonas();
   initCustomChipInputs();
+  initSelectionLimits();
 </script>
 </body>
 </html>
