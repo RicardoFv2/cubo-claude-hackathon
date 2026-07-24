@@ -1571,7 +1571,6 @@ Evaluá la propuesta. Respondé SOLO con el JSON. Nada más.`;
       const rows = personas.map(p => {
         const shortName = p.name;
         const job = p.occupation.split('/')[0].split(' en ')[0].trim();
-        const pct = Math.min(100, (p.monthly_income_usd / 1200) * 100).toFixed(0);
 
         return `
           <div class="persona-row">
@@ -1580,14 +1579,8 @@ Evaluá la propuesta. Respondé SOLO con el JSON. Nada más.`;
               <p style="font-size:0.875rem; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${shortName}</p>
               <p style="font-size:0.75rem; color:var(--text-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:2px;">${p.age} años · ${job}</p>
             </div>
-            <div style="flex-shrink:0; text-align:right; display:flex; flex-direction:column; gap:3px;">
-              <div style="display:flex; align-items:center; gap:6px; justify-content:flex-end;">
-                <div style="width:50px; height:4px; background:var(--border); border-radius:2px; overflow:hidden;">
-                  <div style="width:${pct}%; height:100%; background:var(--amber); border-radius:2px;"></div>
-                </div>
-                <span style="font-family:'Plus Jakarta Sans',sans-serif; font-size:0.78rem; color:var(--amber); font-weight:700; min-width:3.2rem; text-align:right;">$${p.monthly_income_usd}</span>
-              </div>
-              <p style="font-family:'Plus Jakarta Sans',sans-serif; font-size:0.7rem; font-weight:600; color:var(--text-muted); text-align:right;">O:${p.ocean_openness} N:${p.ocean_neuroticism}</p>
+            <div style="flex-shrink:0; text-align:right; display:flex; flex-direction:column; justify-content:center;">
+              <span style="font-family:'Plus Jakarta Sans',sans-serif; font-size:0.92rem; color:var(--amber); font-weight:800; text-align:right;">$${p.monthly_income_usd} <span style="font-size:0.68rem; font-weight:600; opacity:0.8;">/ mes</span></span>
             </div>
           </div>`;
       }).join('');
@@ -1597,8 +1590,7 @@ Evaluá la propuesta. Respondé SOLO con el JSON. Nada más.`;
           <summary class="region-summary">
             <span class="tag ${m.cls}">${region.toUpperCase()}</span>
             <span style="flex:1; font-family:'Fraunces',serif; font-size:1.05rem; font-weight:700; color:var(--text);">${region}</span>
-            <span style="font-family:'Plus Jakarta Sans',sans-serif; font-size:0.75rem; font-weight:700; color:var(--amber);">$${avgIncome} avg</span>
-            <span style="font-family:'Plus Jakarta Sans',sans-serif; font-size:0.75rem; color:var(--text-muted); margin-left:6px;">O:${avgOpen}</span>
+            <span style="font-family:'Plus Jakarta Sans',sans-serif; font-size:0.8rem; font-weight:800; color:var(--amber);">$${avgIncome} / mes <span style="font-size:0.68rem; font-weight:600; color:var(--text-muted);">(promedio)</span></span>
             <svg class="chevron" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round" d="m19 9-7 7-7-7"/>
             </svg>
