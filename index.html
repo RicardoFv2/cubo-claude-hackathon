@@ -559,6 +559,67 @@
       .result-card { animation: none; transition: none; }
     }
 
+    /* ── RESULT CARD — compacto, se expande al clic ──────────────
+       40 citas completas de una a la vez es demasiado para leer. La fila
+       resumen (nombre · región · score) siempre visible; la cita sólo se
+       revela al abrir. */
+    .result-card-summary {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      list-style: none;
+      user-select: none;
+    }
+    .result-card-summary::-webkit-details-marker { display: none; }
+    .result-card-summary:hover .result-card-name { color: var(--terracotta); }
+    .result-card-body {
+      padding-top: 12px;
+      margin-top: 12px;
+      border-top: 1px dashed var(--border-subtle);
+    }
+
+    /* ── FILTER CHIPS — región / veredicto sobre "Voces del Mercado" ── */
+    .filter-group-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.68rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-faint);
+      margin-right: 2px;
+    }
+    .filter-chip {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 5px 11px;
+      border-radius: var(--radius-sm);
+      border: 1.5px solid var(--border);
+      background: var(--surface);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .filter-chip:hover { border-color: var(--amber); color: var(--amber); }
+    .filter-chip[aria-pressed="true"] {
+      background: var(--amber);
+      border-color: var(--amber);
+      color: #fff9f0;
+    }
+
+    /* ── HIGHLIGHT CARDS — "Voces Destacadas" ─────────────────────── */
+    .highlight-card {
+      background: var(--surface-raised);
+      border: 1px solid var(--border-subtle);
+      border-top: 3px solid var(--hl-color, var(--amber));
+      border-radius: var(--radius-lg);
+      padding: 1.1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
     /* ── TITLE — impresión, no neón ────────────────────────────────
        Antes: halo de 60px de blur (glow genérico de dashboard). Ahora:
        una sombra de profundidad discreta, como tinta prensada. */
@@ -1229,13 +1290,39 @@
       </div>
     </div>
 
+    <!-- Voces Destacadas — 3 citas curadas, filled by renderHighlights().
+         Nadie lee 40 párrafos; estas 3 sí se leen. -->
+    <div id="highlights" class="mb-6"></div>
+
     <!-- Result Cards -->
-    <div class="flex items-center gap-2 mb-5">
-      <svg width="15" height="15" fill="none" stroke="var(--amber)" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z"/>
-      </svg>
-      <h2 class="panel-title">Voces del Mercado</h2>
+    <div class="flex items-center justify-between gap-3 mb-4 flex-wrap">
+      <div class="flex items-center gap-2">
+        <svg width="15" height="15" fill="none" stroke="var(--amber)" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z"/>
+        </svg>
+        <h2 class="panel-title">Voces del Mercado</h2>
+      </div>
+      <span id="results-count" style="font-family:'IBM Plex Mono',monospace; font-size:0.76rem; font-weight:600; color:var(--text-muted);"></span>
     </div>
+
+    <!-- Filtros — explorar 40 opiniones por región/veredicto en vez de scrollear todo -->
+    <div id="results-toolbar" class="flex flex-wrap items-center gap-x-4 gap-y-2 mb-4">
+      <div class="flex flex-wrap items-center gap-1.5">
+        <span class="filter-group-label">Región</span>
+        <button type="button" class="filter-chip" data-filter-type="region" data-value="all" aria-pressed="true">Todas</button>
+        <button type="button" class="filter-chip" data-filter-type="region" data-value="Central" aria-pressed="false">Central</button>
+        <button type="button" class="filter-chip" data-filter-type="region" data-value="Oriental" aria-pressed="false">Oriental</button>
+        <button type="button" class="filter-chip" data-filter-type="region" data-value="Occidental" aria-pressed="false">Occidental</button>
+        <button type="button" class="filter-chip" data-filter-type="region" data-value="Paracentral" aria-pressed="false">Paracentral</button>
+      </div>
+      <div class="flex flex-wrap items-center gap-1.5">
+        <span class="filter-group-label">Veredicto</span>
+        <button type="button" class="filter-chip" data-filter-type="verdict" data-value="all" aria-pressed="true">Todos</button>
+        <button type="button" class="filter-chip" data-filter-type="verdict" data-value="accepted" aria-pressed="false">Aceptaron</button>
+        <button type="button" class="filter-chip" data-filter-type="verdict" data-value="rejected" aria-pressed="false">Rechazaron</button>
+      </div>
+    </div>
+
     <!-- min() guard keeps the 280px floor from overflowing narrow viewports -->
     <div id="cards" class="grid grid-cols-[repeat(auto-fit,minmax(min(100%,280px),1fr))] gap-4"></div>
   </div>
@@ -1797,33 +1884,112 @@ Evaluá la propuesta. Respondé SOLO con el JSON. Nada más.`;
   }
 
   // ── RENDER RESULT CARDS ───────────────────────────────────────────
+  // ── HIGHLIGHTED VOICES ───────────────────────────────────────────
+  // 3 curated quotes instead of 40 — the ones actually worth reading.
+  function renderHighlights(results) {
+    const el = document.getElementById('highlights');
+    if (!results.length) { el.innerHTML = ''; return; }
+
+    const sorted = [...results].sort((a, b) => b.score - a.score);
+    const best = sorted[0];
+    const worst = sorted[sorted.length - 1];
+    const pool = results.filter(r => r !== best && r !== worst);
+    const divisive = (pool.length ? pool : results)
+      .reduce((closest, r) => Math.abs(r.score - 50) < Math.abs(closest.score - 50) ? r : closest);
+
+    const spotlight = (icon, label, r, accentVar) => {
+      const m = RMETA[r.region] || {};
+      const col = scoreColor(r.score);
+      return `
+        <div class="highlight-card" style="--hl-color:${accentVar};">
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
+            <span class="filter-group-label" style="color:${accentVar};">${icon} ${label}</span>
+            <span class="score-num" style="font-family:'Plus Jakarta Sans',sans-serif; font-size:1.3rem; font-weight:800; color:${col};">${r.score}<span style="font-size:0.7rem; font-weight:600; color:var(--text-muted);">/100</span></span>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+            <p style="font-family:'Fraunces',serif; font-weight:700; font-size:1.02rem; color:var(--text); min-width:0; overflow-wrap:break-word;">${r.name}</p>
+            <span class="tag ${m.cls}">${(r.region||'').slice(0,3).toUpperCase()}</span>
+          </div>
+          <p style="font-family:'Plus Jakarta Sans',sans-serif; font-size:0.92rem; font-weight:500; color:var(--text); line-height:1.6;">"${r.critique}"</p>
+        </div>`;
+    };
+
+    el.innerHTML = `
+      <div class="flex items-center gap-2 mb-4">
+        <h2 class="panel-title">Voces Destacadas</h2>
+      </div>
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        ${spotlight('🔥', 'La más entusiasta', best, 'var(--score-yes)')}
+        ${spotlight('🥶', 'La más dura', worst, 'var(--score-no)')}
+        ${spotlight('🤔', 'La más dividida', divisive, 'var(--score-warn)')}
+      </div>`;
+  }
+
+  // ── RESULT CARDS — compactas por defecto, filtrables ──────────────
+  const cardFilters = { region: 'all', verdict: 'all' };
+
+  function getFilteredResults() {
+    return lastResults.filter(r => {
+      if (cardFilters.region !== 'all' && r.region !== cardFilters.region) return false;
+      if (cardFilters.verdict === 'accepted' && !r.accepted) return false;
+      if (cardFilters.verdict === 'rejected' && r.accepted) return false;
+      return true;
+    });
+  }
+
+  function applyCardFilters() {
+    const filtered = getFilteredResults();
+    renderCards(filtered);
+    const countEl = document.getElementById('results-count');
+    if (countEl) countEl.textContent = `Mostrando ${filtered.length} de ${lastResults.length}`;
+  }
+
+  document.getElementById('results-toolbar').addEventListener('click', (e) => {
+    const btn = e.target.closest('.filter-chip');
+    if (!btn) return;
+    const { filterType, value } = btn.dataset;
+    cardFilters[filterType] = value;
+    document.querySelectorAll(`.filter-chip[data-filter-type="${filterType}"]`).forEach(b => {
+      b.setAttribute('aria-pressed', b.dataset.value === value ? 'true' : 'false');
+    });
+    applyCardFilters();
+  });
+
   function renderCards(results) {
     const grid = document.getElementById('cards');
     grid.innerHTML = '';
+    if (!results.length) {
+      grid.innerHTML = `<p style="grid-column:1/-1; text-align:center; padding:2rem 1rem; color:var(--text-muted); font-size:0.9rem;">Nadie del grupo focal cae en este filtro. Probá otra combinación.</p>`;
+      return;
+    }
     results.forEach((r, i) => {
       const m   = RMETA[r.region] || {};
       const col = scoreColor(r.score);
       const bd  = getBadgeData(r.score);
       const errNote = r._err ? `<p style="font-family:'Plus Jakarta Sans',sans-serif;font-size:0.78rem;color:var(--fire);margin-top:4px;">[parse error — fallback]</p>` : '';
       grid.insertAdjacentHTML('beforeend', `
-        <div class="result-card" style="background:var(--surface-raised); border:1px solid var(--border-subtle); border-radius:var(--radius-lg); padding:1.25rem; display:flex; flex-direction:column; gap:12px; animation-delay:${i*0.06}s;">
-          <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
-            <div style="min-width:0;">
-              <p style="font-family:'Plus Jakarta Sans',sans-serif; font-size:0.95rem; font-weight:700; color:var(--amber); line-height:1.35; overflow-wrap:break-word;">${r.name}</p>
-              <p style="font-family:'Plus Jakarta Sans',sans-serif; font-size:0.8rem; font-weight:600; color:var(--text-muted); margin-top:2px;">${r.department}</p>
+        <details class="result-card" style="background:var(--surface-raised); border:1px solid var(--border-subtle); border-radius:var(--radius-lg); padding:1.1rem; animation-delay:${i*0.03}s;">
+          <summary class="result-card-summary">
+            <div style="min-width:0; flex:1;">
+              <p class="result-card-name" style="font-family:'Plus Jakarta Sans',sans-serif; font-size:0.95rem; font-weight:700; color:var(--amber); line-height:1.3; overflow-wrap:break-word; transition:color 0.15s;">${r.name}</p>
+              <p style="font-family:'Plus Jakarta Sans',sans-serif; font-size:0.78rem; font-weight:600; color:var(--text-muted); margin-top:2px; overflow-wrap:break-word;">${r.department}</p>
             </div>
             <span class="tag ${m.cls}">${(r.region||'').slice(0,3).toUpperCase()}</span>
+            <span class="score-num" style="font-family:'Plus Jakarta Sans',sans-serif; font-size:1.2rem; font-weight:800; color:${col}; flex-shrink:0;">${r.score}</span>
+            <svg class="chevron" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true" style="flex-shrink:0;"><path stroke-linecap="round" stroke-linejoin="round" d="m19 9-7 7-7-7"/></svg>
+          </summary>
+          <div class="result-card-body">
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:10px;">
+              <span class="badge ${bd.cls}">${bd.text}</span>
+              <span style="font-size:0.78rem; color:var(--text-muted); font-weight:600;">${r.score}<span style="opacity:0.7;">/100</span></span>
+            </div>
+            <div class="score-track" style="margin-bottom:10px;">
+              <div class="score-fill" style="width:${r.score}%; background:${col};"></div>
+            </div>
+            <p style="font-family:'Plus Jakarta Sans',sans-serif; font-size:0.92rem; font-weight:500; color:var(--text); line-height:1.65;">"${r.critique}"</p>
+            ${errNote}
           </div>
-          <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap;">
-            <span class="badge ${bd.cls}">${bd.text}</span>
-            <span class="score-num" style="font-family:'Plus Jakarta Sans',sans-serif; font-size:1.75rem; font-weight:800; color:${col}; line-height:1; flex-shrink:0;">${r.score}<span style="font-size:0.8rem; font-weight:600; color:var(--text-muted); text-shadow:none;">/100</span></span>
-          </div>
-          <div class="score-track">
-            <div class="score-fill" style="width:${r.score}%; background:${col};"></div>
-          </div>
-          <p style="font-family:'Plus Jakarta Sans',sans-serif; font-size:0.92rem; font-weight:500; color:var(--text); line-height:1.65; min-height:56px;">"${r.critique}"</p>
-          ${errNote}
-        </div>`);
+        </details>`);
     });
   }
 
@@ -2011,7 +2177,11 @@ Evaluá la propuesta. Respondé SOLO con el JSON. Nada más.`;
 
     renderVerdict(lastResults, price, dish);
     renderChart(lastResults);
-    renderCards(lastResults);
+    renderHighlights(lastResults);
+    cardFilters.region = 'all';
+    cardFilters.verdict = 'all';
+    document.querySelectorAll('.filter-chip').forEach(b => b.setAttribute('aria-pressed', b.dataset.value === 'all' ? 'true' : 'false'));
+    applyCardFilters();
     document.getElementById('results').style.display = 'block';
     document.getElementById('results').scrollIntoView({ behavior:'smooth', block:'start' });
     appendLog(`Simulación completa. Score promedio: ${mean}/100.`, 'success');
