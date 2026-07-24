@@ -1130,17 +1130,14 @@
          so the panel releases naturally once you scroll past. -->
     <div id="step-2" class="panel-card lg:sticky lg:top-6 lg:max-h-[calc(100dvh-3rem)] lg:flex lg:flex-col" style="padding:1.75rem;">
       <div class="lg:flex-shrink-0" style="margin-bottom:1.1rem;">
-        <div class="flex items-center justify-between gap-2 mb-[3px]">
-          <div class="flex items-center gap-2">
-            <span class="step-badge">PASO 2 DE 3</span>
-            <svg width="15" height="15" fill="none" stroke="var(--amber)" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z"/>
-            </svg>
-            <h2 class="panel-title">Grupo Focal Activo</h2>
-          </div>
-          <span style="font-size:0.75rem; font-weight:700; color:var(--amber); background:rgba(245,158,11,0.12); border:1px solid rgba(245,158,11,0.25); padding:2px 8px; border-radius:9999px;">🔄 Muestras Frescas</span>
+        <div class="flex items-center gap-2 mb-[3px]">
+          <span class="step-badge">PASO 2 DE 3</span>
+          <svg width="15" height="15" fill="none" stroke="var(--amber)" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z"/>
+          </svg>
+          <h2 class="panel-title">Grupo Focal Activo</h2>
         </div>
-        <span class="section-eyebrow" style="padding-left:23px;">40 Personas Nuevas por Simulación · 4 Macro-Regiones</span>
+        <span class="section-eyebrow" style="padding-left:23px;">40 Muestras del Dataset · 4 Macro-Regiones</span>
       </div>
       <div id="persona-grid" class="flex flex-col gap-2 lg:overflow-y-auto lg:pr-1"></div>
     </div>
@@ -1491,7 +1488,8 @@ Evaluá la propuesta. Respondé SOLO con el JSON. Nada más.`;
   // ── HUGGINGFACE DATASET LOADER (nvidia/Nemotron-Personas-El-Salvador) ──
   async function fetchHuggingFacePersonas() {
     try {
-      const randomOffset = Math.floor(Math.random() * 15) * 50;
+      // Pick a random offset between row 0 and row 140,000 out of the 148,000 Hugging Face records
+      const randomOffset = Math.floor(Math.random() * 1400) * 100;
       const url = `https://datasets-server.huggingface.co/rows?dataset=nvidia/Nemotron-Personas-El-Salvador&config=default&split=train&offset=${randomOffset}&limit=100`;
       const res = await fetch(url);
       if (!res.ok) throw new Error(`HF HTTP ${res.status}`);
