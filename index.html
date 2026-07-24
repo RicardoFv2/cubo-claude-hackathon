@@ -620,6 +620,33 @@
       gap: 10px;
     }
 
+    /* ── REGION TABS — one "Voces Destacadas" trio per region ────── */
+    .region-tab {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 12px 5px 6px;
+      border-radius: var(--radius-sm);
+      border: 1.5px solid var(--border);
+      background: var(--surface);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .region-tab .tag { pointer-events: none; }
+    .region-tab-avg {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--text-muted);
+    }
+    .region-tab:hover { border-color: var(--tab-color, var(--amber)); }
+    .region-tab[aria-pressed="true"] {
+      border-color: var(--tab-color, var(--amber));
+      background: color-mix(in oklch, var(--tab-color, var(--amber)) 10%, var(--surface));
+      box-shadow: inset 0 0 0 1px var(--tab-color, var(--amber));
+    }
+    .region-tab[aria-pressed="true"] .region-tab-avg { color: var(--text); }
+
     /* ── TITLE — impresión, no neón ────────────────────────────────
        Antes: halo de 60px de blur (glow genérico de dashboard). Ahora:
        una sombra de profundidad discreta, como tinta prensada. */
@@ -1290,9 +1317,15 @@
       </div>
     </div>
 
-    <!-- Voces Destacadas — 3 citas curadas, filled by renderHighlights().
-         Nadie lee 40 párrafos; estas 3 sí se leen. -->
-    <div id="highlights" class="mb-6"></div>
+    <!-- Voces Destacadas — 3 citas curadas por región. Pestañas por región
+         (renderHighlights) + las 3 voces de la región activa (renderHighlightCards). -->
+    <div id="highlights" class="mb-6">
+      <div class="flex items-center gap-2 mb-4">
+        <h2 class="panel-title">Voces Destacadas</h2>
+      </div>
+      <div id="highlights-tabs" class="flex flex-wrap gap-2 mb-4"></div>
+      <div id="highlights-cards" class="grid grid-cols-1 lg:grid-cols-3 gap-4"></div>
+    </div>
 
     <!-- Result Cards -->
     <div class="flex items-center justify-between gap-3 mb-4 flex-wrap">
@@ -1884,46 +1917,91 @@ Evaluá la propuesta. Respondé SOLO con el JSON. Nada más.`;
   }
 
   // ── RENDER RESULT CARDS ───────────────────────────────────────────
-  // ── HIGHLIGHTED VOICES ───────────────────────────────────────────
-  // 3 curated quotes instead of 40 — the ones actually worth reading.
-  function renderHighlights(results) {
-    const el = document.getElementById('highlights');
-    if (!results.length) { el.innerHTML = ''; return; }
+  // ── HIGHLIGHTED VOICES — 3 curated quotes PER REGION ───────────────
+  // One region's 3 spotlight voices visible at a time (tabs), not all 12
+  // stacked — same "read 3, not 40" idea, scoped to the region that's
+  // actually the point of this app.
+  const HIGHLIGHT_REGION_ORDER = ['Central', 'Oriental', 'Occidental', 'Paracentral'];
+  let highlightsByRegion = {};
+  let activeHighlightRegion = null;
 
-    const sorted = [...results].sort((a, b) => b.score - a.score);
+  function computeRegionHighlights(results, region) {
+    const subset = results.filter(r => r.region === region);
+    if (!subset.length) return null;
+    const sorted = [...subset].sort((a, b) => b.score - a.score);
     const best = sorted[0];
     const worst = sorted[sorted.length - 1];
-    const pool = results.filter(r => r !== best && r !== worst);
-    const divisive = (pool.length ? pool : results)
+    const pool = subset.filter(r => r !== best && r !== worst);
+    const divisive = (pool.length ? pool : subset)
       .reduce((closest, r) => Math.abs(r.score - 50) < Math.abs(closest.score - 50) ? r : closest);
+    const avg = Math.round(subset.reduce((s, r) => s + r.score, 0) / subset.length);
+    return { best, worst, divisive, avg };
+  }
 
-    const spotlight = (icon, label, r, accentVar) => {
-      const m = RMETA[r.region] || {};
-      const col = scoreColor(r.score);
-      return `
-        <div class="highlight-card" style="--hl-color:${accentVar};">
-          <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
-            <span class="filter-group-label" style="color:${accentVar};">${icon} ${label}</span>
-            <span class="score-num" style="font-family:'Plus Jakarta Sans',sans-serif; font-size:1.3rem; font-weight:800; color:${col};">${r.score}<span style="font-size:0.7rem; font-weight:600; color:var(--text-muted);">/100</span></span>
-          </div>
-          <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-            <p style="font-family:'Fraunces',serif; font-weight:700; font-size:1.02rem; color:var(--text); min-width:0; overflow-wrap:break-word;">${r.name}</p>
-            <span class="tag ${m.cls}">${(r.region||'').slice(0,3).toUpperCase()}</span>
-          </div>
-          <p style="font-family:'Plus Jakarta Sans',sans-serif; font-size:0.92rem; font-weight:500; color:var(--text); line-height:1.6;">"${r.critique}"</p>
-        </div>`;
-    };
-
-    el.innerHTML = `
-      <div class="flex items-center gap-2 mb-4">
-        <h2 class="panel-title">Voces Destacadas</h2>
-      </div>
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        ${spotlight('🔥', 'La más entusiasta', best, 'var(--score-yes)')}
-        ${spotlight('🥶', 'La más dura', worst, 'var(--score-no)')}
-        ${spotlight('🤔', 'La más dividida', divisive, 'var(--score-warn)')}
+  function spotlightCard(icon, label, r, accentVar) {
+    const m = RMETA[r.region] || {};
+    const col = scoreColor(r.score);
+    return `
+      <div class="highlight-card" style="--hl-color:${accentVar};">
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
+          <span class="filter-group-label" style="color:${accentVar};">${icon} ${label}</span>
+          <span class="score-num" style="font-family:'Plus Jakarta Sans',sans-serif; font-size:1.3rem; font-weight:800; color:${col};">${r.score}<span style="font-size:0.7rem; font-weight:600; color:var(--text-muted);">/100</span></span>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+          <p style="font-family:'Fraunces',serif; font-weight:700; font-size:1.02rem; color:var(--text); min-width:0; overflow-wrap:break-word;">${r.name}</p>
+          <span class="tag ${m.cls}">${(r.region||'').slice(0,3).toUpperCase()}</span>
+        </div>
+        <p style="font-family:'Plus Jakarta Sans',sans-serif; font-size:0.92rem; font-weight:500; color:var(--text); line-height:1.6;">"${r.critique}"</p>
       </div>`;
   }
+
+  function renderHighlightCards(region) {
+    const h = highlightsByRegion[region];
+    const el = document.getElementById('highlights-cards');
+    if (!h) { el.innerHTML = ''; return; }
+    el.innerHTML =
+      spotlightCard('🔥', 'La más entusiasta', h.best, 'var(--score-yes)') +
+      spotlightCard('🥶', 'La más dura', h.worst, 'var(--score-no)') +
+      spotlightCard('🤔', 'La más dividida', h.divisive, 'var(--score-warn)');
+  }
+
+  function renderHighlights(results) {
+    highlightsByRegion = {};
+    HIGHLIGHT_REGION_ORDER.forEach(reg => {
+      const h = computeRegionHighlights(results, reg);
+      if (h) highlightsByRegion[reg] = h;
+    });
+
+    const available = HIGHLIGHT_REGION_ORDER.filter(reg => highlightsByRegion[reg]);
+    const tabsEl = document.getElementById('highlights-tabs');
+    if (!available.length) {
+      tabsEl.innerHTML = '';
+      document.getElementById('highlights-cards').innerHTML = '';
+      return;
+    }
+
+    activeHighlightRegion = available[0];
+    tabsEl.innerHTML = available.map(reg => {
+      const m = RMETA[reg] || {};
+      const h = highlightsByRegion[reg];
+      return `<button type="button" class="region-tab" data-region="${reg}" aria-pressed="${reg === activeHighlightRegion}" style="--tab-color:${m.rail};">
+        <span class="tag ${m.cls}">${reg.toUpperCase()}</span>
+        <span class="region-tab-avg">${h.avg}/100 prom.</span>
+      </button>`;
+    }).join('');
+
+    renderHighlightCards(activeHighlightRegion);
+  }
+
+  document.getElementById('highlights-tabs').addEventListener('click', (e) => {
+    const btn = e.target.closest('.region-tab');
+    if (!btn) return;
+    activeHighlightRegion = btn.dataset.region;
+    document.querySelectorAll('.region-tab').forEach(b => {
+      b.setAttribute('aria-pressed', b.dataset.region === activeHighlightRegion ? 'true' : 'false');
+    });
+    renderHighlightCards(activeHighlightRegion);
+  });
 
   // ── RESULT CARDS — compactas por defecto, filtrables ──────────────
   const cardFilters = { region: 'all', verdict: 'all' };
