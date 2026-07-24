@@ -865,10 +865,6 @@
             <label for="masa-guajillo" class="chip-label"><span class="masa-dot" style="background:#991b1b;"></span>Chile Guajillo</label>
           </div>
           <div class="chip-option">
-            <input type="radio" name="masa" value="Frijol Negro" id="masa-frijol" class="chip-input" />
-            <label for="masa-frijol" class="chip-label"><span class="masa-dot" style="background:#292524;border-color:rgba(255,255,255,0.25);"></span>Frijol Negro</label>
-          </div>
-          <div class="chip-option">
             <input type="radio" name="masa" value="Mariposa Clitoria (Azul Natural)" id="masa-clitoria" class="chip-input" />
             <label for="masa-clitoria" class="chip-label"><span class="masa-dot" style="background:#4338ca;"></span>Mariposa Azul</label>
           </div>
@@ -900,14 +896,6 @@
           <div class="chip-option">
             <input type="checkbox" class="chip-input protein-cb" value="Chicharrón" id="prot-chicharron" />
             <label for="prot-chicharron" class="chip-label">Chicharrón</label>
-          </div>
-          <div class="chip-option">
-            <input type="checkbox" class="chip-input protein-cb" value="Quesillo Salvadoreño Tradicional" id="prot-quesillo-r" />
-            <label for="prot-quesillo-r" class="chip-label">Quesillo</label>
-          </div>
-          <div class="chip-option">
-            <input type="checkbox" class="chip-input protein-cb" value="Loroco con Queso" id="prot-loroco-r" />
-            <label for="prot-loroco-r" class="chip-label">Loroco con Queso</label>
           </div>
           <div class="chip-option">
             <input type="checkbox" class="chip-input protein-cb" value="Frijoles Volteados" id="prot-frijoles" />
@@ -1759,6 +1747,14 @@ Evaluá la propuesta. Respondé SOLO con el JSON. Nada más.`;
         const type = btn.dataset.type;
         const grid = btn.closest('.section-card').querySelector('.chip-grid');
         if (!grid) return;
+
+        // Duplicate check across all chip options
+        const existingValues = [...document.querySelectorAll('.chip-input')].map(el => el.value.toLowerCase().trim());
+        if (existingValues.includes(val.toLowerCase())) {
+          alert(`El ingrediente "${val}" ya existe en el menú de selección.`);
+          input.value = '';
+          return;
+        }
 
         const uid = `cust-${type}-${Date.now()}`;
         const isRadio = type === 'masa';
