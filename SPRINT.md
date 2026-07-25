@@ -6,6 +6,8 @@
 > **Sprint Duration:** 14 days (2-week aggregate)  
 > **Last Updated:** 2026-06-06
 
+> ⚠️ **Plan histórico, no refleja el estado actual (ver nota 2026-07-25).** El backlog de abajo asume SQLite + MCP; en producción no hay ni base de datos local ni servidor MCP — las personas se cargan vía fetch directo al HuggingFace Datasets Server, y el modelo corre a través de un proxy serverless (`api/evaluate.js`) con cascada de fallback Claude → Gemini → OpenRouter en vez de un único modelo pinned. Los checkboxes no se mantuvieron actualizados durante el desarrollo real; el estado vivo del proyecto vive en el historial de commits, no en este archivo.
+
 ---
 
 ## PROJECT EPIC & GOAL DEFINITION

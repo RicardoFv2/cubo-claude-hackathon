@@ -4,7 +4,18 @@
 **Classification:** Internal Engineering & Product — CONFIDENTIAL
 **Date:** 2026-06-06
 **Author:** Senior PM / Architect (AI-Assisted Draft)
-**Status:** DRAFT — Pending Stakeholder Ratification
+**Status:** DRAFT — SUPERSEDED EN LO TÉCNICO (ver nota de implementación abajo); vigente como referencia de producto/negocio
+
+---
+
+> ### ⚠️ Nota de implementación real (2026-07-25)
+> Este PRD describe el diseño original. Lo que se construyó y está en producción diverge en tres puntos — no lo tomes como arquitectura vigente para esas partes:
+>
+> 1. **Sin SQLite ni MCP.** No existe `personas_sv.db` ni servidor MCP. Las 40 personas se obtienen directo desde el HuggingFace Datasets Server (`nvidia/Nemotron-Personas-El-Salvador`) vía `fetch` en el cliente, con fallback a un fixture JSON local si la API externa falla.
+> 2. **El modelo no está "pinned sin fallback".** `api/evaluate.js` intenta Claude Sonnet (Anthropic) primero, y cae automáticamente a Gemini 3.6 Flash y luego a una cascada de modelos gratuitos de OpenRouter si la key primaria falla o no está configurada. Hoy corre de facto sobre Gemini porque la `ANTHROPIC_API_KEY` de producción está inválida.
+> 3. **La API key nunca se expone en el browser.** No se usa `dangerouslyAllowBrowser`. Todas las llamadas pasan por el proxy serverless `api/evaluate.js`, con las keys guardadas como variables de entorno en Vercel.
+>
+> El resto del documento (visión de producto, OKRs, lógica de elasticidad de precios, guardrails de UX) sigue siendo la referencia vigente.
 
 ---
 

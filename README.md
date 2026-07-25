@@ -2,7 +2,7 @@
 
 > Estudio de mercado del mercado salvadoreño de pupusas usando inteligencia artificial y el dataset de personas sintéticas de NVIDIA Nemotron.
 
-[![Model](https://img.shields.io/badge/model-claude--sonnet--4--6-orange?style=flat-square)](.)
+[![Model](https://img.shields.io/badge/model-Claude%20%E2%86%92%20Gemini%20%E2%86%92%20OpenRouter-orange?style=flat-square)](.)
 [![Dataset](https://img.shields.io/badge/dataset-NVIDIA%20Nemotron--Personas--El--Salvador-green?style=flat-square)](.)
 [![Deploy](https://img.shields.io/badge/deploy-Vercel-black?style=flat-square)](.)
 
@@ -44,7 +44,9 @@ Esta distribución garantiza que cada simulación capture tanto la perspectiva d
 
 ## Cómo mide la aprobación
 
-Para cada receta propuesta, el simulador le pregunta a cada una de las 40 personas si compraría esa pupusa. Claude (`claude-sonnet-4-6`) encarna cada perfil y evalúa la propuesta según:
+Para cada receta propuesta, el simulador le pregunta a cada una de las 40 personas si compraría esa pupusa. Un modelo de lenguaje encarna cada perfil y evalúa la propuesta según:
+
+> El servidor (`api/evaluate.js`) intenta primero **Claude Sonnet** (Anthropic). Si esa key no está configurada o falla, cae automáticamente a **Gemini 3.6 Flash**, y si eso también falla, a una cascada de modelos gratuitos de **OpenRouter**. El proveedor que respondió viaja en cada resultado, así que el simulador sigue funcionando aunque una key individual esté caída — hoy mismo corre sobre Gemini porque la key de Anthropic está inválida.
 
 1. **Identidad regional** — cada región tiene reglas de evaluación distintas. El oriente penaliza ingredientes exóticos; el occidente evalúa primero la masa; la zona paracentral exige volumen por el precio.
 
@@ -72,7 +74,7 @@ Los resultados se agregan por región en un gráfico de barras y se muestran ind
 |---|---|
 | Frontend | HTML + Vanilla JS + Tailwind CSS (CDN) |
 | Visualización | Chart.js |
-| Modelo | `claude-sonnet-4-6` via Anthropic API |
+| Modelo | Claude Sonnet (Anthropic) → Gemini 3.6 Flash → OpenRouter (fallback automático en `api/evaluate.js`) |
 | Dataset | NVIDIA Nemotron-Personas-El-Salvador |
 | Deploy | Vercel (serverless proxy para la API key) |
 
@@ -86,11 +88,14 @@ La API key vive únicamente en el servidor de Vercel como variable de entorno. E
 git clone https://github.com/RicardoFv2/cubo-claude-hackathon.git
 cd cubo-claude-hackathon
 
-# Crear config.local.json con tu API key
-echo '{"apiKey":"sk-ant-api03-..."}' > config.local.json
+# La API key vive server-side (api/evaluate.js la lee de variables de entorno),
+# nunca en el cliente. Configúrala en un .env local:
+echo 'ANTHROPIC_API_KEY=sk-ant-api03-...' > .env
+echo 'GEMINI_API_KEY=...' >> .env
+echo 'OPENROUTER_API_KEY=...' >> .env
 
-# Servir el archivo estático
-npx serve .
+# Levantar con Vercel dev (sirve /index.html y la función /api/evaluate)
+npx vercel dev
 ```
 
 ---

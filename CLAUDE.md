@@ -24,3 +24,15 @@ const msg = await client.messages.create({
   messages: [{ role: "user", content: "..." }],
 });
 console.log(msg.content[0].text);
+```
+
+---
+
+## ESTADO ACTUAL DE LA IMPLEMENTACIÓN (2026-07-25)
+
+Lo anterior es el brief original de inicialización. La arquitectura ya construida diverge en dos puntos deliberados — **no la reviertas a lo descrito arriba**:
+
+1. **La API key nunca vive en el browser.** El bloque de la sección 5 (`dangerouslyAllowBrowser: true`, key en el cliente) fue el punto de partida, pero la implementación real mueve toda llamada al modelo a un proxy serverless (`api/evaluate.js`) que lee la key de variables de entorno en Vercel. El cliente solo hace `fetch('/api/evaluate', { system, messages })`.
+2. **El modelo no está pinned sin fallback.** `api/evaluate.js` intenta `claude-sonnet-4-6` (Anthropic) primero, y si la key falla o no está configurada, cae automáticamente a Gemini (`gemini-3.6-flash`) y luego a una cascada de modelos gratuitos de OpenRouter. El campo `provider` en cada respuesta indica cuál sirvió la llamada. Al día de esta nota, la `ANTHROPIC_API_KEY` de producción está inválida, así que el sistema corre de facto sobre Gemini.
+
+Cualquier cambio futuro al pipeline de evaluación debe preservar el proxy server-side y la cascada de fallback — son requisitos de seguridad y resiliencia, no deuda técnica.
