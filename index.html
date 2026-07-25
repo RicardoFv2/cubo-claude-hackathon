@@ -2227,7 +2227,15 @@ Evaluá la propuesta. Respondé SOLO con el JSON. Nada más.`;
     appendLog(`Receta: ${masa} con ${displayRecipe} · $${price.toFixed(2)} USD`, 'info');
     appendLog('Iniciando 40 agentes con límite de concurrencia de 10…', 'wait');
 
+    // Circuit breaker: if every provider (Anthropic + Gemini + all OpenRouter
+    // fallbacks) is genuinely down, fail fast instead of burning through all 40
+    // calls and presenting a fake "Score promedio: 0/100" as if it were real data.
+    const ABORT_THRESHOLD = 3;
+    let consecutiveFailures = 0;
+    let aborted = false;
+
     const tasks = targetPersonas.map(p => async () => {
+      if (aborted) return null;
       appendLog(`[${p.region}] Consultando a ${p.name.split('"')[0].trim() || p.name.split(' ')[0]}…`, 'wait');
       try {
         const res = await fetch('/api/evaluate', {
@@ -2242,15 +2250,29 @@ Evaluá la propuesta. Respondé SOLO con el JSON. Nada más.`;
         const data = await res.json();
         const raw = data.text ?? '';
         const parsed = safeparse(raw, p);
+        consecutiveFailures = 0;
         appendLog(`[${p.region}] ${parsed.score}/100 — ${parsed.accepted ? 'APROBADO' : 'RECHAZADO'}`, parsed.accepted ? 'success' : 'error');
         return parsed;
       } catch (err) {
         appendLog(`[${p.region}] Error: ${err.message}`, 'error');
+        consecutiveFailures++;
+        if (consecutiveFailures >= ABORT_THRESHOLD && !aborted) {
+          aborted = true;
+          appendLog(`⛔ ${consecutiveFailures} fallos seguidos — se agotaron todos los proveedores de IA disponibles. Abortando simulación.`, 'error');
+        }
         return { name:p.name, department:p.department, region:p.region, score:0, accepted:false, critique:`API error: ${err.message}`, _err:true };
       }
     });
 
-    lastResults = await runWithConcurrencyLimit(tasks, 10);
+    lastResults = (await runWithConcurrencyLimit(tasks, 10)).filter(Boolean);
+
+    if (aborted) {
+      appendLog('La simulación se detuvo: no se pudo contactar ningún proveedor de IA. Revisá las API keys configuradas o tu conexión e intentá de nuevo.', 'error');
+      btn.disabled = false; btn.textContent = 'Ejecutar Simulación';
+      btn.classList.remove('scanning');
+      return;
+    }
+
     const mean = Math.round(lastResults.reduce((a, r) => a + r.score, 0) / lastResults.length);
 
     renderVerdict(lastResults, price, dish);

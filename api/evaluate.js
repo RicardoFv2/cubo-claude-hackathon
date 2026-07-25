@@ -2,9 +2,26 @@
 // Receives { system, messages } from the browser, forwards to Anthropic (claude-sonnet-4-6),
 // with automatic fallback to Gemini (gemini-3.6-flash) if ANTHROPIC_API_KEY is not set or fails.
 
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+// The 40-persona run fires up to 10 concurrent evaluations, which routinely trips
+// per-key rate limits on both providers. Retry 429s with backoff (honoring
+// Retry-After when the provider sends one) instead of failing the persona outright.
+async function fetchWithRetry429(url, options, maxRetries = 4) {
+  for (let attempt = 0; ; attempt++) {
+    const upstream = await fetch(url, options);
+    if (upstream.status !== 429 || attempt >= maxRetries) return upstream;
+    const retryAfter = Number(upstream.headers.get('retry-after'));
+    const delayMs = Number.isFinite(retryAfter) && retryAfter > 0
+      ? retryAfter * 1000
+      : Math.min(1000 * 2 ** attempt, 8000) + Math.random() * 250;
+    await sleep(delayMs);
+  }
+}
+
 async function callAnthropic(apiKey, system, messages) {
   try {
-    const upstream = await fetch('https://api.anthropic.com/v1/messages', {
+    const upstream = await fetchWithRetry429('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -65,7 +82,7 @@ async function callGemini(apiKey, system, messages) {
   // Fallback to generateContent REST endpoint
   try {
     const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
-    const upstream = await fetch(url, {
+    const upstream = await fetchWithRetry429(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -85,6 +102,53 @@ async function callGemini(apiKey, system, messages) {
   }
 }
 
+// Third-tier fallback: OpenRouter's free models. No single free model has a quota
+// generous enough for a 40-call run on its own, so try several in order — if one
+// is rate-limited or exhausted, move to the next rather than failing the persona.
+const OPENROUTER_FREE_MODELS = [
+  'nvidia/nemotron-3-ultra-550b-a55b:free',       // 550B MoE (55B active) — best-calibrated on price-elasticity + caliche in testing
+  'nvidia/nemotron-3-super-120b-a12b:free',       // 120B — reliable second opinion, correct field semantics
+  'nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free',
+  'openai/gpt-oss-20b:free',                      // usually fine, occasionally malforms JSON under this compound task
+  'google/gemma-4-26b-a4b-it:free',
+  'nvidia/nemotron-nano-9b-v2:free',
+];
+
+async function callOpenRouter(apiKey, system, messages) {
+  let lastError = { error: 'Todos los modelos gratuitos de OpenRouter fallaron.' };
+  let lastStatus = 502;
+
+  for (const model of OPENROUTER_FREE_MODELS) {
+    try {
+      const upstream = await fetchWithRetry429('https://openrouter.ai/api/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          model,
+          messages: [{ role: 'system', content: system }, ...messages],
+        }),
+      }, 1);
+
+      const body = await upstream.json().catch(() => ({}));
+      if (!upstream.ok) {
+        lastStatus = upstream.status;
+        lastError = body;
+        continue;
+      }
+      const text = body.choices?.[0]?.message?.content ?? '';
+      if (text) return { ok: true, text, model };
+      lastError = { error: `Respuesta vacía de ${model}` };
+    } catch (err) {
+      lastError = { error: `No se pudo contactar OpenRouter (${model}): ${err.message}` };
+    }
+  }
+
+  return { ok: false, status: lastStatus, error: lastError };
+}
+
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', req.headers.origin || '');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -100,10 +164,11 @@ module.exports = async function handler(req, res) {
 
   const anthropicKey = process.env.ANTHROPIC_API_KEY;
   const geminiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
+  const openrouterKey = process.env.OPENROUTER_API_KEY;
 
-  if (!anthropicKey && !geminiKey) {
+  if (!anthropicKey && !geminiKey && !openrouterKey) {
     return res.status(500).json({
-      error: 'API key no configurada en el servidor. Se requiere ANTHROPIC_API_KEY o GEMINI_API_KEY.',
+      error: 'API key no configurada en el servidor. Se requiere ANTHROPIC_API_KEY, GEMINI_API_KEY u OPENROUTER_API_KEY.',
     });
   }
 
@@ -113,18 +178,30 @@ module.exports = async function handler(req, res) {
     if (resAnthropic.ok) {
       return res.status(200).json({ text: resAnthropic.text, provider: 'anthropic' });
     }
-    console.warn('[ANTHROPIC CALL FAILED, TRYING GEMINI FALLBACK IF AVAILABLE]', resAnthropic.error);
-    if (!geminiKey) {
+    console.warn('[ANTHROPIC CALL FAILED, TRYING NEXT PROVIDER IF AVAILABLE]', resAnthropic.error);
+    if (!geminiKey && !openrouterKey) {
       return res.status(resAnthropic.status || 500).json(resAnthropic.error);
     }
   }
 
-  // Fallback / Secondary: Gemini (gemini-3.6-flash)
-  const resGemini = await callGemini(geminiKey, system, messages);
-  if (resGemini.ok) {
-    return res.status(200).json({ text: resGemini.text, provider: 'gemini' });
+  // Secondary: Gemini (gemini-3.6-flash)
+  if (geminiKey) {
+    const resGemini = await callGemini(geminiKey, system, messages);
+    if (resGemini.ok) {
+      return res.status(200).json({ text: resGemini.text, provider: 'gemini' });
+    }
+    console.warn('[GEMINI CALL FAILED, TRYING OPENROUTER FALLBACK IF AVAILABLE]', resGemini.error);
+    if (!openrouterKey) {
+      return res.status(resGemini.status || 500).json(resGemini.error);
+    }
   }
 
-  return res.status(resGemini.status || 500).json(resGemini.error);
+  // Tertiary: OpenRouter free models
+  const resOpenRouter = await callOpenRouter(openrouterKey, system, messages);
+  if (resOpenRouter.ok) {
+    return res.status(200).json({ text: resOpenRouter.text, provider: `openrouter:${resOpenRouter.model}` });
+  }
+
+  return res.status(resOpenRouter.status || 500).json(resOpenRouter.error);
 };
 
